@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{2c4c2f93-b29f-4209-9b6a-7fa9ef8c3ba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib">
+      <UniqueIdentifier>{d849512b-ee47-4f28-b33d-3cd63960984d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\krc">
+      <UniqueIdentifier>{a47ca931-f341-4e4b-90b4-dea44911503b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\krbf">
+      <UniqueIdentifier>{b7e88c37-c4e2-4619-8c41-694bd80c8fbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\app">
+      <UniqueIdentifier>{d1ed7d8c-89cd-41ac-bb3a-fcea08fa7997}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
