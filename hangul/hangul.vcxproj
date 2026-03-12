@@ -23,7 +23,7 @@
     <ClCompile Include="src\lib\krc\krc_code_convert.c" />
     <ClCompile Include="src\lib\krc\krc_cp949_index.c" />
     <ClCompile Include="src\lib\krc\krc_code_table.c" />
-    <ClCompile Include="src\lib\krc\krc_code_type.c" />
+    <ClCompile Include="src\lib\krc\krc_code_range.c" />
     <ClCompile Include="src\lib\krc\krc_stream.c" />
     <ClCompile Include="src\lib\krc\krc_convert.c" />
     <ClCompile Include="src\main.cpp" />
@@ -39,7 +39,7 @@
     <ClInclude Include="src\lib\krc\krc_code_table\krc_unicode_to_cp949_hangul_11172.h" />
     <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_hanja_4888.h" />
     <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_special_1128.h" />
-    <ClInclude Include="src\lib\krc\krc_code_type.h" />
+    <ClInclude Include="src\lib\krc\krc_code_range.h" />
     <ClInclude Include="src\lib\krc\krc_config.h" />
     <ClInclude Include="src\lib\krc\krc_stream.h" />
     <ClInclude Include="src\lib\krc\krc_convert.h" />

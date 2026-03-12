@@ -33,7 +33,7 @@
     <ClCompile Include="src\lib\krc\krc_code_table.c">
       <Filter>src\lib\krc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\krc\krc_code_type.c">
+    <ClCompile Include="src\lib\krc\krc_code_range.c">
       <Filter>src\lib\krc</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\krc\krc_cp949_index.c">
@@ -74,7 +74,7 @@
     <ClInclude Include="src\lib\krc\krc_code_table.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_type.h">
+    <ClInclude Include="src\lib\krc\krc_code_range.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\krc\krc_config.h">

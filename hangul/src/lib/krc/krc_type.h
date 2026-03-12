@@ -17,8 +17,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-typedef signed   int       krc_int32_t; 
+typedef signed   short int krc_int16_t;
+typedef unsigned short int krc_uint16_t;
+typedef signed   int       krc_int32_t;
 typedef unsigned int       krc_uint32_t;
+
+typedef signed   long long int krc_size_t;
+typedef unsigned long long int krc_ssize_t;
 
 //===========================================================================
 typedef unsigned int       krc_bool_t;

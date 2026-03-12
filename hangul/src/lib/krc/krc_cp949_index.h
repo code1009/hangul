@@ -17,9 +17,9 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_int32_t krc_cp949_index_hangul_11172(krc_char16_t ch);
-KRC_API krc_int32_t krc_cp949_index_special_1128(krc_char16_t ch);
-KRC_API krc_int32_t krc_cp949_index_hanja_4888(krc_char16_t ch);
+KRC_API krc_int16_t krc_cp949_index_hangul_11172(krc_char16_t ch);
+KRC_API krc_int16_t krc_cp949_index_special_1128(krc_char16_t ch);
+KRC_API krc_int16_t krc_cp949_index_hanja_4888(krc_char16_t ch);
 
 
 
