@@ -1,8 +1,10 @@
 ﻿#include <iostream>
 
+#include "app/app_krc.hpp"
+
 int main()
 {
-    std::cout << "Hello World!\n";
+    krc_main();
 
     return 0;
 }

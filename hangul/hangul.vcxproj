@@ -19,7 +19,25 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\app\app_krc.cpp" />
+    <ClCompile Include="src\lib\krc\krc_code_convert.c" />
+    <ClCompile Include="src\lib\krc\krc_code_table.c" />
+    <ClCompile Include="src\lib\krc\krc_code_type.c" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\app\app_krc.hpp" />
+    <ClInclude Include="src\lib\krc\krc.h" />
+    <ClInclude Include="src\lib\krc\krc_api.h" />
+    <ClInclude Include="src\lib\krc\krc_code_convert.h" />
+    <ClInclude Include="src\lib\krc\krc_code_table.h" />
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hangul_11172_cp949_to_unicode.h" />
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hangul_11172_unicode_to_cp949.h" />
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hanja_4888_cp949_to_unicode.h" />
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_special_1128_cp949_to_unicode.h" />
+    <ClInclude Include="src\lib\krc\krc_code_type.h" />
+    <ClInclude Include="src\lib\krc\krc_config.h" />
+    <ClInclude Include="src\lib\krc\krc_type.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -1,0 +1,1 @@
+﻿void krc_main();
