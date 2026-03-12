@@ -17,13 +17,10 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-extern krc_wchar_t  _krc_code_table_hangul_11172_cp949_to_unicode[11172];
-
-extern krc_char16_t _krc_code_table_hangul_11172_unicode_to_cp949[11172];
-
-extern krc_wchar_t  _krc_code_table_special_1128_cp949_to_unicode[1128];
-
-extern krc_wchar_t  _krc_code_table_hanja_4888_cp949_to_unicode[4888];
+extern krc_char16_t _krc_unicode_to_cp949_hangul_11172[11172];
+extern krc_wchar_t  _krc_cp949_to_unicode_hangul_11172[11172];
+extern krc_wchar_t  _krc_cp949_to_unicode_special_1128[1128];
+extern krc_wchar_t  _krc_cp949_to_unicode_hanja_4888[4888];
 
 
 

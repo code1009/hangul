@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_code_convert.c
+// File: krc_code_type.c
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.

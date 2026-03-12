@@ -1,9 +1,9 @@
-﻿#ifndef __krc_h__
-#define __krc_h__
+﻿#ifndef __krc_cp949_index__h__
+#define __krc_cp949_index__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// File: krc.h
+// File: krc_cp949_index.h
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -17,11 +17,9 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#include "krc_config.h"
-#include "krc_type.h"
-
-#include "krc_api.h"
-#include "krc_convert.h"
+KRC_API krc_int32_t krc_cp949_index_hangul_11172(krc_char16_t ch);
+KRC_API krc_int32_t krc_cp949_index_special_1128(krc_char16_t ch);
+KRC_API krc_int32_t krc_cp949_index_hanja_4888(krc_char16_t ch);
 
 
 

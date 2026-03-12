@@ -26,12 +26,10 @@
 #include "krc_type.h"
 
 //===========================================================================
-#include "krc_code_table/krc_code_table_hangul_11172_cp949_to_unicode.h"
-#include "krc_code_table/krc_code_table_hangul_11172_unicode_to_cp949.h"
-
-#include "krc_code_table/krc_code_table_special_1128_cp949_to_unicode.h"
-
-#include "krc_code_table/krc_code_table_hanja_4888_cp949_to_unicode.h"
+#include "krc_code_table/krc_unicode_to_cp949_hangul_11172.h"
+#include "krc_code_table/krc_cp949_to_unicode_hangul_11172.h"
+#include "krc_code_table/krc_cp949_to_unicode_special_1128.h"
+#include "krc_code_table/krc_cp949_to_unicode_hanja_4888.h"
 
 
 

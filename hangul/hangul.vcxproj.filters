@@ -36,21 +36,30 @@
     <ClCompile Include="src\lib\krc\krc_code_type.c">
       <Filter>src\lib\krc</Filter>
     </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_cp949_index.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_convert.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_stream.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app\app_krc.hpp">
       <Filter>src\app</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hangul_11172_cp949_to_unicode.h">
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_hangul_11172.h">
       <Filter>src\lib\krc\krc_code_table</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hangul_11172_unicode_to_cp949.h">
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_unicode_to_cp949_hangul_11172.h">
       <Filter>src\lib\krc\krc_code_table</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_hanja_4888_cp949_to_unicode.h">
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_hanja_4888.h">
       <Filter>src\lib\krc\krc_code_table</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_table\krc_code_table_special_1128_cp949_to_unicode.h">
+    <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_special_1128.h">
       <Filter>src\lib\krc\krc_code_table</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\krc\krc.h">
@@ -72,6 +81,15 @@
       <Filter>src\lib\krc</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\krc\krc_type.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_cp949_index.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_convert.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_stream.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
   </ItemGroup>
