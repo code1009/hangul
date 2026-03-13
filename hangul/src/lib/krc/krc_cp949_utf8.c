@@ -222,8 +222,6 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 		case 2u:
 		case 3u:
 		case 4u:
-		case 5u:
-		case 6u:
 			index += (utf8_read-1u);
 			break;
 
