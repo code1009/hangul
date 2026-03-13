@@ -43,8 +43,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_uint16_t krc_code_range_cp949(krc_char16_t ch);
-KRC_API krc_uint16_t krc_code_range_unicode(krc_wchar_t ch);
+KRC_API krc_uint16_t krc_code_range_cp949(const krc_char16_t ch);
+KRC_API krc_uint16_t krc_code_range_unicode(const krc_wchar_t ch);
 
 
 

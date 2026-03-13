@@ -20,19 +20,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\app\app_krc.cpp" />
-    <ClCompile Include="src\lib\krc\krc_code_convert.c" />
+    <ClCompile Include="src\lib\krc\krc_code_conversion.c" />
     <ClCompile Include="src\lib\krc\krc_cp949_index.c" />
     <ClCompile Include="src\lib\krc\krc_code_table.c" />
     <ClCompile Include="src\lib\krc\krc_code_range.c" />
+    <ClCompile Include="src\lib\krc\krc_cp949_unicode.c" />
+    <ClCompile Include="src\lib\krc\krc_cp949_utf8.c" />
     <ClCompile Include="src\lib\krc\krc_stream.c" />
-    <ClCompile Include="src\lib\krc\krc_convert.c" />
+    <ClCompile Include="src\lib\krc\krc_unicode_conversion.c" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\app\app_krc.hpp" />
     <ClInclude Include="src\lib\krc\krc.h" />
     <ClInclude Include="src\lib\krc\krc_api.h" />
-    <ClInclude Include="src\lib\krc\krc_code_convert.h" />
+    <ClInclude Include="src\lib\krc\krc_code_conversion.h" />
     <ClInclude Include="src\lib\krc\krc_cp949_index.h" />
     <ClInclude Include="src\lib\krc\krc_code_table.h" />
     <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_hangul_11172.h" />
@@ -41,9 +43,11 @@
     <ClInclude Include="src\lib\krc\krc_code_table\krc_cp949_to_unicode_special_1128.h" />
     <ClInclude Include="src\lib\krc\krc_code_range.h" />
     <ClInclude Include="src\lib\krc\krc_config.h" />
+    <ClInclude Include="src\lib\krc\krc_cp949_unicode.h" />
+    <ClInclude Include="src\lib\krc\krc_cp949_utf8.h" />
     <ClInclude Include="src\lib\krc\krc_stream.h" />
-    <ClInclude Include="src\lib\krc\krc_convert.h" />
     <ClInclude Include="src\lib\krc\krc_type.h" />
+    <ClInclude Include="src\lib\krc\krc_unicode_conversion.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_code_convert.c
+// File: krc_code_conversion.c
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -24,9 +24,9 @@
 //===========================================================================
 #include "krc_config.h"
 #include "krc_type.h"
-
 #include "krc_api.h"
-#include "krc_code_convert.h"
+
+#include "krc_code_conversion.h"
 
 #include "krc_cp949_index.h"
 #include "krc_code_table.h"

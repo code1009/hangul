@@ -21,7 +21,13 @@
 #include "krc_type.h"
 
 #include "krc_api.h"
-#include "krc_convert.h"
+
+#include "krc_code_range.h"
+#include "krc_cp949_index.h"
+#include "krc_code_conversion.h"
+
+#include "krc_cp949_unicode.h"
+#include "krc_cp949_utf8.h"
 
 
 

@@ -17,16 +17,18 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+//typedef signed   char      krc_int8_t;
+//typedef unsigned char      krc_uint8_t;
 typedef signed   short int krc_int16_t;
 typedef unsigned short int krc_uint16_t;
-typedef signed   int       krc_int32_t;
-typedef unsigned int       krc_uint32_t;
+//typedef signed   int       krc_int32_t;
+//typedef unsigned int       krc_uint32_t;
 
 typedef signed   long long int krc_size_t;
-typedef unsigned long long int krc_ssize_t;
+//typedef unsigned long long int krc_ssize_t;
 
 //===========================================================================
-typedef unsigned int       krc_bool_t;
+typedef unsigned int krc_bool_t;
 
 //===========================================================================
 typedef char               krc_char_t;
@@ -34,6 +36,7 @@ typedef unsigned char      krc_char8_t;
 typedef unsigned short int krc_char16_t;
 
 typedef unsigned short int krc_wchar_t;
+typedef unsigned char      krc_wchar8_t;
 typedef unsigned short int krc_wchar16_t;
 typedef unsigned long  int krc_wchar32_t;
 

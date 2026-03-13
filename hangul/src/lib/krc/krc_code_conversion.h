@@ -1,9 +1,9 @@
-﻿#ifndef __krc_code_convert__h__
-#define __krc_code_convert__h__
+﻿#ifndef __krc_code_conversion__h__
+#define __krc_code_conversion__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_char_convert.h
+// File: krc_code_conversion.h
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.

@@ -24,8 +24,8 @@
 //===========================================================================
 #include "krc_config.h"
 #include "krc_type.h"
-
 #include "krc_api.h"
+
 #include "krc_cp949_index.h"
 
 
@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_int16_t krc_cp949_index_hangul_11172(krc_char16_t ch)
+KRC_API krc_int16_t krc_cp949_index_hangul_11172(const krc_char16_t ch)
 {
 	krc_uint16_t offset;
 
@@ -128,7 +128,7 @@ KRC_API krc_int16_t krc_cp949_index_hangul_11172(krc_char16_t ch)
 	return index;
 }
 
-KRC_API krc_int16_t krc_cp949_index_special_1128(krc_char16_t ch)
+KRC_API krc_int16_t krc_cp949_index_special_1128(const krc_char16_t ch)
 {
 	krc_uint16_t offset;
 
@@ -153,7 +153,7 @@ KRC_API krc_int16_t krc_cp949_index_special_1128(krc_char16_t ch)
 	return -1;
 }
 
-KRC_API krc_int16_t krc_cp949_index_hanja_4888(krc_char16_t ch)
+KRC_API krc_int16_t krc_cp949_index_hanja_4888(const krc_char16_t ch)
 {
 	krc_uint16_t offset;
 

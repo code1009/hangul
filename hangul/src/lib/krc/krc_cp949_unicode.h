@@ -1,9 +1,9 @@
-﻿#ifndef __krc_cp949_index__h__
-#define __krc_cp949_index__h__
+﻿#ifndef __krc_cp949_unicode__h__
+#define __krc_cp949_unicode__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_cp949_index.h
+// File: krc_cp949_unicode.h
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -17,9 +17,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_int16_t krc_cp949_index_hangul_11172(const krc_char16_t ch);
-KRC_API krc_int16_t krc_cp949_index_special_1128(const krc_char16_t ch);
-KRC_API krc_int16_t krc_cp949_index_hanja_4888(const krc_char16_t ch);
+KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t*  mbcs_string, const krc_size_t mbcs_length, krc_wchar_t* wcs_string , const krc_size_t wcs_length);
+KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string , const krc_size_t wcs_length , krc_char_t*  mbcs_string, const krc_size_t mbcs_length);
 
 
 

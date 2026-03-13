@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_code_convert.c
+// File: krc_stream.c
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -24,8 +24,8 @@
 //===========================================================================
 #include "krc_config.h"
 #include "krc_type.h"
-
 #include "krc_api.h"
+
 #include "krc_stream.h"
 
 
@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API void krc_mbcs_ostream_init(krc_mbcs_ostream_t* ctx, krc_char_t* p, krc_int32_t l)
+KRC_API void krc_mbcs_ostream_init(krc_mbcs_ostream_t* ctx, krc_char_t* p, const krc_size_t l)
 {
 	ctx->pointer = p;
 	ctx->max_length = l;
@@ -42,7 +42,7 @@ KRC_API void krc_mbcs_ostream_init(krc_mbcs_ostream_t* ctx, krc_char_t* p, krc_i
 	ctx->offset = 0;
 }
 
-KRC_API void krc_mbcs_ostream_put_char(krc_mbcs_ostream_t* ctx, krc_char_t c)
+KRC_API void krc_mbcs_ostream_put_char(krc_mbcs_ostream_t* ctx, const krc_char_t c)
 {
 	if (ctx->offset < ctx->max_length)
 	{
@@ -59,7 +59,7 @@ KRC_API void krc_mbcs_ostream_put_char(krc_mbcs_ostream_t* ctx, krc_char_t c)
 	}
 }
 
-KRC_API void krc_mbcs_ostream_put_char8(krc_mbcs_ostream_t* ctx, krc_char8_t c)
+KRC_API void krc_mbcs_ostream_put_char8(krc_mbcs_ostream_t* ctx, const krc_char8_t c)
 {
 	if (ctx->offset < ctx->max_length)
 	{
@@ -76,7 +76,7 @@ KRC_API void krc_mbcs_ostream_put_char8(krc_mbcs_ostream_t* ctx, krc_char8_t c)
 	}
 }
 
-KRC_API void krc_mbcs_ostream_put_char16(krc_mbcs_ostream_t* ctx, krc_char16_t c)
+KRC_API void krc_mbcs_ostream_put_char16(krc_mbcs_ostream_t* ctx, const krc_char16_t c)
 {
 	if (ctx->offset + 1 < ctx->max_length)
 	{
@@ -102,7 +102,7 @@ KRC_API void krc_mbcs_ostream_put_char16(krc_mbcs_ostream_t* ctx, krc_char16_t c
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_wcs_ostream_init(krc_wcs_ostream_t* ctx, krc_wchar_t* p, krc_int32_t l)
+KRC_API void krc_wcs_ostream_init(krc_wcs_ostream_t* ctx, krc_wchar_t* p, const krc_size_t l)
 {
 	ctx->pointer = p;
 	ctx->max_length = l;
@@ -110,7 +110,7 @@ KRC_API krc_wcs_ostream_init(krc_wcs_ostream_t* ctx, krc_wchar_t* p, krc_int32_t
 	ctx->offset = 0;
 }
 
-KRC_API krc_wcs_ostream_put_wchar(krc_wcs_ostream_t* ctx, krc_wchar_t c)
+KRC_API void krc_wcs_ostream_put_wchar(krc_wcs_ostream_t* ctx, const krc_wchar_t c)
 {
 	if (ctx->offset < ctx->max_length)
 	{

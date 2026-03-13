@@ -24,8 +24,8 @@
 //===========================================================================
 #include "krc_config.h"
 #include "krc_type.h"
-
 #include "krc_api.h"
+
 #include "krc_code_range.h"
 
 
@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-static krc_uint16_t krc_code_range_cp949_special_1128(krc_char16_t ch)
+static krc_uint16_t krc_code_range_cp949_special_1128(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
 	// 0xA1A1 ~ 0xACFE: 완성형한글.특수문자1128자
@@ -113,7 +113,7 @@ static krc_uint16_t krc_code_range_cp949_special_1128(krc_char16_t ch)
 	return KRC_CODE_RANGE_UNKNOWN;
 }
 
-static krc_uint16_t krc_code_range_cp949_hanja_4888(krc_char16_t ch)
+static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
 	// 0xCAA1 ~ 0xFDFE : 완성형한글.한자4888자
@@ -129,7 +129,7 @@ static krc_uint16_t krc_code_range_cp949_hanja_4888(krc_char16_t ch)
 	return KRC_CODE_RANGE_UNKNOWN;
 }
 
-static krc_uint16_t krc_code_range_cp949_hangul_51(krc_char16_t ch)
+static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
 	// 완성형한글.특수문자1128자 영역에 포함 됨
@@ -149,7 +149,7 @@ static krc_uint16_t krc_code_range_cp949_hangul_51(krc_char16_t ch)
 	return KRC_CODE_RANGE_UNKNOWN;
 }
 
-static krc_uint16_t krc_code_range_cp949_hangul_11172(krc_char16_t ch)
+static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
 	krc_uint16_t rv;
@@ -190,7 +190,7 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(krc_char16_t ch)
 	return KRC_CODE_RANGE_UNKNOWN;
 }
 
-static krc_uint16_t krc_code_range_cp949_ascii(krc_char16_t ch)
+static krc_uint16_t krc_code_range_cp949_ascii(const krc_char16_t ch)
 {
 	if ((0x0000u <= ch) && (ch <= 0x007Fu))
 	{
@@ -205,7 +205,7 @@ static krc_uint16_t krc_code_range_cp949_ascii(krc_char16_t ch)
 	return KRC_CODE_RANGE_UNKNOWN;
 }
 
-KRC_API krc_uint16_t krc_code_range_cp949(krc_char16_t ch)
+KRC_API krc_uint16_t krc_code_range_cp949(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
 	krc_uint16_t rv;
@@ -262,7 +262,7 @@ KRC_API krc_uint16_t krc_code_range_cp949(krc_char16_t ch)
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_uint16_t krc_code_range_unicode(krc_wchar_t ch)
+KRC_API krc_uint16_t krc_code_range_unicode(const krc_wchar_t ch)
 {
 	//-----------------------------------------------------------------------
 	if ((0x0000u <= ch) && (ch <= 0x007Fu))
