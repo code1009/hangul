@@ -49,62 +49,62 @@ static krc_uint16_t krc_code_range_cp949_special_1128(const krc_char16_t ch)
 	}
 	*/
 	//-----------------------------------------------------------------------
-	if ((0xA1A1u <= ch) && (ch <= 0xA1FE))
+	if ((0xA1A1u <= ch) && (ch <= 0xA1FEu))
 	{
 		//문장 부호, 괄호, 연산자 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA2A1u <= ch) && (ch <= 0xA2FE))
+	if ((0xA2A1u <= ch) && (ch <= 0xA2FEu))
 	{
 		//숫자, 로마자 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA3A1u <= ch) && (ch <= 0xA3FE))
+	if ((0xA3A1u <= ch) && (ch <= 0xA3FEu))
 	{
 		//라틴 대소문자
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA4A1u <= ch) && (ch <= 0xA4FE))
+	if ((0xA4A1u <= ch) && (ch <= 0xA4FEu))
 	{
 		//한글 낱글자 (자음/모음 51자)
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA5A1u <= ch) && (ch <= 0xA5FE))
+	if ((0xA5A1u <= ch) && (ch <= 0xA5FEu))
 	{
 		//그리스 문자
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA6A1u <= ch) && (ch <= 0xA6FE))
+	if ((0xA6A1u <= ch) && (ch <= 0xA6FEu))
 	{
 		//키릴 문자
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA7A1u <= ch) && (ch <= 0xA7FE))
+	if ((0xA7A1u <= ch) && (ch <= 0xA7FEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA8A1u <= ch) && (ch <= 0xA8FE))
+	if ((0xA8A1u <= ch) && (ch <= 0xA8FEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xA9A1u <= ch) && (ch <= 0xA9FE))
+	if ((0xA9A1u <= ch) && (ch <= 0xA9FEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xAAA1u <= ch) && (ch <= 0xAAFE))
+	if ((0xAAA1u <= ch) && (ch <= 0xAAFEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xABA1u <= ch) && (ch <= 0xABFE))
+	if ((0xABA1u <= ch) && (ch <= 0xABFEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
 	}
-	if ((0xACA1u <= ch) && (ch <= 0xACFE))
+	if ((0xACA1u <= ch) && (ch <= 0xACFEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
@@ -120,7 +120,7 @@ static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
 	// 0xCAFE - 0xCAA1 + 1 = 94자
 	// 94자 * 52개영역 = 4888자
 	//-----------------------------------------------------------------------
-	if ((0xCAA1 <= ch) && (ch <= 0xFDFE))
+	if ((0xCAA1u <= ch) && (ch <= 0xFDFEu))
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_HANJA_4888;
@@ -268,11 +268,6 @@ KRC_API krc_uint16_t krc_code_range_unicode(const krc_wchar_t ch)
 	if ((0x0000u <= ch) && (ch <= 0x007Fu))
 	{
 		return KRC_CODE_RANGE_ASCII_LOW;
-	}
-
-	if ((0x0080u <= ch) && (ch <= 0x00FFu))
-	{
-		return KRC_CODE_RANGE_ASCII_HIGH;
 	}
 
 

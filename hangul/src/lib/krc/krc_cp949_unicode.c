@@ -58,14 +58,14 @@ KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t* mbcs_string, const krc
 
 	src = mbcs_string;
 	count = mbcs_length;
-	for (index = 0; index < count; index++)
+	for (index = 0u; index < count; index++)
 	{
 		ch1 = (krc_char8_t)(*(src + index));
 
 
 		if (ch1 == 0x00u)
 		{
-			krc_wcs_ostream_put_wchar(&o, 0u);
+			krc_wcs_ostream_term(&o);
 			return o.length;
 		}
 		else if (ch1 < 0x80u)
@@ -75,9 +75,9 @@ KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t* mbcs_string, const krc
 		}
 		else
 		{
-			if ((index + 1) <= count)
+			if ((index + 1u) < count)
 			{
-				ch2 = (krc_char8_t)(*(src + index + 1));
+				ch2 = (krc_char8_t)(*(src + index + 1u));
 				mbcs = (ch1 << 8u) | ch2;
 
 
@@ -110,9 +110,8 @@ KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t* mbcs_string, const krc
 			}
 		}
 	}
-	krc_wcs_ostream_put_wchar(&o, 0u);
 
-
+	krc_wcs_ostream_term(&o);
 	return o.length;
 }
 
@@ -144,19 +143,17 @@ KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string, krc_size_
 
 		if (wcs == 0x00u)
 		{
-			krc_mbcs_ostream_put_char8(&o, 0u);
+			krc_mbcs_ostream_term(&o);
 			return o.length;
 		}
 		else if (wcs < 0x0080u)
 		{
 			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-
 			krc_mbcs_ostream_put_char8(&o, ch1);
 		}
 		else if (wcs < 0x0100u)
 		{
 			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-
 			krc_mbcs_ostream_put_char8(&o, ch1);
 		}
 
@@ -180,8 +177,7 @@ KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string, krc_size_
 			krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
 		}
 	}
-	krc_mbcs_ostream_put_char8(&o, 0u);
 
-
+	krc_mbcs_ostream_term(&o);
 	return o.length;
 }

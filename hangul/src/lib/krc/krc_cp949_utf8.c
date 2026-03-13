@@ -38,13 +38,13 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-static krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const krc_wchar_t wcs)
+static void krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const krc_wchar_t wcs)
 {
 	krc_char_t buffer[6];
 	krc_size_t wsize;
 
 
-	wsize = krc_unicode_to_utf8_char(wcs, buffer, 6);
+	wsize = krc_unicode_to_utf8_char(wcs, buffer, 6u);
 	switch (wsize)
 	{
 	case 1:
@@ -113,14 +113,14 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 
 	src = cp949_string;
 	count = cp949_length;
-	for (index = 0; index < count; index++)
+	for (index = 0u; index < count; index++)
 	{
 		ch1 = (krc_char8_t)(*(src + index));
 
 
 		if (ch1 == 0x00u)
 		{
-			krc_mbcs_ostream_put_char8(&o, 0u);
+			krc_mbcs_ostream_term(&o);
 			return o.length;
 		}
 		else if (ch1 < 0x80u)
@@ -130,7 +130,7 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 		}
 		else
 		{
-			if ((index + 1) <= count)
+			if ((index + 1u) < count)
 			{
 				ch2 = (krc_char8_t)(*(src + index + 1));
 				mbcs = (ch1 << 8u) | ch2;
@@ -165,9 +165,8 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 			}
 		}
 	}
-	krc_mbcs_ostream_put_char8(&o, 0u);
 
-
+	krc_mbcs_ostream_term(&o);
 	return o.length;
 }
 
@@ -202,14 +201,14 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 
 	src = utf8_string;
 	count = utf8_length;
-	for (index = 0; index < count; index++)
+	for (index = 0u; index < count; index++)
 	{
 		ch1 = (krc_char8_t)(*(src + index));
 
 
 		if (0x00u == ch1)
 		{
-			krc_mbcs_ostream_put_char8(&o, 0u);
+			krc_mbcs_ostream_term(&o);
 			return o.length;
 		}
 
@@ -219,19 +218,19 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 		utf8_read = krc_utf8_to_unicode_char(utf8_pointer, utf8_size, &wcs32);
 		switch (utf8_read)
 		{
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-			index += (utf8_read-1);
+		case 1u:
+		case 2u:
+		case 3u:
+		case 4u:
+		case 5u:
+		case 6u:
+			index += (utf8_read-1u);
 			break;
 		}
 		wcs = (krc_wchar_t)wcs32; // ucs32 -> ucs16
 
 
-		if (wcs == 0x00)
+		if (wcs == 0x00u)
 		{
 			krc_mbcs_ostream_put_char8(&o, 0u);
 			return o.offset;
@@ -239,14 +238,13 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 		else if (wcs < 0x0080u)
 		{
 			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-
 			krc_mbcs_ostream_put_char8(&o, ch1);
 		}
 		else if (wcs < 0x0100u)
 		{
-			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-
-			krc_mbcs_ostream_put_char8(&o, ch1);
+			//ch1 = (krc_char8_t)(wcs & 0x00FFu);
+			//krc_mbcs_ostream_put_char8(&o, ch1);
+			krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
 		}
 
 		else if (krc_unicode_to_cp949_hangul_51_11172(wcs, &mbcs) == KRC_TRUE)
@@ -269,8 +267,7 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 			krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
 		}
 	}
-	krc_mbcs_ostream_put_char8(&o, 0u);
 
-
+	krc_mbcs_ostream_term(&o);
 	return o.length;
 }

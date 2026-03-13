@@ -38,8 +38,20 @@ KRC_API void krc_mbcs_ostream_init(krc_mbcs_ostream_t* ctx, krc_char_t* p, const
 {
 	ctx->pointer = p;
 	ctx->max_length = l;
-	ctx->length = 0;
-	ctx->offset = 0;
+	ctx->length = 0u;
+	ctx->offset = 0u;
+}
+
+KRC_API void krc_mbcs_ostream_term(krc_mbcs_ostream_t* ctx)
+{
+	if (ctx->offset < ctx->max_length)
+	{
+		if (ctx->pointer)
+		{
+			*(ctx->pointer + ctx->offset) = 0;
+			ctx->offset++;
+		}
+	}
 }
 
 KRC_API void krc_mbcs_ostream_put_char(krc_mbcs_ostream_t* ctx, const krc_char_t c)
@@ -50,12 +62,9 @@ KRC_API void krc_mbcs_ostream_put_char(krc_mbcs_ostream_t* ctx, const krc_char_t
 		{
 			*(ctx->pointer + ctx->offset) = c;
 			ctx->offset++;
-		}
-	}
 
-	if (c)
-	{
-		ctx->length++;
+			ctx->length++;
+		}
 	}
 }
 
@@ -67,18 +76,15 @@ KRC_API void krc_mbcs_ostream_put_char8(krc_mbcs_ostream_t* ctx, const krc_char8
 		{
 			*(ctx->pointer + ctx->offset) = (krc_char_t)c;
 			ctx->offset++;
-		}
-	}
 
-	if (c)
-	{
-		ctx->length++;
+			ctx->length++;
+		}
 	}
 }
 
 KRC_API void krc_mbcs_ostream_put_char16(krc_mbcs_ostream_t* ctx, const krc_char16_t c)
 {
-	if (ctx->offset + 1 < ctx->max_length)
+	if (ctx->offset + 1u < ctx->max_length)
 	{
 		if (ctx->pointer)
 		{
@@ -87,12 +93,9 @@ KRC_API void krc_mbcs_ostream_put_char16(krc_mbcs_ostream_t* ctx, const krc_char
 
 			*(ctx->pointer + ctx->offset) = (krc_char_t)(c & 0x00FFu);
 			ctx->offset++;
-		}
-	}
 
-	if (c)
-	{
-		ctx->length += 2;
+			ctx->length += 2u;
+		}
 	}
 }
 
@@ -106,8 +109,20 @@ KRC_API void krc_wcs_ostream_init(krc_wcs_ostream_t* ctx, krc_wchar_t* p, const 
 {
 	ctx->pointer = p;
 	ctx->max_length = l;
-	ctx->length = 0;
-	ctx->offset = 0;
+	ctx->length = 0u;
+	ctx->offset = 0u;
+}
+
+KRC_API void krc_wcs_ostream_term(krc_wcs_ostream_t* ctx)
+{
+	if (ctx->offset < ctx->max_length)
+	{
+		if (ctx->pointer)
+		{
+			*(ctx->pointer + ctx->offset) = 0u;
+			ctx->offset++;
+		}
+	}
 }
 
 KRC_API void krc_wcs_ostream_put_wchar(krc_wcs_ostream_t* ctx, const krc_wchar_t c)
@@ -118,11 +133,8 @@ KRC_API void krc_wcs_ostream_put_wchar(krc_wcs_ostream_t* ctx, const krc_wchar_t
 		{
 			*(ctx->pointer + ctx->offset) = c;
 			ctx->offset++;
-		}
-	}
 
-	if (c)
-	{
-		ctx->length++;
+			ctx->length++;
+		}
 	}
 }
