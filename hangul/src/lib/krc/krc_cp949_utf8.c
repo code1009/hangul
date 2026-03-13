@@ -103,7 +103,7 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 
 		if (ch1 == 0x00u)
 		{
-			krc_mbcs_ostream_term(&o);
+			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 		else if (ch1 < 0x80u)
@@ -149,7 +149,7 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 		}
 	}
 
-	krc_mbcs_ostream_term(&o);
+	krc_mbcs_ostream_put_null_term(&o);
 	return o.length;
 }
 
@@ -191,7 +191,7 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 
 		if (0x00u == ch1)
 		{
-			krc_mbcs_ostream_term(&o);
+			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 
@@ -209,7 +209,7 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 			break;
 
 		default:
-			krc_mbcs_ostream_term(&o);
+			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 		wcs = (krc_wchar_t)wcs32; // ucs32 -> ucs16
@@ -217,7 +217,7 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 
 		if (wcs == 0x00u)
 		{
-			krc_mbcs_ostream_term(&o);
+			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 		else if (wcs < 0x0080u)
@@ -265,6 +265,6 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 		}
 	}
 
-	krc_mbcs_ostream_term(&o);
+	krc_mbcs_ostream_put_null_term(&o);
 	return o.length;
 }

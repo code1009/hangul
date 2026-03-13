@@ -65,7 +65,7 @@ KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t* mbcs_string, const krc
 
 		if (ch1 == 0x00u)
 		{
-			krc_wcs_ostream_term(&o);
+			krc_wcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 		else if (ch1 < 0x80u)
@@ -111,7 +111,7 @@ KRC_API krc_size_t krc_cp949_to_unicode(const krc_char_t* mbcs_string, const krc
 		}
 	}
 
-	krc_wcs_ostream_term(&o);
+	krc_wcs_ostream_put_null_term(&o);
 	return o.length;
 }
 
@@ -143,7 +143,7 @@ KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string, krc_size_
 
 		if (wcs == 0x00u)
 		{
-			krc_mbcs_ostream_term(&o);
+			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 		else if (wcs < 0x0080u)
@@ -191,6 +191,6 @@ KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string, krc_size_
 		}
 	}
 
-	krc_mbcs_ostream_term(&o);
+	krc_mbcs_ostream_put_null_term(&o);
 	return o.length;
 }

@@ -42,7 +42,7 @@ KRC_API void krc_mbcs_ostream_init(krc_mbcs_ostream_t* ctx, krc_char_t* p, const
 	ctx->offset = 0u;
 }
 
-KRC_API void krc_mbcs_ostream_term(krc_mbcs_ostream_t* ctx)
+KRC_API void krc_mbcs_ostream_put_null_term(krc_mbcs_ostream_t* ctx)
 {
 	if (ctx->offset < ctx->max_length)
 	{
@@ -113,7 +113,7 @@ KRC_API void krc_wcs_ostream_init(krc_wcs_ostream_t* ctx, krc_wchar_t* p, const 
 	ctx->offset = 0u;
 }
 
-KRC_API void krc_wcs_ostream_term(krc_wcs_ostream_t* ctx)
+KRC_API void krc_wcs_ostream_put_null_term(krc_wcs_ostream_t* ctx)
 {
 	if (ctx->offset < ctx->max_length)
 	{
