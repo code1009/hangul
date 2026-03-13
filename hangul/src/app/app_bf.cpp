@@ -20,7 +20,7 @@ private:
 
 public:
 	text_bitmap() :
-		_cx(128u), _cy(16u)
+		_cx(128u), _cy(32u)
 	{
 		setup();
 	}
@@ -97,14 +97,54 @@ public:
 		uint32_t y = start_y;
 
 		const char* src = str;
+		bool font_bitmap_drawn = false;
+
 		while (*src)
 		{
 			bf_uint16_t char_code;
 
 			if ((unsigned char)*src < 0x80)
 			{
-				char_code = (bf_uint16_t)(unsigned char)*src;
-				src += 1;
+				if (*src == '\n')
+				{
+					x = start_x;
+					y += 16u;
+					src += 1;
+					continue;
+				}
+				else if (*src == '\r')
+				{
+					x = start_x;
+					src += 1;
+					continue;
+				}
+				else if (*src == '\t')
+				{
+					x += 8*8u;
+					src += 1;
+					continue;
+				}
+				else if (*src == '\b')
+				{
+					x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+					src += 1;
+					continue;
+				}
+				else if (*src < 0x20)
+				{
+					char_code = '?';
+					src += 1;
+				}
+				else if (*src == 0x7F)
+				{
+					char_code = '?';
+					src += 1;
+				}
+				else
+				{
+					char_code = (bf_uint16_t)(unsigned char)*src;
+					src += 1;
+				}
 			}
 			else
 			{
@@ -121,7 +161,7 @@ public:
 			}
 
 			bf_get_cp949_bitmap(ctx, char_code, &font_bitmap);
-			draw_font_bitmap(x, y, &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 		}
 	}
@@ -130,7 +170,7 @@ public:
 static void test1()
 {
 	text_bitmap tb;
-	tb.draw_string(1u, 0u, "A한글!ф詰");
+	tb.draw_string(1u, 0u, "A한글\n!ф詰");
 	tb.output();
 }
 
