@@ -40,71 +40,71 @@ KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_cha
 
 	wc = unicode;
 
-	if (0 <= wc && wc <= 0x7f)
+	if (/*(0U <= wc) &&*/ (wc <= 0x7Fu))
 	{
-		if (1 <= utf8_size)
+		if (1u <= utf8_size)
 		{
 			*(utf8_pointer + 0) = (krc_char_t)(wc);
 
-			return 1;
+			return 1u;
 		}
 	}
-	else if (0x80 <= wc && wc <= 0x7ff)
+	else if ((0x80u <= wc) && (wc <= 0x7FFu))
 	{
-		if (2 <= utf8_size)
+		if (2u <= utf8_size)
 		{
-			*(utf8_pointer + 0) = (krc_char_t)(0xc0 | (wc >> 6));
-			*(utf8_pointer + 1) = (krc_char_t)(0x80 | (wc & 0x3f));
+			*(utf8_pointer + 0) = (krc_char_t)(0xC0u | (wc >> 6u));
+			*(utf8_pointer + 1) = (krc_char_t)(0x80u | (wc & 0x3Fu));
 
-			return 2;
+			return 2u;
 		}
 	}
-	else if (0x800 <= wc && wc <= 0xffff)
+	else if (0x800u <= wc && wc <= 0xFFFFu)
 	{
-		if (3 <= utf8_size)
+		if (3u <= utf8_size)
 		{
-			*(utf8_pointer + 0) = (krc_char_t)(0xe0 | (wc >> 12));
-			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 6) & 0x3f));
-			*(utf8_pointer + 2) = (krc_char_t)(0x80 | (wc & 0x3f));
+			*(utf8_pointer + 0) = (krc_char_t)(0xE0u |  (wc >> 12u));
+			*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((wc >>  6u) & 0x3Fu));
+			*(utf8_pointer + 2) = (krc_char_t)(0x80u |  (wc         & 0x3Fu));
 
-			return 3;
+			return 3u;
 		}
 	}
-	else if (0x10000 <= wc && wc <= 0x1fffff)
+	else if (0x10000u <= wc && wc <= 0x1FFFFFu)
 	{
-		if (4 <= utf8_size)
+		if (4u <= utf8_size)
 		{
-			*(utf8_pointer + 0) = (krc_char_t)(0xf0 | (wc >> 18));
-			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 12) & 0x3f));
-			*(utf8_pointer + 2) = (krc_char_t)(0x80 | ((wc >> 6) & 0x3f));
-			*(utf8_pointer + 3) = (krc_char_t)(0x80 | (wc & 0x3f));
+			*(utf8_pointer + 0) = (krc_char_t)(0xF0u |  (wc >> 18u));
+			*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((wc >> 12u) & 0x3Fu));
+			*(utf8_pointer + 2) = (krc_char_t)(0x80u | ((wc >>  6u) & 0x3Fu));
+			*(utf8_pointer + 3) = (krc_char_t)(0x80u |  (wc         & 0x3Fu));
 
 			return 4;
 		}
 	}
-	else if (0x200000 <= wc && wc <= 0x3ffffff)
+	else if (0x200000u <= wc && wc <= 0x3FFFFFFu)
 	{
-		if (5 <= utf8_size)
+		if (5u <= utf8_size)
 		{
-			*(utf8_pointer + 0) = (krc_char_t)(0xf8 | (wc >> 24));
-			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 18) & 0x3f));
-			*(utf8_pointer + 2) = (krc_char_t)(0x80 | ((wc >> 12) & 0x3f));
-			*(utf8_pointer + 3) = (krc_char_t)(0x80 | ((wc >> 6) & 0x3f));
-			*(utf8_pointer + 4) = (krc_char_t)(0x80 | (wc & 0x3f));
+			*(utf8_pointer + 0) = (krc_char_t)(0xF8 |  (wc >> 24u));
+			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 18u) & 0x3Fu));
+			*(utf8_pointer + 2) = (krc_char_t)(0x80 | ((wc >> 12u) & 0x3Fu));
+			*(utf8_pointer + 3) = (krc_char_t)(0x80 | ((wc >>  6u) & 0x3Fu));
+			*(utf8_pointer + 4) = (krc_char_t)(0x80 |  (wc         & 0x3Fu));
 
 			return 5;
 		}
 	}
-	else if (0x4000000 <= wc && wc <= 0x7fffffff)
+	else if (0x4000000u <= wc && wc <= 0x7FFFFFFFu)
 	{
-		if (6 <= utf8_size)
+		if (6u <= utf8_size)
 		{
-			*(utf8_pointer + 0) = (krc_char_t)(0xfc | (wc >> 30));
-			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 24) & 0x3f));
-			*(utf8_pointer + 2) = (krc_char_t)(0x80 | ((wc >> 18) & 0x3f));
-			*(utf8_pointer + 3) = (krc_char_t)(0x80 | ((wc >> 12) & 0x3f));
-			*(utf8_pointer + 4) = (krc_char_t)(0x80 | ((wc >> 6) & 0x3f));
-			*(utf8_pointer + 5) = (krc_char_t)(0x80 | (wc & 0x3f));
+			*(utf8_pointer + 0) = (krc_char_t)(0xfc |  (wc >> 30u));
+			*(utf8_pointer + 1) = (krc_char_t)(0x80 | ((wc >> 24u) & 0x3Fu));
+			*(utf8_pointer + 2) = (krc_char_t)(0x80 | ((wc >> 18u) & 0x3Fu));
+			*(utf8_pointer + 3) = (krc_char_t)(0x80 | ((wc >> 12u) & 0x3Fu));
+			*(utf8_pointer + 4) = (krc_char_t)(0x80 | ((wc >>  6u) & 0x3Fu));
+			*(utf8_pointer + 5) = (krc_char_t)(0x80 |  (wc         & 0x3Fu));
 
 			return 6;
 		}

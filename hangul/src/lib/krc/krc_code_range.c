@@ -166,7 +166,7 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 	if ((0x8141u <= ch) && (ch <= 0xA0FEu))
 	{
 		// 확장완성형한글.추가한글8822자 중 5696자
-		// (12*16-1-6-6-1=178) * 33영역 = 5696자
+		// (12*16-1-6-6-1=178) * 32영역 = 5696자
 		return KRC_CODE_RANGE_HANGUL_11172;
 	}
 	if ((0xA141u <= ch) && (ch <= 0xC5A0u))
