@@ -145,7 +145,7 @@ public:
 		{
 			return;
 		}
-		_bitmap_buffer[y][x] = pixel ? '*' : '.';
+		_bitmap_buffer[y][x] = pixel ? '@' : '.';
 	}
 
 	void draw_font_bitmap(const uint32_t start_x, const uint32_t start_y, bf_font_bitmap_t* font_bitmap)
@@ -367,16 +367,9 @@ public:
 			else
 			{
 				utf8_char_pointer = (uint8_t*)src;
-				utf8_char_length = (uint32_t)(src - str);
+				utf8_char_length = (uint32_t)krc_utf8_char_size((const krc_char_t*)src);
 
-				krc_wchar32_t unicode_char;
-				krc_size_t consumed_bytes;
-				consumed_bytes = krc_utf8_to_unicode_char(
-					(const krc_char_t*)utf8_char_pointer,
-					(krc_size_t)utf8_char_length,
-					&unicode_char
-				);
-				if (consumed_bytes == 0)
+				if (utf8_char_length == 0)
 				{
 					utf8_char = '?';
 					utf8_char_pointer = &utf8_char;
@@ -386,9 +379,8 @@ public:
 				}
 				else
 				{
-					src += consumed_bytes;
+					src += utf8_char_length;
 				}
-
 			}
 
 			bf_get_utf8_bitmap(ctx, utf8_char_pointer, utf8_char_length , &font_bitmap);
