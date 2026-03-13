@@ -176,7 +176,7 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_length, krc_char_t* cp949_string, krc_size_t cp949_length)
+KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_size_t utf8_length, krc_char_t* cp949_string, const krc_size_t cp949_length)
 {
 	krc_mbcs_ostream_t o;
 
@@ -189,12 +189,12 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 	krc_char16_t mbcs;
 	krc_char8_t  ch1;
 	
-	krc_char_t* utf8_pointer;
+	const krc_char_t* utf8_pointer;
 	krc_size_t utf8_size;
 	krc_size_t utf8_read;
 
 
-	krc_char_t* src;
+	const krc_char_t* src;
 	krc_size_t index;
 	krc_size_t count;
 
@@ -226,14 +226,18 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 		case 6u:
 			index += (utf8_read-1u);
 			break;
+
+		default:
+			krc_mbcs_ostream_term(&o);
+			return o.length;
 		}
 		wcs = (krc_wchar_t)wcs32; // ucs32 -> ucs16
 
 
 		if (wcs == 0x00u)
 		{
-			krc_mbcs_ostream_put_char8(&o, 0u);
-			return o.offset;
+			krc_mbcs_ostream_term(&o);
+			return o.length;
 		}
 		else if (wcs < 0x0080u)
 		{
@@ -242,9 +246,21 @@ KRC_API krc_size_t krc_utf8_to_cp949(krc_char_t* utf8_string, krc_size_t utf8_le
 		}
 		else if (wcs < 0x0100u)
 		{
-			//ch1 = (krc_char8_t)(wcs & 0x00FFu);
-			//krc_mbcs_ostream_put_char8(&o, ch1);
-			krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+			if ((0x00A1u <= wcs) && (wcs <= 0x00FEu))
+			{
+				if (krc_unicode_to_cp949_special_1128(wcs, &mbcs) == KRC_TRUE)
+				{
+					krc_mbcs_ostream_put_char16(&o, mbcs);
+				}
+				else
+				{
+					krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+				}
+			}
+			else
+			{
+				krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+			}
 		}
 
 		else if (krc_unicode_to_cp949_hangul_51_11172(wcs, &mbcs) == KRC_TRUE)

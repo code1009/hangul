@@ -153,8 +153,21 @@ KRC_API krc_size_t krc_unicode_to_cp949(const krc_wchar_t* wcs_string, krc_size_
 		}
 		else if (wcs < 0x0100u)
 		{
-			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-			krc_mbcs_ostream_put_char8(&o, ch1);
+			 if ((0x00A1u <= wcs) && (wcs <= 0x00FEu))
+			 {
+				 if (krc_unicode_to_cp949_special_1128(wcs, &mbcs) == KRC_TRUE)
+				 {
+					 krc_mbcs_ostream_put_char16(&o, mbcs);
+				 }
+				 else
+				 {
+					 krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+				 }
+			 }
+			 else
+			 {
+				 krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+			 }
 		}
 
 		else if (krc_unicode_to_cp949_hangul_51_11172(wcs, &mbcs) == KRC_TRUE)
