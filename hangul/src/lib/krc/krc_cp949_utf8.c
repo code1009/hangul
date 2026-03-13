@@ -40,11 +40,11 @@
 //===========================================================================
 static void krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const krc_wchar_t wcs)
 {
-	krc_char_t buffer[6];
+	krc_char_t buffer[4];
 	krc_size_t wsize;
 
 
-	wsize = krc_unicode_to_utf8_char(wcs, buffer, 6u);
+	wsize = krc_unicode_to_utf8_char(wcs, buffer, 4u);
 	switch (wsize)
 	{
 	case 1:
@@ -67,23 +67,6 @@ static void krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const 
 		krc_mbcs_ostream_put_char8(o, buffer[1]);
 		krc_mbcs_ostream_put_char8(o, buffer[2]);
 		krc_mbcs_ostream_put_char8(o, buffer[3]);
-		break;
-
-	case 5:
-		krc_mbcs_ostream_put_char8(o, buffer[0]);
-		krc_mbcs_ostream_put_char8(o, buffer[1]);
-		krc_mbcs_ostream_put_char8(o, buffer[2]);
-		krc_mbcs_ostream_put_char8(o, buffer[3]);
-		krc_mbcs_ostream_put_char8(o, buffer[4]);
-		break;
-
-	case 6:
-		krc_mbcs_ostream_put_char8(o, buffer[0]);
-		krc_mbcs_ostream_put_char8(o, buffer[1]);
-		krc_mbcs_ostream_put_char8(o, buffer[2]);
-		krc_mbcs_ostream_put_char8(o, buffer[3]);
-		krc_mbcs_ostream_put_char8(o, buffer[4]);
-		krc_mbcs_ostream_put_char8(o, buffer[5]);
 		break;
 
 	default:
@@ -132,7 +115,7 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 		{
 			if ((index + 1u) < count)
 			{
-				ch2 = (krc_char8_t)(*(src + index + 1));
+				ch2 = (krc_char8_t)(*(src + index + 1u));
 				mbcs = (ch1 << 8u) | ch2;
 
 

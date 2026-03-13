@@ -192,7 +192,7 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 
 static krc_uint16_t krc_code_range_cp949_ascii(const krc_char16_t ch)
 {
-	if ((0x0000u <= ch) && (ch <= 0x007Fu))
+	if (/*(0x0000u <= ch) &&*/ (ch <= 0x007Fu))
 	{
 		return KRC_CODE_RANGE_ASCII_LOW;
 	}

@@ -52,7 +52,7 @@ KRC_API krc_int16_t krc_cp949_index_hangul_11172(const krc_char16_t ch)
 	if ((0xB0A1u <= ch) && (ch <= 0xC8FEu))
 	{
 		offset = (ch - 0xB0A0u) % 0x0100u;
-		if ((0u < offset) && (offset < 96u))
+		if ((0u < offset) && (offset < 95u))
 		{
 			index = (ch - 0xB0A0u) / 0x0100u * 94u + offset - 1u;
 			return index;
@@ -83,8 +83,8 @@ KRC_API krc_int16_t krc_cp949_index_hangul_11172(const krc_char16_t ch)
 				return -1;
 			}
 
-			if (offset > 0x0040u) { offset -= 12u; }
-			else if (offset > 0x0020u) { offset -= 6u; }
+			if      (offset > 0x0040u) { offset -= 12u; }
+			else if (offset > 0x0020u) { offset -=  6u; }
 
 			index = (ch - 0x8140u) / 0x0100u * (192u - 2u - 6u - 6u) + offset - 1u + 2350u;
 			return index;
@@ -136,15 +136,12 @@ KRC_API krc_int16_t krc_cp949_index_special_1128(const krc_char16_t ch)
 	/*
 	# 완성형한글.특수문자1128자: 0xA1A1u - 0xACFEu
 	  12개영역 * 94문자 = 1128문자
-		 0xA1A0u
-	   + 0x0C00u(12*256)
-	   = 0xFEA0u
 	*/
 	if ((0xA1A1u <= ch) && (ch <= 0xACFEu))
 	{
 		offset = (ch - 0xA1A0u) % 0x0100u;
 
-		if ((0u < offset) && (offset < 96u))
+		if ((0u < offset) && (offset < 95u))
 		{
 			return ((ch - 0xA1A0u) / 0x0100u) * 94u + offset - 1u;
 		}
@@ -161,15 +158,12 @@ KRC_API krc_int16_t krc_cp949_index_hanja_4888(const krc_char16_t ch)
 	/*
 	# 완성형한글.한자4888자: 0xCAA1u-0xFDFEu
 	  52개영역 * 94문자 = 4888문자
-		 0xCAA0u
-	   + 0x3400u(52*256)
-	   = 0xFEA0u
 	*/
 	if ((0xCAA1u <= ch) && (ch <= 0xFDFEu))
 	{
 		offset = (ch - 0xCAA0u) % 0x0100u;
 
-		if ((0u < offset) && (offset < 96u))
+		if ((0u < offset) && (offset < 95u))
 		{
 			return ((ch - 0xCAA0u) / 0x0100u) * 94u + offset - 1u;
 		}
