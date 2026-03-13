@@ -1,0 +1,141 @@
+﻿/////////////////////////////////////////////////////////////////////////////
+//
+// File: bf_context.c
+//
+// Created by MOON, Eui-kwon.
+// Created on Nov-14th, 2019.
+//
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+#define BF_COMPILE 1
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+#include "bf_config.h"
+#include "bf_type.h"
+#include "bf_api.h"
+
+#include "bf_font.h"
+
+#include "bf_context.h"
+
+#include "bf_font_data.h"
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+static bf_font_t _bf_default_font_unknown;
+
+#if (1==BF_CONFIG_FONT_DATA_ASCII_LOW)
+static bf_font_t _bf_default_font_ascii_low;
+#endif
+
+#if (1==BF_CONFIG_FONT_DATA_HANGUL)
+static bf_font_hangul_johab844_t _bf_default_font_hangul_johab844;
+#endif
+
+#if (1==BF_CONFIG_FONT_DATA_SPECIAL)
+static bf_font_t _bf_font_cp949_special_1128;
+#endif
+
+#if (1==BF_CONFIG_FONT_DATA_HANJA)
+static bf_font_t _bf_font_cp949_hanja_4888;
+#endif
+
+//===========================================================================
+static bf_context_t _context;
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+static void bf_font_default_font_unknown(void)
+{
+	bf_font_16x16_init(
+		&_bf_default_font_unknown, 
+		_bf_font_data_16x16_unknown, sizeof(_bf_font_data_16x16_unknown), 
+		BF_FONT_TYPE_UNKNOWN, 1u
+	);
+}
+
+static void bf_font_default_font_ascii_low(void)
+{
+	bf_font_08x16_init(
+		&_bf_default_font_ascii_low,
+		_bf_font_data_08x16_ascii_low, sizeof(_bf_font_data_08x16_ascii_low),
+		BF_FONT_TYPE_ASCII_LOW, 128u
+	);
+}
+
+static void bf_font_default_font_hangul(void)
+{
+	bf_font_hangul_johab844_16x16_init(
+		&_bf_default_font_hangul_johab844,
+		_bf_font_data_16x16_hangul_johab844, sizeof(_bf_font_data_16x16_hangul_johab844)
+	);
+}
+
+static void bf_font_default_font_special(void)
+{
+	bf_font_16x16_init(
+		&_bf_font_cp949_special_1128,
+		_bf_font_data_16x16_cp949_special_1128, sizeof(_bf_font_data_16x16_cp949_special_1128),
+		BF_FONT_TYPE_CP949_SPECIAL_1128, 1128u
+	);
+}
+
+static void bf_font_default_font_hanja(void)
+{
+	bf_font_16x16_init(
+		&_bf_font_cp949_hanja_4888,
+		_bf_font_data_16x16_cp949_hanja_4888, sizeof(_bf_font_data_16x16_cp949_hanja_4888),
+		BF_FONT_TYPE_CP949_HANJA_4888, 4888u
+	);
+}
+
+static void bf_font_default_font_init(void)
+{
+	bf_font_default_font_unknown();
+	bf_font_default_font_ascii_low();
+	bf_font_default_font_hangul();
+	bf_font_default_font_special();
+	bf_font_default_font_hanja();
+}
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+BF_API void bf_context_default_init(void)
+{
+	bf_font_default_font_init();
+
+	_context.font_unknown = &_bf_default_font_unknown;
+	_context.font_ascii_low = &_bf_default_font_ascii_low;
+	_context.font_hangul_johab844 = &_bf_default_font_hangul_johab844;
+	_context.font_cp949_special_1128 = &_bf_font_cp949_special_1128;
+	_context.font_cp949_hanja_4888 = &_bf_font_cp949_hanja_4888;
+}
+
+BF_API bf_context_t* bf_context_default_get(void)
+{
+	return &_context;
+}
+

@@ -34,6 +34,42 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
+{
+	//-----------------------------------------------------------------------
+	// 0xCAA1 ~ 0xFDFE : 완성형한글.한자4888자
+	// 0xCAFE - 0xCAA1 + 1 = 94자
+	// 94자 * 52개영역 = 4888자
+	//-----------------------------------------------------------------------
+	if ((0xCAA1u <= ch) && (ch <= 0xFDFEu))
+	{
+		//선문자, 단위 기호 등
+		return KRC_CODE_RANGE_HANJA_4888;
+	}
+
+	return KRC_CODE_RANGE_UNKNOWN;
+}
+
+static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
+{
+	//-----------------------------------------------------------------------
+	// 완성형한글.특수문자1128자 영역에 포함 됨
+	//-----------------------------------------------------------------------
+	if ((0xA4A1u <= ch) && (ch <= 0xA4D3u))
+	{
+		if ((0xA4A1u <= ch) && (ch <= 0xA4BEu))
+		{
+			return KRC_CODE_RANGE_HANGUL_JAMO_JAEUM;
+		}
+		if ((0xA4BFu <= ch) && (ch <= 0xA4D3u))
+		{
+			return KRC_CODE_RANGE_HANGUL_JAMO_MOEUM;
+		}
+	}
+
+	return KRC_CODE_RANGE_UNKNOWN;
+}
+
 static krc_uint16_t krc_code_range_cp949_special_1128(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
@@ -108,42 +144,6 @@ static krc_uint16_t krc_code_range_cp949_special_1128(const krc_char16_t ch)
 	{
 		//선문자, 단위 기호 등
 		return KRC_CODE_RANGE_SPECIAL_1128;
-	}
-
-	return KRC_CODE_RANGE_UNKNOWN;
-}
-
-static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
-{
-	//-----------------------------------------------------------------------
-	// 0xCAA1 ~ 0xFDFE : 완성형한글.한자4888자
-	// 0xCAFE - 0xCAA1 + 1 = 94자
-	// 94자 * 52개영역 = 4888자
-	//-----------------------------------------------------------------------
-	if ((0xCAA1u <= ch) && (ch <= 0xFDFEu))
-	{
-		//선문자, 단위 기호 등
-		return KRC_CODE_RANGE_HANJA_4888;
-	}
-
-	return KRC_CODE_RANGE_UNKNOWN;
-}
-
-static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
-{
-	//-----------------------------------------------------------------------
-	// 완성형한글.특수문자1128자 영역에 포함 됨
-	//-----------------------------------------------------------------------
-	if ((0xA4A1u <= ch) && (ch <= 0xA4D3u))
-	{
-		if ((0xA4A1u <= ch) && (ch <= 0xA4BEu))
-		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_JAEUM;
-		}
-		if ((0xA4BFu <= ch) && (ch <= 0xA4D3u))
-		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_MOEUM;
-		}
 	}
 
 	return KRC_CODE_RANGE_UNKNOWN;

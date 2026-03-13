@@ -19,7 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\app\app_bf.cpp" />
     <ClCompile Include="src\app\app_krc.cpp" />
+    <ClCompile Include="src\lib\bf\bf_char_bitmap.c" />
+    <ClCompile Include="src\lib\bf\bf_font.c" />
+    <ClCompile Include="src\lib\bf\bf_font_bitmap.c" />
+    <ClCompile Include="src\lib\bf\bf_context.c" />
+    <ClCompile Include="src\lib\bf\bf_font_data.c" />
+    <ClCompile Include="src\lib\bf\bf_font_bitmap_hangul_johab844.c" />
     <ClCompile Include="src\lib\krc\krc_code_conversion.c" />
     <ClCompile Include="src\lib\krc\krc_cp949_index.c" />
     <ClCompile Include="src\lib\krc\krc_code_table.c" />
@@ -31,7 +38,23 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\app\app_bf.hpp" />
     <ClInclude Include="src\app\app_krc.hpp" />
+    <ClInclude Include="src\lib\bf\bf.h" />
+    <ClInclude Include="src\lib\bf\bf_api.h" />
+    <ClInclude Include="src\lib\bf\bf_char_bitmap.h" />
+    <ClInclude Include="src\lib\bf\bf_config.h" />
+    <ClInclude Include="src\lib\bf\bf_font.h" />
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_08x16_ascii_low.h" />
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_cp949_hanja_4888.h" />
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_cp949_special_1128.h" />
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_hangul_johab844.h" />
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_unknown.h" />
+    <ClInclude Include="src\lib\bf\bf_font_bitmap.h" />
+    <ClInclude Include="src\lib\bf\bf_context.h" />
+    <ClInclude Include="src\lib\bf\bf_font_data.h" />
+    <ClInclude Include="src\lib\bf\bf_font_bitmap_hangul_johab844.h" />
+    <ClInclude Include="src\lib\bf\bf_type.h" />
     <ClInclude Include="src\lib\krc\krc.h" />
     <ClInclude Include="src\lib\krc\krc_api.h" />
     <ClInclude Include="src\lib\krc\krc_code_conversion.h" />
