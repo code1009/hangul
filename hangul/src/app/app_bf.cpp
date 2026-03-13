@@ -98,7 +98,7 @@ private:
 
 public:
 	text_canvas() :
-		_cx(128u), _cy(32u)
+		_cx(128u+2), _cy(32u+2)
 	{
 		setup();
 	}
@@ -395,7 +395,7 @@ static void test1()
 	text_canvas c;
 
 
-	c.draw_cp949_string(1u, 0u, "A한글.똠방각하\n!ф詰☎★");
+	c.draw_cp949_string(1u, 1u, "A한글.똠방각하\n!ф詰☎★");
 	c.output();
 
 
@@ -403,7 +403,7 @@ static void test1()
 
 
 	c.clear();
-	c.draw_unicode_string(1u, 0u, L"b유니코드\n!ф詰");
+	c.draw_unicode_string(10u, 1u, L"b유니코드\n!ф詰");
 	c.output();
 
 
@@ -411,8 +411,8 @@ static void test1()
 
 
 	c.clear();
-	std::string utf8 = mbcs_to_utf8("c유니코드\n!ф詰", CP_ACP);
-	c.draw_utf8_string(1u, 0u, (const uint8_t*)utf8.c_str());
+	std::string utf8 = mbcs_to_utf8("c유니코드\n! UTF-8 ▒", CP_ACP);
+	c.draw_utf8_string(1u, 1u, (const uint8_t*)utf8.c_str());
 	c.output();
 }
 
