@@ -90,7 +90,6 @@ public:
 
 	void draw_string(const uint32_t start_x, const uint32_t start_y, const char* str)
 	{
-		// 기본 컨텍스트 가져오기
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
 
