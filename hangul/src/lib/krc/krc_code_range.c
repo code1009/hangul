@@ -39,7 +39,7 @@ static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
 	//-----------------------------------------------------------------------
 	// 0xCAA1 ~ 0xFDFE : 완성형한글.한자4888자
 	// 0xCAFE - 0xCAA1 + 1 = 94자
-	// 94자 * 52개영역 = 4888자
+	// 94(=6*16-1-1)자 * 52개영역 = 4888문자
 	//-----------------------------------------------------------------------
 	if ((0xCAA1u <= ch) && (ch <= 0xFDFEu))
 	{
@@ -53,7 +53,8 @@ static krc_uint16_t krc_code_range_cp949_hanja_4888(const krc_char16_t ch)
 static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
-	// 완성형한글.특수문자1128자 영역에 포함 됨
+	// 0xA4A1 ~ 0xA4D3: 완성형한글.특수문자1128자 영역에 포함 됨
+	// 0xA4D3 - 0xA4A1 + 1 = 51자
 	//-----------------------------------------------------------------------
 	if ((0xA4A1u <= ch) && (ch <= 0xA4D3u))
 	{
@@ -73,12 +74,11 @@ static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
 static krc_uint16_t krc_code_range_cp949_special_1128(const krc_char16_t ch)
 {
 	//-----------------------------------------------------------------------
-	// 0xA1A1 ~ 0xACFE: 완성형한글.특수문자1128자
+	// 0xA1A1 ~ 0xACFE: 완성형한글.특수문자1128자(완성형한글.한글11172자.추가8822자.확장B-3108자와 영역과 겹침)
 	// 0xA1FE - 0xA1A1 + 1 = 94자
-	// 94자 * 12개영역 = 1128자
+	// 94(=6*16-1-1)자 * 12개영역 = 1128문자
 	//-----------------------------------------------------------------------
-	/*
-	한글 확장 영역B와 겹침
+	/*	
 	if ((0xA1A1u <= ch) && (ch <= 0xACFE))
 	{
 		return KRC_CODE_RANGE_SPECIAL_1128;
@@ -160,13 +160,14 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 	//-----------------------------------------------------------------------
 	if ((0xB0A1u <= ch) && (ch <= 0xC8FEu))
 	{
-		// 완성형한글.한글11172자 2350자
+		// 2350자(EUC-KR)
+		// 94(=6*16-1-1)자 * 25영역 = 2350자
 		return KRC_CODE_RANGE_HANGUL_11172;
 	}
 	if ((0x8141u <= ch) && (ch <= 0xA0FEu))
 	{
-		// 확장완성형한글.추가한글8822자 중 5696자
-		// (12*16-1-6-6-1=178) * 32영역 = 5696자
+		// 추가8822자.확장A-5696자
+		// 178(=12*16-1-6-6-1)자 * 32영역 = 5696자
 		return KRC_CODE_RANGE_HANGUL_11172;
 	}
 	if ((0xA141u <= ch) && (ch <= 0xC5A0u))
@@ -177,13 +178,14 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 			return rv;
 		}
 
-		// 확장완성형한글.추가한글8822자 중 3108자
-		// (7*16-1-6-6-14-1=84) * 37영역 = 3108자
+		// 추가8822자.확장B-3108자
+		// 84(=7*16-1-6-6-14-1)자 * 37영역 = 3108자
 		return KRC_CODE_RANGE_HANGUL_11172;
 	}
 	if ((0xC641u <= ch) && (ch <= 0xC652u))
 	{
-		// 확장완성형한글.추가한글8822자 중 18자
+		// 추가8822자.확장C-18자
+		// 18자 * 1영역 = 18자
 		return KRC_CODE_RANGE_HANGUL_11172;
 	}
 
@@ -192,12 +194,11 @@ static krc_uint16_t krc_code_range_cp949_hangul_11172(const krc_char16_t ch)
 
 static krc_uint16_t krc_code_range_cp949_ascii(const krc_char16_t ch)
 {
-	if (/*(0x0000u <= ch) &&*/ (ch <= 0x007Fu))
+	if (ch <= 0x007Fu)
 	{
 		return KRC_CODE_RANGE_ASCII_LOW;
 	}
-
-	if ((0x0080u <= ch) && (ch <= 0x00FFu))
+	else if (ch <= 0x00FFu)
 	{
 		return KRC_CODE_RANGE_ASCII_HIGH;
 	}

@@ -75,27 +75,34 @@ static void krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const 
 	}
 }
 
-KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_size_t cp949_length, krc_char_t* utf8_string, const krc_size_t utf8_length)
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+KRC_API krc_size_t krc_cp949_to_utf8(
+	const krc_char_t* cp949_string, const krc_size_t cp949_string_length,
+	krc_char_t* utf8_string, const krc_size_t utf8_string_length
+)
 {
 	krc_mbcs_ostream_t o;
+	krc_mbcs_ostream_init(&o, utf8_string, utf8_string_length);
 
 
-	krc_mbcs_ostream_init(&o, utf8_string, utf8_length);
-
-
-	krc_wchar_t  wcs;
-	krc_char16_t mbcs;
+	krc_wchar_t  ucs;
+	krc_char16_t cp949;
 	krc_char8_t  ch1;
 	krc_char8_t  ch2;
 
-	const krc_char_t* src;
 
+	const krc_char_t* src;
 	krc_size_t index;
 	krc_size_t count;
 
 
 	src = cp949_string;
-	count = cp949_length;
+	count = cp949_string_length;
 	for (index = 0u; index < count; index++)
 	{
 		ch1 = (krc_char8_t)(*(src + index));
@@ -116,24 +123,24 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 			if ((index + 1u) < count)
 			{
 				ch2 = (krc_char8_t)(*(src + index + 1u));
-				mbcs = (ch1 << 8u) | ch2;
+				cp949 = (ch1 << 8u) | ch2;
 
 
-				if (krc_cp949_to_unicode_hangul_51_11172(mbcs, &wcs) == KRC_TRUE)
+				if (krc_cp949_to_unicode_hangul_51_11172(cp949, &ucs) == KRC_TRUE)
 				{
-					krc_mbcs_ostream_put_utf8_from_unicode(&o, wcs);
+					krc_mbcs_ostream_put_utf8_from_unicode(&o, ucs);
 					index++;
 				}
 
-				else if (krc_cp949_to_unicode_special_1128(mbcs, &wcs) == KRC_TRUE)
+				else if (krc_cp949_to_unicode_special_1128(cp949, &ucs) == KRC_TRUE)
 				{
-					krc_mbcs_ostream_put_utf8_from_unicode(&o, wcs);
+					krc_mbcs_ostream_put_utf8_from_unicode(&o, ucs);
 					index++;
 				}
 
-				else if (krc_cp949_to_unicode_hanja_4888(mbcs, &wcs) == KRC_TRUE)
+				else if (krc_cp949_to_unicode_hanja_4888(cp949, &ucs) == KRC_TRUE)
 				{
-					krc_mbcs_ostream_put_utf8_from_unicode(&o, wcs);
+					krc_mbcs_ostream_put_utf8_from_unicode(&o, ucs);
 					index++;
 				}
 
@@ -159,22 +166,24 @@ KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_s
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_size_t utf8_length, krc_char_t* cp949_string, const krc_size_t cp949_length)
+KRC_API krc_size_t krc_utf8_to_cp949(
+	const krc_char_t* utf8_string, const krc_size_t utf8_string_length,
+	krc_char_t* cp949_string, const krc_size_t cp949_string_length
+)
 {
 	krc_mbcs_ostream_t o;
+	krc_mbcs_ostream_init(&o, cp949_string, cp949_string_length);
 
 
-	krc_mbcs_ostream_init(&o, cp949_string, cp949_length);
+	krc_wchar_t   unicode;
+	krc_char16_t  cp949;
+	krc_char8_t   ch;
+	krc_uchar32_t unicode32;
 
 
-	krc_wchar32_t wcs32;
-	krc_wchar_t wcs;
-	krc_char16_t mbcs;
-	krc_char8_t  ch1;
-	
-	const krc_char_t* utf8_pointer;
+	const krc_char_t* utf8_char_pointer;
+	krc_size_t utf8_char_read;
 	krc_size_t utf8_size;
-	krc_size_t utf8_read;
 
 
 	const krc_char_t* src;
@@ -183,55 +192,55 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 
 
 	src = utf8_string;
-	count = utf8_length;
+	count = utf8_string_length;
 	for (index = 0u; index < count; index++)
 	{
-		ch1 = (krc_char8_t)(*(src + index));
+		ch = (krc_char8_t)(*(src + index));
 
 
-		if (0x00u == ch1)
+		if (0x00u == ch)
 		{
 			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
 
 
-		utf8_pointer = (src + index);
 		utf8_size = count - index;
-		utf8_read = krc_utf8l_to_unicode_char(utf8_pointer, utf8_size, &wcs32);
-		switch (utf8_read)
+		utf8_char_pointer = (src + index);
+		utf8_char_read = krc_utf8l_to_unicode_char(utf8_char_pointer, utf8_size, &unicode32);
+		switch (utf8_char_read)
 		{
 		case 1u:
 		case 2u:
 		case 3u:
 		case 4u:
-			index += (utf8_read-1u);
+			index += (utf8_char_read -1u);
 			break;
 
 		default:
 			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
-		wcs = (krc_wchar_t)wcs32; // ucs32 -> ucs16
+		unicode = (krc_wchar_t)unicode32; // ucs32 -> ucs16
 
 
-		if (wcs == 0x00u)
+		if (unicode == 0x0000u)
 		{
 			krc_mbcs_ostream_put_null_term(&o);
 			return o.length;
 		}
-		else if (wcs < 0x0080u)
+		else if (unicode < 0x0080u)
 		{
-			ch1 = (krc_char8_t)(wcs & 0x00FFu);
-			krc_mbcs_ostream_put_char8(&o, ch1);
+			ch = (krc_char8_t)(unicode & 0x00FFu);
+			krc_mbcs_ostream_put_char8(&o, ch);
 		}
-		else if (wcs < 0x0100u)
+		else if (unicode < 0x0100u)
 		{
-			if ((0x00A1u <= wcs) && (wcs <= 0x00FEu))
+			if ((0x00A1u <= unicode) && (unicode <= 0x00FEu))
 			{
-				if (krc_unicode_to_cp949_special_1128(wcs, &mbcs) == KRC_TRUE)
+				if (krc_unicode_to_cp949_special_1128(unicode, &cp949) == KRC_TRUE)
 				{
-					krc_mbcs_ostream_put_char16(&o, mbcs);
+					krc_mbcs_ostream_put_char16(&o, cp949);
 				}
 				else
 				{
@@ -244,19 +253,19 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 			}
 		}
 
-		else if (krc_unicode_to_cp949_hangul_51_11172(wcs, &mbcs) == KRC_TRUE)
+		else if (krc_unicode_to_cp949_hangul_51_11172(unicode, &cp949) == KRC_TRUE)
 		{
-			krc_mbcs_ostream_put_char16(&o, mbcs);
+			krc_mbcs_ostream_put_char16(&o, cp949);
 		}
 
-		else if (krc_unicode_to_cp949_special_1128(wcs, &mbcs) == KRC_TRUE)
+		else if (krc_unicode_to_cp949_special_1128(unicode, &cp949) == KRC_TRUE)
 		{
-			krc_mbcs_ostream_put_char16(&o, mbcs);
+			krc_mbcs_ostream_put_char16(&o, cp949);
 		}
 
-		else if (krc_unicode_to_cp949_hanja_4888(wcs, &mbcs) == KRC_TRUE)
+		else if (krc_unicode_to_cp949_hanja_4888(unicode, &cp949) == KRC_TRUE)
 		{
-			krc_mbcs_ostream_put_char16(&o, mbcs);
+			krc_mbcs_ostream_put_char16(&o, cp949);
 		}
 
 		else

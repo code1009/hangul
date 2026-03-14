@@ -32,13 +32,15 @@ typedef unsigned int krc_bool_t;
 
 //===========================================================================
 typedef char               krc_char_t;
+
 typedef unsigned char      krc_char8_t;
 typedef unsigned short int krc_char16_t;
 
 typedef unsigned short int krc_wchar_t;
-typedef unsigned char      krc_wchar8_t;
-typedef unsigned short int krc_wchar16_t;
-typedef unsigned long  int krc_wchar32_t;
+
+typedef unsigned char      krc_uchar8_t;
+typedef unsigned short int krc_uchar16_t;
+typedef unsigned long  int krc_uchar32_t;
 
 
 

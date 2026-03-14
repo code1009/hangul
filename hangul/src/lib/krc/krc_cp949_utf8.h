@@ -17,8 +17,15 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_size_t krc_cp949_to_utf8(const krc_char_t* cp949_string, const krc_size_t cp949_length, krc_char_t* utf8_string, const krc_size_t utf8_length);
-KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_size_t utf8_length, krc_char_t* cp949_string, const krc_size_t cp949_length);
+KRC_API krc_size_t krc_cp949_to_utf8(
+	const krc_char_t* cp949_string, const krc_size_t cp949_string_length,
+	krc_char_t* utf8_string, const krc_size_t utf8_string_length
+);
+
+KRC_API krc_size_t krc_utf8_to_cp949(
+	const krc_char_t* utf8_string, const krc_size_t utf8_string_length,
+	krc_char_t* cp949_string, const krc_size_t cp949_string_length
+);
 
 
 

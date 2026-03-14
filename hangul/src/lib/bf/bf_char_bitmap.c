@@ -253,7 +253,7 @@ BF_API void bf_get_utf8_bitmap(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	krc_wchar32_t unicode_char;
+	krc_uchar32_t unicode_char;
 	krc_size_t consumed_bytes;
 	consumed_bytes = krc_utf8_to_unicode_char(
 		(const krc_char_t*)char_pointer,
@@ -276,7 +276,7 @@ BF_API void bf_get_utf8l_bitmap(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	krc_wchar32_t unicode_char;
+	krc_uchar32_t unicode_char;
 	krc_size_t consumed_bytes;
 	consumed_bytes = krc_utf8l_to_unicode_char(
 		(const krc_char_t*)char_pointer,

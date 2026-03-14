@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_bool_t krc_utf8_continuation(const krc_char8_t c)
+KRC_API krc_bool_t krc_utf8_continuation(const krc_uchar8_t c)
 {
 	if (0x80u <= c && c <= 0xBFu)
 	{
@@ -45,7 +45,7 @@ KRC_API krc_bool_t krc_utf8_continuation(const krc_char8_t c)
 
 KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer)
 {
-	const krc_wchar8_t* p = (const krc_wchar8_t*)utf8_pointer;
+	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
 	if ((p[0] & 0x80u) == 0x00u)
@@ -86,7 +86,7 @@ KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer)
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_char_t* utf8_pointer)
+KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_uchar32_t unicode, krc_char_t* utf8_pointer)
 {
 	if ((unicode <= 0x7Fu))
 	{
@@ -99,7 +99,7 @@ KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_cha
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
 		return 2;
 	}
-	else if ((unicode <= 0xffff))
+	else if ((unicode <= 0xFFFFu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xE0u | (unicode >> 12u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 6u) & 0x3Fu));
@@ -117,7 +117,7 @@ KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_cha
 	return 0;
 }
 
-KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_wchar32_t unicode, krc_char_t* utf8_pointer, const krc_size_t utf8_size)
+KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_uchar32_t unicode, krc_char_t* utf8_pointer, const krc_size_t utf8_size)
 {
 	if     ((unicode <= 0x7Fu) && (1u <= utf8_size))
 	{
@@ -154,9 +154,9 @@ KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_wchar32_t unicode, krc_ch
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_size_t krc_utf8_to_unicode_char(const krc_char_t* utf8_pointer, krc_wchar32_t* unicode)
+KRC_API krc_size_t krc_utf8_to_unicode_char(const krc_char_t* utf8_pointer, krc_uchar32_t* unicode)
 {
-	const krc_wchar8_t* p = (const krc_wchar8_t*)utf8_pointer;
+	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
 	if (((p[0] & 0x80u) == 0x00u))
@@ -201,9 +201,9 @@ KRC_API krc_size_t krc_utf8_to_unicode_char(const krc_char_t* utf8_pointer, krc_
 	return 0u;
 }
 
-KRC_API krc_size_t krc_utf8l_to_unicode_char(const krc_char_t* utf8_pointer, const krc_size_t utf8_size, krc_wchar32_t* unicode)
+KRC_API krc_size_t krc_utf8l_to_unicode_char(const krc_char_t* utf8_pointer, const krc_size_t utf8_size, krc_uchar32_t* unicode)
 {
-	const krc_wchar8_t* p = (const krc_wchar8_t*)utf8_pointer;
+	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
 	if      (((p[0] & 0x80u) == 0x00u) && (1u <= utf8_size))
