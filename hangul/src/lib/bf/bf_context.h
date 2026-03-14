@@ -42,7 +42,7 @@ bf_context_t;
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-BF_API void bf_context_default_init(void);
+BF_API void bf_context_default_setup(void);
 BF_API bf_context_t* bf_context_default_get(void);
 
 

@@ -502,7 +502,7 @@ void bf_main()
 {
     std::cout << "bf_main()!\n";
 
-    bf_context_default_init();
+    bf_context_default_setup();
 
 	test1();
 }

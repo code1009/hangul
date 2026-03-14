@@ -66,9 +66,9 @@ bf_font_hangul_johab844_t;
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-BF_API bf_bool_t bf_font_08x16_init(bf_font_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size, bf_uint32_t font_type, bf_uint32_t font_count);
-BF_API bf_bool_t bf_font_16x16_init(bf_font_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size, bf_uint32_t font_type, bf_uint32_t font_count);
-BF_API bf_bool_t bf_font_hangul_johab844_16x16_init(bf_font_hangul_johab844_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size);
+BF_API bf_bool_t bf_font_setup_08x16(bf_font_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size, bf_uint32_t font_type, bf_uint32_t font_count);
+BF_API bf_bool_t bf_font_setup_16x16(bf_font_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size, bf_uint32_t font_type, bf_uint32_t font_count);
+BF_API bf_bool_t bf_font_setup_hangul_johab844_16x16(bf_font_hangul_johab844_t* ctx, bf_uint8_t* font_data_pointer, bf_uint32_t font_data_size);
 
 
 

@@ -62,7 +62,7 @@ static bf_context_t _context;
 //===========================================================================
 static void bf_font_default_font_unknown(void)
 {
-	bf_font_16x16_init(
+	bf_font_setup_16x16(
 		&_bf_default_font_unknown, 
 		_bf_font_data_16x16_unknown, sizeof(_bf_font_data_16x16_unknown), 
 		BF_FONT_TYPE_UNKNOWN, 1u
@@ -71,7 +71,7 @@ static void bf_font_default_font_unknown(void)
 
 static void bf_font_default_font_ascii_low(void)
 {
-	bf_font_08x16_init(
+	bf_font_setup_08x16(
 		&_bf_default_font_ascii_low,
 		_bf_font_data_08x16_ascii_low, sizeof(_bf_font_data_08x16_ascii_low),
 		BF_FONT_TYPE_ASCII_LOW, 128u
@@ -80,7 +80,7 @@ static void bf_font_default_font_ascii_low(void)
 
 static void bf_font_default_font_hangul(void)
 {
-	bf_font_hangul_johab844_16x16_init(
+	bf_font_setup_hangul_johab844_16x16(
 		&_bf_default_font_hangul_johab844,
 		_bf_font_data_16x16_hangul_johab844, sizeof(_bf_font_data_16x16_hangul_johab844)
 	);
@@ -89,7 +89,7 @@ static void bf_font_default_font_hangul(void)
 #if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 static void bf_font_default_font_special(void)
 {
-	bf_font_16x16_init(
+	bf_font_setup_16x16(
 		&_bf_font_cp949_special_1128,
 		_bf_font_data_16x16_cp949_special_1128, sizeof(_bf_font_data_16x16_cp949_special_1128),
 		BF_FONT_TYPE_CP949_SPECIAL_1128, 1128u
@@ -100,7 +100,7 @@ static void bf_font_default_font_special(void)
 #if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 static void bf_font_default_font_hanja(void)
 {
-	bf_font_16x16_init(
+	bf_font_setup_16x16(
 		&_bf_font_cp949_hanja_4888,
 		_bf_font_data_16x16_cp949_hanja_4888, sizeof(_bf_font_data_16x16_cp949_hanja_4888),
 		BF_FONT_TYPE_CP949_HANJA_4888, 4888u
@@ -108,7 +108,7 @@ static void bf_font_default_font_hanja(void)
 }
 #endif
 
-static void bf_font_default_font_init(void)
+static void bf_font_default_font_setup(void)
 {
 	bf_font_default_font_unknown();
 
@@ -131,9 +131,9 @@ static void bf_font_default_font_init(void)
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-BF_API void bf_context_default_init(void)
+BF_API void bf_context_default_setup(void)
 {
-	bf_font_default_font_init();
+	bf_font_default_font_setup();
 
 	_context.font_unknown = &_bf_default_font_unknown;
 

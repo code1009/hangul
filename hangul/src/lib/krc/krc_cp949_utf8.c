@@ -218,8 +218,9 @@ KRC_API krc_size_t krc_utf8_to_cp949(
 			break;
 
 		default:
-			krc_mbcs_ostream_put_null_term(&o);
-			return o.length;
+			krc_mbcs_ostream_put_char8(&o, 0x3Fu); // '?'
+			index += 1u;
+			continue;
 		}
 		unicode = (krc_wchar_t)unicode32; // ucs32 -> ucs16
 
