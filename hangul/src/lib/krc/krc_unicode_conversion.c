@@ -45,6 +45,27 @@ RFC 3629/유니코드 표준
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+/*
+#define KRC_UTF8_CONTINUATION_MIN 0x80u
+#define KRC_UTF8_CONTINUATION_MAX 0xBFu
+
+#define KRC_UTF8_IS_1BYTE_START(ch) (((ch) & 0x80u) == 0x00u)
+#define KRC_UTF8_IS_2BYTE_START(ch) (((ch) & 0xE0u) == 0xC0u)
+#define KRC_UTF8_IS_3BYTE_START(ch) (((ch) & 0xF0u) == 0xE0u)
+#define KRC_UTF8_IS_4BYTE_START(ch) (((ch) & 0xF8u) == 0xF0u)
+
+#define KRC_UTF8_IN_1BYTE_RANGE(ch) ((ch) <= 0x7Fu)
+#define KRC_UTF8_IN_2BYTE_RANGE(ch) ((ch) <= 0x7FFu)
+#define KRC_UTF8_IN_3BYTE_RANGE(ch) ((ch) <= 0xFFFFu)
+#define KRC_UTF8_IN_4BYTE_RANGE(ch) ((ch) <= 0x10FFFFu)
+*/
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 KRC_API krc_bool_t krc_utf8_continuation(const krc_uchar8_t c)
 {
 	if (0x80u <= c && c <= 0xBFu)

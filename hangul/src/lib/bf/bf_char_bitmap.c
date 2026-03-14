@@ -283,7 +283,7 @@ BF_API void bf_get_utf8l_bitmap(
 		(krc_size_t)char_length,
 		&unicode_char
 	);
-	if (consumed_bytes == 0) 
+	if (consumed_bytes == 0)
 	{
 		bf_get_font_bitmap(ctx->font_unknown, 0u, font_bitmap);
 		return;

@@ -39,11 +39,9 @@
 //===========================================================================
 static bf_uint32_t bf_hangul_johab844_choseong_set(const bf_uint32_t choseong, const bf_uint32_t jungseong, const bf_uint32_t jongseong)
 {
-	bf_uint32_t set;
-	bf_uint32_t temp;
+	bf_uint32_t set = 0u;
+	bf_uint32_t temp = 0u;
 
-
-	set = 0;
 
 	switch (jungseong)
 	{
@@ -56,31 +54,35 @@ static bf_uint32_t bf_hangul_johab844_choseong_set(const bf_uint32_t choseong, c
 	case  6u:       // ㅕ
 	case  7u:       // ㅖ
 	case 20u:       // ㅣ
-		set = 0;
+		set = 0u;
 		break;
 
 	case  8u:       // ㅗ
 	case 12u:       // ㅛ
 	case 18u:       // ㅡ
-		set = 1;
+		set = 1u;
 		break;
 
 	case 13u:       // ㅜ
 	case 17u:       // ㅠ
-		set = 2;
+		set = 2u;
 		break;
 
 	case  9u:       // ㅘ
 	case 10u:       // ㅙ
 	case 11u:       // ㅚ
 	case 19u:       // ㅢ
-		set = 3;
+		set = 3u;
 		break;
 
 	case 14u:       // ㅝ
 	case 15u:       // ㅞ
 	case 16u:       // ㅟ
-		set = 4;
+		set = 4u;
+		break;
+
+	default:
+		set = 0u;
 		break;
 	}
 
@@ -102,6 +104,10 @@ static bf_uint32_t bf_hangul_johab844_choseong_set(const bf_uint32_t choseong, c
 		case 4:
 			temp = 7;
 			break;
+
+		default:
+			temp = set;
+			break;
 		}
 
 		set = temp;
@@ -112,7 +118,7 @@ static bf_uint32_t bf_hangul_johab844_choseong_set(const bf_uint32_t choseong, c
 
 static bf_uint32_t bf_hangul_johab844_jungseong_set(const bf_uint32_t choseong, const bf_uint32_t jungseong, const bf_uint32_t jongseong)
 {
-	bf_uint32_t set;
+	bf_uint32_t set = 0u;
 
 
 	if (jongseong == 0u)
@@ -120,11 +126,11 @@ static bf_uint32_t bf_hangul_johab844_jungseong_set(const bf_uint32_t choseong, 
 		// 종성이 없는 경우
 		if (choseong == 0u || choseong == 1u) // ㄱㅋ
 		{
-			set = 0;
+			set = 0u;
 		}
 		else
 		{
-			set = 1;
+			set = 1u;
 		}
 	}
 	else
@@ -132,11 +138,11 @@ static bf_uint32_t bf_hangul_johab844_jungseong_set(const bf_uint32_t choseong, 
 		// 종성이 있는 경우
 		if (choseong == 0u || choseong == 1u) // ㄱㅋ
 		{
-			set = 2;
+			set = 2u;
 		}
 		else
 		{
-			set = 3;
+			set = 3u;
 		}
 	}
 
@@ -145,10 +151,8 @@ static bf_uint32_t bf_hangul_johab844_jungseong_set(const bf_uint32_t choseong, 
 
 static bf_uint32_t bf_hangul_johab844_jongseong_set(const bf_uint32_t choseong, const bf_uint32_t jungseong, const bf_uint32_t jongseong)
 {
-	bf_uint32_t set;
+	bf_uint32_t set = 0u;
 
-
-	set = 0;
 
 	switch (jungseong)
 	{
@@ -183,6 +187,10 @@ static bf_uint32_t bf_hangul_johab844_jongseong_set(const bf_uint32_t choseong, 
 	case 17u:       // ㅠ
 	case 18u:       // ㅡ
 		set = 3;
+		break;
+
+	default:
+		set = 0u;
 		break;
 	}
 
@@ -221,13 +229,13 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 
 	font_bitmap_pointer_choseong  = font->choseong [choseong_set ] + font->font_size * choseong;
 	font_bitmap_pointer_jungseong = font->jungseong[jungseong_set] + font->font_size * jungseong;
-	if (0u != jongseong)
+	if (0u == jongseong)
 	{
-		font_bitmap_pointer_jongseong = font->jongseong[jongseong_set] + font->font_size * (jongseong - 1u);
+		font_bitmap_pointer_jongseong = BF_NULL_PTR;
 	}
 	else
 	{
-		font_bitmap_pointer_jongseong = BF_NULL_PTR;
+		font_bitmap_pointer_jongseong = font->jongseong[jongseong_set] + font->font_size * (jongseong - 1u);
 	}
 
 
@@ -393,6 +401,8 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jaeum(
 	/*ㅌ*/ case 0x1Bu: jamo = font->choseong [0]; jamo_index = 16u;      break;
 	/*ㅍ*/ case 0x1Cu: jamo = font->choseong [0]; jamo_index = 17u;      break;
 	/*ㅎ*/ case 0x1Du: jamo = font->choseong [0]; jamo_index = 18u;      break;
+	default:
+		return;
 	}
 
 

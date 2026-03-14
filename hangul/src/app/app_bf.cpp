@@ -150,11 +150,12 @@ public:
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
 
-		uint32_t x = start_x;
-		uint32_t y = start_y;
+		uint32_t x = 0u;
+		uint32_t y = 0u;
 
 		const char* src = str;
 		bool font_bitmap_drawn = false;
+		uint32_t backspace;
 
 		while (*src)
 		{
@@ -164,14 +165,14 @@ public:
 			{
 				if (*src == '\n')
 				{
-					x = start_x;
+					x = 0u;
 					y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 					src += 1u;
 					continue;
 				}
 				else if (*src == '\r')
 				{
-					x = start_x;
+					x = 0u;
 					src += 1u;
 					continue;
 				}
@@ -183,7 +184,8 @@ public:
 				}
 				else if (*src == '\b')
 				{
-					x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+					backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+					x = (x < backspace) ? 0u : (x - backspace);
 					src += 1u;
 					continue;
 				}
@@ -218,7 +220,7 @@ public:
 			}
 
 			bf_get_cp949_bitmap(ctx, char_code, &font_bitmap);
-			draw_font_bitmap(x, y, &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 
 			font_bitmap_drawn = true;
@@ -230,25 +232,26 @@ public:
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
 
-		uint32_t x = start_x;
-		uint32_t y = start_y;
+		uint32_t x = 0u;
+		uint32_t y = 0u;
 
 		const wchar_t* src = str;
 		bool font_bitmap_drawn = false;
+		uint32_t backspace;
 
 		while (*src)
 		{
 			bf_uint16_t char_code;
 			if (*src == '\n')
 			{
-				x = start_x;
+				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\r')
 			{
-				x = start_x;
+				x = 0u;
 				src += 1u;
 				continue;
 			}
@@ -260,7 +263,8 @@ public:
 			}
 			else if (*src == '\b')
 			{
-				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				x = (x < backspace) ? 0u : (x - backspace);
 				src += 1u;
 				continue;
 			}
@@ -281,7 +285,7 @@ public:
 			}
 
 			bf_get_unicode_bitmap(ctx, char_code, &font_bitmap);
-			draw_font_bitmap(x, y, &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 
 			font_bitmap_drawn = true;
@@ -293,11 +297,12 @@ public:
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
 
-		uint32_t x = start_x;
-		uint32_t y = start_y;
+		uint32_t x = 0u;
+		uint32_t y = 0u;
 
 		const uint8_t* src = str;
 		bool font_bitmap_drawn = false;
+		uint32_t backspace;
 
 		while (*src)
 		{
@@ -307,14 +312,14 @@ public:
 
 			if (*src == '\n')
 			{
-				x = start_x;
+				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\r')
 			{
-				x = start_x;
+				x = 0u;
 				src += 1u;
 				continue;
 			}
@@ -326,7 +331,8 @@ public:
 			}
 			else if (*src == '\b')
 			{
-				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				x = (x < backspace) ? 0u : (x - backspace);
 				src += 1u;
 				continue;
 			}
@@ -366,7 +372,7 @@ public:
 			}
 
 			bf_get_utf8l_bitmap(ctx, utf8_char_pointer, utf8_char_length , &font_bitmap);
-			draw_font_bitmap(x, y, &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 
 			font_bitmap_drawn = true;
@@ -378,11 +384,12 @@ public:
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
 
-		uint32_t x = start_x;
-		uint32_t y = start_y;
+		uint32_t x = 0u;
+		uint32_t y = 0u;
 
 		const uint8_t* src = str;
 		bool font_bitmap_drawn = false;
+		uint32_t backspace;
 
 		while (*src)
 		{
@@ -391,14 +398,14 @@ public:
 
 			if (*src == '\n')
 			{
-				x = start_x;
+				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\r')
 			{
-				x = start_x;
+				x = 0u;
 				src += 1u;
 				continue;
 			}
@@ -410,7 +417,8 @@ public:
 			}
 			else if (*src == '\b')
 			{
-				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				x = (x < backspace) ? 0u : (x - backspace);
 				src += 1u;
 				continue;
 			}
@@ -446,7 +454,7 @@ public:
 			}
 
 			bf_get_utf8_bitmap(ctx, utf8_char_pointer, &font_bitmap);
-			draw_font_bitmap(x, y, &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 
 			font_bitmap_drawn = true;
