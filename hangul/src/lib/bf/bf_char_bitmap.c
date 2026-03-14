@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-// File: bf_char_bi.c
+// File: bf_char_bitmap.c
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -42,9 +42,9 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define BF_UNICODE_HANGUL_CHOSEONG(char_code)   ((char_code-0xAC00u)/(21u*28u))
-#define BF_UNICODE_HANGUL_JUNGSEONG(char_code) (((char_code-0xAC00u)%(21u*28u))/28u)
-#define BF_UNICODE_HANGUL_JONGSEONG(char_code)  ((char_code-0xAC00u)%28u)
+#define BF_UNICODE_HANGUL_CHOSEONG(char_code)   (((char_code)-0xAC00u)/(21u*28u))
+#define BF_UNICODE_HANGUL_JUNGSEONG(char_code) ((((char_code)-0xAC00u)%(21u*28u))/28u)
+#define BF_UNICODE_HANGUL_JONGSEONG(char_code)  (((char_code)-0xAC00u)%28u)
 
 
 

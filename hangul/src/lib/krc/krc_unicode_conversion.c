@@ -34,6 +34,17 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+/*
+# Ref. 
+RFC 3629/유니코드 표준
+*/
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 KRC_API krc_bool_t krc_utf8_continuation(const krc_uchar8_t c)
 {
 	if (0x80u <= c && c <= 0xBFu)
@@ -106,7 +117,7 @@ KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_uchar32_t unicode, krc_cha
 		*(utf8_pointer + 2) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
 		return 3;
 	}
-	else if ((unicode <= 0x1FFFFFu))
+	else if ((unicode <= 0x10FFFFu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xF0u | (unicode >> 18u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 12u) & 0x3Fu));
@@ -137,7 +148,7 @@ KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_uchar32_t unicode, krc_ch
 		*(utf8_pointer + 2) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
 		return 3;
 	}
-	else if ((unicode <= 0x1FFFFFu) && (4u <= utf8_size))
+	else if ((unicode <= 0x10FFFFu) && (4u <= utf8_size))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xF0u |  (unicode >> 18u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 12u) & 0x3Fu));

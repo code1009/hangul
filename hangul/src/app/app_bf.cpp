@@ -35,7 +35,7 @@ std::string wcs_to_mbcs(std::wstring input, UINT codepage)
 	return std::string();
 }
 
-std::string utf8_to_mbcs(std::string /*input*/utf8, UINT codepage)
+std::string utf8_to_mbcs(std::string utf8, UINT codepage)
 {
 	std::wstring utf16;
 	std::string  mbcs;
@@ -44,7 +44,7 @@ std::string utf8_to_mbcs(std::string /*input*/utf8, UINT codepage)
 	return mbcs;
 }
 
-std::string mbcs_to_utf8(std::string /*input*/mbcs, UINT codepage)
+std::string mbcs_to_utf8(std::string mbcs, UINT codepage)
 {
 	std::string  utf8;
 	std::wstring utf16;
@@ -218,8 +218,10 @@ public:
 			}
 
 			bf_get_cp949_bitmap(ctx, char_code, &font_bitmap);
-			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
+			draw_font_bitmap(x, y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
+
+			font_bitmap_drawn = true;
 		}
 	}
 
@@ -279,8 +281,10 @@ public:
 			}
 
 			bf_get_unicode_bitmap(ctx, char_code, &font_bitmap);
-			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
+			draw_font_bitmap(x, y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
+
+			font_bitmap_drawn = true;
 		}
 	}
 
@@ -362,8 +366,10 @@ public:
 			}
 
 			bf_get_utf8l_bitmap(ctx, utf8_char_pointer, utf8_char_length , &font_bitmap);
-			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
+			draw_font_bitmap(x, y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
+
+			font_bitmap_drawn = true;
 		}
 	}
 
@@ -440,8 +446,10 @@ public:
 			}
 
 			bf_get_utf8_bitmap(ctx, utf8_char_pointer, &font_bitmap);
-			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
+			draw_font_bitmap(x, y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
+
+			font_bitmap_drawn = true;
 		}
 	}
 };
