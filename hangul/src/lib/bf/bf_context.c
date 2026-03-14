@@ -37,18 +37,18 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-static bf_font_t _bf_default_font_unknown;
+static bf_font_t _bf_default_font_unknown = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static bf_font_t _bf_default_font_ascii_low;
+static bf_font_t _bf_default_font_ascii_low = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-static bf_font_hangul_johab844_t _bf_default_font_hangul_johab844;
+static bf_font_hangul_johab844_t _bf_default_font_hangul_johab844 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, { 0 }, { 0 }, { 0 } };
 
 #if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
-static bf_font_t _bf_font_cp949_special_1128;
+static bf_font_t _bf_font_cp949_special_1128 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 #endif
 
 #if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
-static bf_font_t _bf_font_cp949_hanja_4888;
+static bf_font_t _bf_font_cp949_hanja_4888 = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 #endif
 
 //===========================================================================
