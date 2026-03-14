@@ -468,7 +468,7 @@ static void test1()
 	text_canvas c;
 
 
-	c.draw_cp949_string(1u, 1u, "A한글.똠방각하\n!ф詰☎★");
+	c.draw_cp949_string(0u, 0u, "A 한글 똠방각하 안녕?\n!ф詰");
 	c.output();
 
 
@@ -476,7 +476,7 @@ static void test1()
 
 
 	c.clear();
-	c.draw_unicode_string(10u, 1u, L"b유니코드\n!ф詰");
+	c.draw_unicode_string(10u, 1u, L"유니코드\n안녕?");
 	c.output();
 
 
@@ -484,7 +484,7 @@ static void test1()
 
 
 	c.clear();
-	utf8 = mbcs_to_utf8("C유니코드\n! UTF-8 ▒", CP_ACP);
+	utf8 = mbcs_to_utf8("유니코드\nUTF-8 ABCDEFG", CP_ACP);
 	c.draw_utf8_string(1u, 1u, (const uint8_t*)utf8.c_str());
 	c.output();
 
@@ -493,8 +493,8 @@ static void test1()
 
 
 	c.clear();
-	utf8 = mbcs_to_utf8("d유니코드\n! UTF-8 ▒", CP_ACP);
-	c.draw_utf8l_string(1u, 1u, (const uint8_t*)utf8.c_str());
+	utf8 = mbcs_to_utf8("유니코드\nUTF-8 가나다", CP_ACP);
+	c.draw_utf8l_string(2u, 2u, (const uint8_t*)utf8.c_str());
 	c.output();
 }
 
