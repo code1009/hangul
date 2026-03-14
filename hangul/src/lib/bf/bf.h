@@ -48,7 +48,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844_XXX(
 	...
 );
 
-함수들의 index파라메터는 범위검사를 하지 않음. 
+함수들의 index파라메터는 의도적으로 범위검사를 하지 않음.
 호출하는 쪽에서 범위검사를 해야함.
 
 */
