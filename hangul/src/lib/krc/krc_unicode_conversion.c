@@ -86,6 +86,37 @@ KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer)
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_char_t* utf8_pointer)
+{
+	if ((unicode <= 0x7Fu))
+	{
+		*(utf8_pointer + 0) = (krc_char_t)(unicode);
+		return 1;
+	}
+	else if ((unicode <= 0x7FFu))
+	{
+		*(utf8_pointer + 0) = (krc_char_t)(0xC0u | (unicode >> 6u));
+		*(utf8_pointer + 1) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
+		return 2;
+	}
+	else if ((unicode <= 0xffff))
+	{
+		*(utf8_pointer + 0) = (krc_char_t)(0xE0u | (unicode >> 12u));
+		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 6u) & 0x3Fu));
+		*(utf8_pointer + 2) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
+		return 3;
+	}
+	else if ((unicode <= 0x1FFFFFu))
+	{
+		*(utf8_pointer + 0) = (krc_char_t)(0xF0u | (unicode >> 18u));
+		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 12u) & 0x3Fu));
+		*(utf8_pointer + 2) = (krc_char_t)(0x80u | ((unicode >> 6u) & 0x3Fu));
+		*(utf8_pointer + 3) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
+		return 4;
+	}
+	return 0;
+}
+
 KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_wchar32_t unicode, krc_char_t* utf8_pointer, const krc_size_t utf8_size)
 {
 	if     ((unicode <= 0x7Fu) && (1u <= utf8_size))
@@ -117,36 +148,6 @@ KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_wchar32_t unicode, krc_ch
 	return 0;
 }
 
-KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_wchar32_t unicode, krc_char_t* utf8_pointer)
-{
-	if     ((unicode <= 0x7Fu))
-	{
-		*(utf8_pointer + 0) = (krc_char_t)(unicode);
-		return 1;
-	}
-	else if ((unicode <= 0x7FFu))
-	{
-		*(utf8_pointer + 0) = (krc_char_t)(0xC0u | (unicode >> 6u));
-		*(utf8_pointer + 1) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
-		return 2;
-	}
-	else if ((unicode <= 0xffff))
-	{
-		*(utf8_pointer + 0) = (krc_char_t)(0xE0u |  (unicode >> 12u));
-		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >>  6u) & 0x3Fu));
-		*(utf8_pointer + 2) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
-		return 3;
-	}
-	else if ((unicode <= 0x1FFFFFu))
-	{
-		*(utf8_pointer + 0) = (krc_char_t)(0xF0u |  (unicode >> 18u));
-		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 12u) & 0x3Fu));
-		*(utf8_pointer + 2) = (krc_char_t)(0x80u | ((unicode >>  6u) & 0x3Fu));
-		*(utf8_pointer + 3) = (krc_char_t)(0x80u |  (unicode & 0x3Fu));
-		return 4;
-	}
-	return 0;
-}
 
 
 
