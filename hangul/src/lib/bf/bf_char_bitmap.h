@@ -31,8 +31,14 @@ BF_API void bf_get_unicode_bitmap(
 
 BF_API void bf_get_utf8_bitmap(
 	bf_context_t* ctx,
-	const bf_uint8_t* char_code_pointer,
-	const bf_uint32_t char_code_length,
+	const bf_uint8_t* char_poiner,
+	bf_font_bitmap_t* font_bitmap
+);
+
+BF_API void bf_get_utf8l_bitmap(
+	bf_context_t* ctx,
+	const bf_uint8_t* char_pointer,
+	const bf_uint32_t char_length,
 	bf_font_bitmap_t* font_bitmap
 );
 

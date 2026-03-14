@@ -44,7 +44,7 @@ static void krc_mbcs_ostream_put_utf8_from_unicode(krc_mbcs_ostream_t* o, const 
 	krc_size_t wsize;
 
 
-	wsize = krc_unicode_to_utf8_char(wcs, buffer, 4u);
+	wsize = krc_unicode_to_utf8_char(wcs, buffer);
 	switch (wsize)
 	{
 	case 1:
@@ -198,7 +198,7 @@ KRC_API krc_size_t krc_utf8_to_cp949(const krc_char_t* utf8_string, const krc_si
 
 		utf8_pointer = (src + index);
 		utf8_size = count - index;
-		utf8_read = krc_utf8_to_unicode_char(utf8_pointer, utf8_size, &wcs32);
+		utf8_read = krc_utf8l_to_unicode_char(utf8_pointer, utf8_size, &wcs32);
 		switch (utf8_read)
 		{
 		case 1u:

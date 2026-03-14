@@ -14,19 +14,15 @@
 //===========================================================================
 #include "bf_font/bf_font_data_16x16_unknown.h"
 
-#if (1==BF_CONFIG_FONT_DATA_ASCII_LOW)
 #include "bf_font/bf_font_data_08x16_ascii_low.h"
-#endif
 
-#if (1==BF_CONFIG_FONT_DATA_HANGUL)
 #include "bf_font/bf_font_data_16x16_hangul_johab844.h"
-#endif
 
-#if (1==BF_CONFIG_FONT_DATA_SPECIAL)
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 #include "bf_font/bf_font_data_16x16_cp949_special_1128.h"
 #endif
 
-#if (1==BF_CONFIG_FONT_DATA_HANJA)
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 #include "bf_font/bf_font_data_16x16_cp949_hanja_4888.h"
 #endif
 

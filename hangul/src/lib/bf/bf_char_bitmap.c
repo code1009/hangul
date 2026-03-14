@@ -58,11 +58,14 @@ BF_API void bf_get_cp949_bitmap(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	krc_wchar_t char_unicode;
+#if ((1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL) || (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA))
+	bf_int32_t  code_index;
+#endif
 	krc_bool_t  char_conversion;
+	krc_wchar_t char_unicode;
+
 
 	bf_uint32_t char_type;
-	bf_int32_t code_index;
 
 	bf_uint32_t choseong;
 	bf_uint32_t jungseong;
@@ -104,6 +107,7 @@ BF_API void bf_get_cp949_bitmap(
 
 
 		//-----------------------------------------------------------------------
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 	case KRC_CODE_RANGE_SPECIAL_1128:
 		code_index = krc_cp949_index_special_1128(char_code);
 		if (code_index >= 0)
@@ -112,9 +116,10 @@ BF_API void bf_get_cp949_bitmap(
 			return;
 		}
 		break;
-
+#endif
 
 		//-----------------------------------------------------------------------
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 	case KRC_CODE_RANGE_HANJA_4888:
 		code_index = krc_cp949_index_hanja_4888(char_code);
 		if (code_index >= 0)
@@ -123,7 +128,7 @@ BF_API void bf_get_cp949_bitmap(
 			return;
 		}
 		break;
-
+#endif
 
 		//-----------------------------------------------------------------------
 	case KRC_CODE_RANGE_UNKNOWN:
@@ -148,11 +153,14 @@ BF_API void bf_get_unicode_bitmap(
 	bf_font_bitmap_t* font_bitmap
 )
 {
+#if ((1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL) || (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA))
+	bf_int32_t   code_index;
+
 	krc_char16_t char_code;
 	krc_bool_t   char_conversion;
+#endif
 
 	bf_uint32_t char_type;
-	bf_int32_t code_index;
 
 	bf_uint32_t choseong;
 	bf_uint32_t jungseong;
@@ -189,6 +197,7 @@ BF_API void bf_get_unicode_bitmap(
 
 
 		//-----------------------------------------------------------------------
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 	case KRC_CODE_RANGE_SPECIAL_1128:
 		char_conversion = krc_unicode_to_cp949_special_1128(char_unicode, &char_code);
 		if (KRC_TRUE == char_conversion)
@@ -201,9 +210,11 @@ BF_API void bf_get_unicode_bitmap(
 			}
 		}
 		break;
+#endif
 
 
 		//-----------------------------------------------------------------------
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 	case KRC_CODE_RANGE_HANJA_4888:
 		char_conversion = krc_unicode_to_cp949_hanja_4888(char_unicode, &char_code);
 		if (KRC_TRUE == char_conversion)
@@ -216,6 +227,7 @@ BF_API void bf_get_unicode_bitmap(
 			}
 		}
 		break;
+#endif
 
 
 		//-----------------------------------------------------------------------
@@ -237,16 +249,38 @@ BF_API void bf_get_unicode_bitmap(
 //===========================================================================
 BF_API void bf_get_utf8_bitmap(
 	bf_context_t* ctx,
-	const bf_uint8_t* char_code_pointer,
-	const bf_uint32_t char_code_length,
+	const bf_uint8_t* char_pointer,
 	bf_font_bitmap_t* font_bitmap
 )
 {
 	krc_wchar32_t unicode_char;
 	krc_size_t consumed_bytes;
 	consumed_bytes = krc_utf8_to_unicode_char(
-		(const krc_char_t*)char_code_pointer,
-		(krc_size_t)char_code_length,
+		(const krc_char_t*)char_pointer,
+		&unicode_char
+	);
+	if (consumed_bytes == 0)
+	{
+		bf_get_font_bitmap(ctx->font_unknown, 0u, font_bitmap);
+		return;
+	}
+
+
+	bf_get_unicode_bitmap(ctx, (bf_uint16_t)unicode_char, font_bitmap);
+}
+
+BF_API void bf_get_utf8l_bitmap(
+	bf_context_t* ctx,
+	const bf_uint8_t* char_pointer,
+	const bf_uint32_t char_length,
+	bf_font_bitmap_t* font_bitmap
+)
+{
+	krc_wchar32_t unicode_char;
+	krc_size_t consumed_bytes;
+	consumed_bytes = krc_utf8l_to_unicode_char(
+		(const krc_char_t*)char_pointer,
+		(krc_size_t)char_length,
 		&unicode_char
 	);
 	if (consumed_bytes == 0) 

@@ -39,19 +39,15 @@
 //===========================================================================
 static bf_font_t _bf_default_font_unknown;
 
-#if (1==BF_CONFIG_FONT_DATA_ASCII_LOW)
 static bf_font_t _bf_default_font_ascii_low;
-#endif
 
-#if (1==BF_CONFIG_FONT_DATA_HANGUL)
 static bf_font_hangul_johab844_t _bf_default_font_hangul_johab844;
-#endif
 
-#if (1==BF_CONFIG_FONT_DATA_SPECIAL)
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 static bf_font_t _bf_font_cp949_special_1128;
 #endif
 
-#if (1==BF_CONFIG_FONT_DATA_HANJA)
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 static bf_font_t _bf_font_cp949_hanja_4888;
 #endif
 
@@ -90,6 +86,7 @@ static void bf_font_default_font_hangul(void)
 	);
 }
 
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 static void bf_font_default_font_special(void)
 {
 	bf_font_16x16_init(
@@ -98,7 +95,9 @@ static void bf_font_default_font_special(void)
 		BF_FONT_TYPE_CP949_SPECIAL_1128, 1128u
 	);
 }
+#endif
 
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 static void bf_font_default_font_hanja(void)
 {
 	bf_font_16x16_init(
@@ -107,14 +106,23 @@ static void bf_font_default_font_hanja(void)
 		BF_FONT_TYPE_CP949_HANJA_4888, 4888u
 	);
 }
+#endif
 
 static void bf_font_default_font_init(void)
 {
 	bf_font_default_font_unknown();
+
 	bf_font_default_font_ascii_low();
+
 	bf_font_default_font_hangul();
+
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 	bf_font_default_font_special();
+#endif
+
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 	bf_font_default_font_hanja();
+#endif
 }
 
 
@@ -128,10 +136,18 @@ BF_API void bf_context_default_init(void)
 	bf_font_default_font_init();
 
 	_context.font_unknown = &_bf_default_font_unknown;
+
 	_context.font_ascii_low = &_bf_default_font_ascii_low;
+
 	_context.font_hangul_johab844 = &_bf_default_font_hangul_johab844;
+
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL)
 	_context.font_cp949_special_1128 = &_bf_font_cp949_special_1128;
+#endif
+
+#if (1==BF_CONFIG_SUPPORT_FONT_CP949_HANJA)
 	_context.font_cp949_hanja_4888 = &_bf_font_cp949_hanja_4888;
+#endif
 }
 
 BF_API bf_context_t* bf_context_default_get(void)

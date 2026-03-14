@@ -284,7 +284,7 @@ public:
 		}
 	}
 
-	void draw_utf8_string(const uint32_t start_x, const uint32_t start_y, const uint8_t* str)
+	void draw_utf8l_string(const uint32_t start_x, const uint32_t start_y, const uint8_t* str)
 	{
 		bf_context_t* ctx = bf_context_default_get();
 		bf_font_bitmap_t font_bitmap;
@@ -361,7 +361,85 @@ public:
 				}
 			}
 
-			bf_get_utf8_bitmap(ctx, utf8_char_pointer, utf8_char_length , &font_bitmap);
+			bf_get_utf8l_bitmap(ctx, utf8_char_pointer, utf8_char_length , &font_bitmap);
+			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
+			x += font_bitmap.font_bitmap_cx;
+		}
+	}
+
+	void draw_utf8_string(const uint32_t start_x, const uint32_t start_y, const uint8_t* str)
+	{
+		bf_context_t* ctx = bf_context_default_get();
+		bf_font_bitmap_t font_bitmap;
+
+		uint32_t x = start_x;
+		uint32_t y = start_y;
+
+		const uint8_t* src = str;
+		bool font_bitmap_drawn = false;
+
+		while (*src)
+		{
+			uint8_t utf8_char;
+			const uint8_t* utf8_char_pointer = NULL;
+
+			if (*src == '\n')
+			{
+				x = start_x;
+				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
+				src += 1u;
+				continue;
+			}
+			else if (*src == '\r')
+			{
+				x = start_x;
+				src += 1u;
+				continue;
+			}
+			else if (*src == '\t')
+			{
+				x += 8u * 8u;
+				src += 1u;
+				continue;
+			}
+			else if (*src == '\b')
+			{
+				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
+				src += 1u;
+				continue;
+			}
+			else if (*src < 0x20u)
+			{
+				utf8_char = '?';
+				src += 1u;
+
+				utf8_char_pointer = &utf8_char;
+			}
+			else if (*src == 0x7Fu)
+			{
+				utf8_char = '?';
+				src += 1u;
+
+				utf8_char_pointer = &utf8_char;
+			}
+			else
+			{
+				krc_size_t char_size = krc_utf8_char_size((const krc_char_t*)src);
+				if (char_size == 0u)
+				{
+					utf8_char = '?';
+					src += 1u;
+
+					utf8_char_pointer = &utf8_char;
+				}
+				else
+				{
+					utf8_char_pointer = (uint8_t*)src;
+					src += char_size;
+				}
+			}
+
+			bf_get_utf8_bitmap(ctx, utf8_char_pointer, &font_bitmap);
 			draw_font_bitmap(start_x + x, start_y + y, &font_bitmap);
 			x += font_bitmap.font_bitmap_cx;
 		}
@@ -370,6 +448,7 @@ public:
 
 static void test1()
 {
+	std::string utf8;
 	text_canvas c;
 
 
@@ -389,8 +468,17 @@ static void test1()
 
 
 	c.clear();
-	std::string utf8 = mbcs_to_utf8("c유니코드\n! UTF-8 ▒", CP_ACP);
+	utf8 = mbcs_to_utf8("C유니코드\n! UTF-8 ▒", CP_ACP);
 	c.draw_utf8_string(1u, 1u, (const uint8_t*)utf8.c_str());
+	c.output();
+
+
+	printf("\r\n\r\n");
+
+
+	c.clear();
+	utf8 = mbcs_to_utf8("d유니코드\n! UTF-8 ▒", CP_ACP);
+	c.draw_utf8l_string(1u, 1u, (const uint8_t*)utf8.c_str());
 	c.output();
 }
 

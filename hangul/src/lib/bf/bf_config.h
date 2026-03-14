@@ -17,10 +17,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define BF_CONFIG_FONT_DATA_ASCII_LOW 1
-#define BF_CONFIG_FONT_DATA_HANGUL 1
-#define BF_CONFIG_FONT_DATA_SPECIAL 1
-#define BF_CONFIG_FONT_DATA_HANJA 1
+#define BF_CONFIG_SUPPORT_FONT_CP949_SPECIAL 0
+#define BF_CONFIG_SUPPORT_FONT_CP949_HANJA 0
 
 
 
