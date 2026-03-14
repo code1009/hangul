@@ -14,50 +14,33 @@
 std::wstring mbcs_to_wcs(std::string input, UINT codepage)
 {
 	int len = MultiByteToWideChar(codepage, 0, input.c_str(), -1, NULL, 0);
-
-
 	if (len > 0)
 	{
 		std::vector<wchar_t> buf(len);
-
-
 		MultiByteToWideChar(codepage, 0, input.c_str(), -1, &buf[0], len);
-
 		return std::wstring(&buf[0]);
 	}
-
 	return std::wstring();
 }
 
 std::string wcs_to_mbcs(std::wstring input, UINT codepage)
 {
 	int len = WideCharToMultiByte(codepage, 0, input.c_str(), -1, NULL, 0, NULL, NULL);
-
-
 	if (len > 0)
 	{
 		std::vector<char> buf(len);
-
-
 		WideCharToMultiByte(codepage, 0, input.c_str(), -1, &buf[0], len, NULL, NULL);
-
 		return std::string(&buf[0]);
 	}
-
 	return std::string();
 }
 
 std::string utf8_to_mbcs(std::string /*input*/utf8, UINT codepage)
 {
-	//	std::string  utf8 ;
 	std::wstring utf16;
 	std::string  mbcs;
-
-
-	//	utf8  = input;
 	utf16 = mbcs_to_wcs(utf8, CP_UTF8);
 	mbcs = wcs_to_mbcs(utf16, codepage);
-
 	return mbcs;
 }
 
@@ -65,13 +48,8 @@ std::string mbcs_to_utf8(std::string /*input*/mbcs, UINT codepage)
 {
 	std::string  utf8;
 	std::wstring utf16;
-	//	std::string  mbcs ;
-
-
-	//	mbcs  = input;
 	utf16 = mbcs_to_wcs(mbcs, codepage);
 	utf8 = wcs_to_mbcs(utf16, CP_UTF8);
-
 	return utf8;
 }
 
@@ -150,7 +128,7 @@ public:
 
 	void draw_font_bitmap(const uint32_t start_x, const uint32_t start_y, bf_font_bitmap_t* font_bitmap)
 	{
-		static const uint8_t mask[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+		static const uint8_t mask[8] = { 0x80u, 0x40u, 0x20u, 0x10u, 0x08u, 0x04u, 0x02u, 0x01u };
 
 		uint32_t x;
 		uint32_t y;
@@ -159,9 +137,9 @@ public:
 		{
 			for (x = 0u; x < font_bitmap->font_bitmap_cx; x++)
 			{
-				if (font_bitmap->font_bitmap_pointer[y * font_bitmap->font_bitmap_cx_size + x / 8u] & mask[x % 8])
+				if (font_bitmap->font_bitmap_pointer[y * font_bitmap->font_bitmap_cx_size + x / 8u] & mask[x % 8u])
 				{
-					draw_pixel(start_x + x, start_y + y, 1);
+					draw_pixel(start_x + x, start_y + y, 1u);
 				}
 			}
 		}
@@ -182,47 +160,47 @@ public:
 		{
 			bf_uint16_t char_code;
 
-			if ((unsigned char)*src < 0x80)
+			if ((unsigned char)*src < 0x80u)
 			{
 				if (*src == '\n')
 				{
 					x = start_x;
 					y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
-					src += 1;
+					src += 1u;
 					continue;
 				}
 				else if (*src == '\r')
 				{
 					x = start_x;
-					src += 1;
+					src += 1u;
 					continue;
 				}
 				else if (*src == '\t')
 				{
 					x += 8*8u;
-					src += 1;
+					src += 1u;
 					continue;
 				}
 				else if (*src == '\b')
 				{
 					x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-					src += 1;
+					src += 1u;
 					continue;
 				}
 				else if (*src < 0x20)
 				{
 					char_code = '?';
-					src += 1;
+					src += 1u;
 				}
 				else if (*src == 0x7F)
 				{
 					char_code = '?';
-					src += 1;
+					src += 1u;
 				}
 				else
 				{
 					char_code = (bf_uint16_t)(unsigned char)*src;
-					src += 1;
+					src += 1u;
 				}
 			}
 			else
@@ -230,12 +208,12 @@ public:
 				if (*(src + 1) != '\0')
 				{
 					char_code = ((bf_uint16_t)(unsigned char)*src << 8) | (bf_uint16_t)(unsigned char)*(src + 1);
-					src += 2;
+					src += 2u;
 				}
 				else
 				{
 					char_code = '?';
-					src += 1;
+					src += 1u;
 				}
 			}
 
@@ -263,41 +241,41 @@ public:
 			{
 				x = start_x;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
-				src += 1;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\r')
 			{
 				x = start_x;
-				src += 1;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\t')
 			{
-				x += 8 * 8u;
-				src += 1;
+				x += 8u * 8u;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\b')
 			{
 				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-				src += 1;
+				src += 1u;
 				continue;
 			}
 			else if (*src < 0x20)
 			{
 				char_code = '?';
-				src += 1;
+				src += 1u;
 			}
 			else if (*src == 0x7F)
 			{
 				char_code = '?';
-				src += 1;
+				src += 1u;
 			}
 			else
 			{
 				char_code = (bf_uint16_t)*src;
-				src += 1;
+				src += 1u;
 			}
 
 			bf_get_unicode_bitmap(ctx, char_code, &font_bitmap);
@@ -321,61 +299,61 @@ public:
 		{
 			uint8_t utf8_char;
 			const uint8_t* utf8_char_pointer = NULL;
-			uint32_t utf8_char_length = 0;
+			uint32_t utf8_char_length = 0u;
 
 			if (*src == '\n')
 			{
 				x = start_x;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
-				src += 1;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\r')
 			{
 				x = start_x;
-				src += 1;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\t')
 			{
-				x += 8 * 8u;
-				src += 1;
+				x += 8u * 8u;
+				src += 1u;
 				continue;
 			}
 			else if (*src == '\b')
 			{
 				x -= (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-				src += 1;
+				src += 1u;
 				continue;
 			}
-			else if (*src < 0x20)
+			else if (*src < 0x20u)
 			{
 				utf8_char = '?';
-				src += 1;
+				src += 1u;
 
 				utf8_char_pointer = &utf8_char;
-				utf8_char_length = 1;
+				utf8_char_length = 1u;
 			}
-			else if (*src == 0x7F)
+			else if (*src == 0x7Fu)
 			{
 				utf8_char = '?';
-				src += 1;
+				src += 1u;
 
 				utf8_char_pointer = &utf8_char;
-				utf8_char_length = 1;
+				utf8_char_length = 1u;
 			}
 			else
 			{
 				utf8_char_pointer = (uint8_t*)src;
 				utf8_char_length = (uint32_t)krc_utf8_char_size((const krc_char_t*)src);
 
-				if (utf8_char_length == 0)
+				if (utf8_char_length == 0u)
 				{
 					utf8_char = '?';
 					utf8_char_pointer = &utf8_char;
-					utf8_char_length = 1;
+					utf8_char_length = 1u;
 
-					src += 1;
+					src += 1u;
 				}
 				else
 				{
