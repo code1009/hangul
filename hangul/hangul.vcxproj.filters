@@ -10,14 +10,17 @@
     <Filter Include="src\lib\krc">
       <UniqueIdentifier>{a47ca931-f341-4e4b-90b4-dea44911503b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\lib\krbf">
-      <UniqueIdentifier>{b7e88c37-c4e2-4619-8c41-694bd80c8fbd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\app">
       <UniqueIdentifier>{d1ed7d8c-89cd-41ac-bb3a-fcea08fa7997}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\lib\krc\krc_code_table">
       <UniqueIdentifier>{60f48eaa-6e93-4918-bc2f-e6df9180e4f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\bf">
+      <UniqueIdentifier>{b7e88c37-c4e2-4619-8c41-694bd80c8fbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\lib\bf\bf_font_data">
+      <UniqueIdentifier>{7872b7b3-9429-4c28-9c3e-8790d1c12f4c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,9 +29,6 @@
     </ClCompile>
     <ClCompile Include="src\app\app_krc.cpp">
       <Filter>src\app</Filter>
-    </ClCompile>
-    <ClCompile Include="src\lib\krc\krc_code_convert.c">
-      <Filter>src\lib\krc</Filter>
     </ClCompile>
     <ClCompile Include="src\lib\krc\krc_code_table.c">
       <Filter>src\lib\krc</Filter>
@@ -39,11 +39,41 @@
     <ClCompile Include="src\lib\krc\krc_cp949_index.c">
       <Filter>src\lib\krc</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\krc\krc_convert.c">
-      <Filter>src\lib\krc</Filter>
-    </ClCompile>
     <ClCompile Include="src\lib\krc\krc_stream.c">
       <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_char_bitmap.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_context.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_font.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_font_bitmap.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_font_bitmap_hangul_johab844.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\bf\bf_font_data.c">
+      <Filter>src\lib\bf</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_code_conversion.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_cp949_unicode.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_cp949_utf8.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc\krc_unicode_conversion.c">
+      <Filter>src\lib\krc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\app\app_bf.cpp">
+      <Filter>src\app</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,9 +98,6 @@
     <ClInclude Include="src\lib\krc\krc_api.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_code_convert.h">
-      <Filter>src\lib\krc</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\krc\krc_code_table.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
@@ -86,11 +113,68 @@
     <ClInclude Include="src\lib\krc\krc_cp949_index.h">
       <Filter>src\lib\krc</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc\krc_convert.h">
-      <Filter>src\lib\krc</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\krc\krc_stream.h">
       <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_api.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_char_bitmap.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_config.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_context.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font_bitmap.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font_bitmap_hangul_johab844.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font_data.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_code_conversion.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_cp949_unicode.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_cp949_utf8.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc\krc_unicode_conversion.h">
+      <Filter>src\lib\krc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\app\app_bf.hpp">
+      <Filter>src\app</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_type.h">
+      <Filter>src\lib\bf</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_08x16_ascii_low.h">
+      <Filter>src\lib\bf\bf_font_data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_cp949_hanja_4888.h">
+      <Filter>src\lib\bf\bf_font_data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_cp949_special_1128.h">
+      <Filter>src\lib\bf\bf_font_data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_hangul_johab844.h">
+      <Filter>src\lib\bf\bf_font_data</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\bf\bf_font\bf_font_data_16x16_unknown.h">
+      <Filter>src\lib\bf\bf_font_data</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
