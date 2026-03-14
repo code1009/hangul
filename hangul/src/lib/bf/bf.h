@@ -31,6 +31,31 @@
 
 
 
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+/*
+
+# 주의사항
+BF_API void bf_get_font_bitmap(
+	bf_font_t* font,
+	const bf_uint32_t index,
+	bf_font_bitmap_t* font_bitmap
+);
+
+BF_API void bf_get_font_bitmap_hangul_johab844_XXX(
+	bf_font_hangul_johab844_t* font,
+	const bf_uint32_t index,
+	...
+);
+
+함수들의 index파라메터는 범위검사를 하지 않음. 
+호출하는 쪽에서 범위검사를 해야함.
+
+*/
+
+
+
+
 #endif
 
 
