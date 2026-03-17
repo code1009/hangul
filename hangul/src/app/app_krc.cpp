@@ -16,6 +16,14 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+extern "C" const krc_uchar16_t _krc_cp949_to_unicode_special_1128[1128];
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 std::wstring generate_unicode_hangul_11172()
 {
     std::wstring str;
@@ -44,6 +52,22 @@ std::wstring generate_unicode_hangul_51()
     return str;
 }
 
+std::wstring generate_unicode_special_1128()
+{
+    std::wstring str;
+	wchar_t code;
+    size_t index;
+    for (index = 0u; index < 1128u; index++)
+    {
+        code = _krc_cp949_to_unicode_special_1128[index];
+        if (code != 0x003fu)
+        {
+            str += code;
+        }
+	}
+    return str;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 std::string generate_cp949_hangul_51()
@@ -52,8 +76,8 @@ std::string generate_cp949_hangul_51()
     uint16_t code;
     for (code = 0xA4A1u; code <= 0xA4D3u; code++)
     {
-        str += static_cast<char>(code);
 		str += static_cast<char>(code >> 8u);
+        str += static_cast<char>(code);
     }
 
     assert(str.length() == 51u * 2u);
@@ -79,8 +103,8 @@ std::string generate_cp949_hangul_euckr_2350()
         for (offset = 0xA1u; offset <= 0xFEu; offset++, code_count++)
         {
             code = page + offset;
-            str += static_cast<char>(code);
             str += static_cast<char>(code >> 8u);
+            str += static_cast<char>(code);
         }
 		assert(code_count == 94u);
     }
@@ -216,7 +240,8 @@ std::string generate_cp949_special_1128()
 		assert(code_count == 94u);
     }
 	assert(page_count == 12u);
-    assert(str.length() == 1128u * 2u); // 1,128개의 2바이트 문자
+    assert(str.length() == 1128u * 2u); // 1,128개의 2바이트 문자 
+
     return str;
 }
 
@@ -281,31 +306,76 @@ std::string  _krc_utf8_hanja_4888;
 //===========================================================================
 void setup_window_charset(void)
 {
-    std::wstring unicode_hangul_51     = generate_unicode_hangul_51();
-    std::wstring unicode_hangul_11172  = generate_unicode_hangul_11172();
+	//-----------------------------------------------------------------------
+    std::wstring unicode_hangul_51;
+    std::string  cp949_hangul_51;
 
-    /*
-    std::string cp949_hangul_51        = generate_cp949_hangul_51();
+    unicode_hangul_51 = generate_unicode_hangul_51();
+    cp949_hangul_51 = generate_cp949_hangul_51();
+    assert(unicode_hangul_51 == mbcs_to_wcs(cp949_hangul_51, 949));
+    assert(cp949_hangul_51 == wcs_to_mbcs(unicode_hangul_51, 949));
+
+    cp949_hangul_51 = wcs_to_mbcs(unicode_hangul_51, 949);
+	unicode_hangul_51 = mbcs_to_wcs(cp949_hangul_51, 949);
+    assert(unicode_hangul_51 == mbcs_to_wcs(cp949_hangul_51, 949));
+    assert(cp949_hangul_51 == wcs_to_mbcs(unicode_hangul_51, 949));
+
+    
+
+    //-----------------------------------------------------------------------
     std::string cp949_hangul_2350      = generate_cp949_hangul_euckr_2350();
     std::string cp949_hangul_ex_a_5696 = generate_cp949_hangul_ex_a_5696();
     std::string cp949_hangul_ex_b_3108 = generate_cp949_hangul_ex_b_3108();
     std::string cp949_hangul_ex_c_18   = generate_cp949_hangul_ex_c_18();
-    std::string cp949_hangul_11172     = cp949_hangul_2350 + cp949_hangul_ex_a_5696 + cp949_hangul_ex_b_3108 + cp949_hangul_ex_c_18;
-    */
-    std::string cp949_hangul_51        = wcs_to_mbcs(unicode_hangul_51, 949);
-	std::string cp949_hangul_11172     = wcs_to_mbcs(unicode_hangul_11172, 949);
-    std::string cp949_special_1128     = generate_cp949_special_1128();
-    std::string cp949_hanja_4888       = generate_cp949_hanja_4888();
 
-	std::wstring unicode_special_1128 = mbcs_to_wcs(cp949_special_1128, 949);
-	std::wstring unicode_hanja_4888   = mbcs_to_wcs(cp949_hanja_4888, 949);
+    std::wstring unicode_hangul_11172;
+    std::string  cp949_hangul_11172;
+
+    unicode_hangul_11172 = generate_unicode_hangul_11172();
+	cp949_hangul_11172 = wcs_to_mbcs(unicode_hangul_11172, 949);
+
+    assert(unicode_hangul_11172 == mbcs_to_wcs(cp949_hangul_11172, 949));
+    assert(cp949_hangul_11172 == wcs_to_mbcs(unicode_hangul_11172, 949));
+
+    cp949_hangul_11172 = cp949_hangul_2350 + cp949_hangul_ex_a_5696 + cp949_hangul_ex_b_3108 + cp949_hangul_ex_c_18;
+	unicode_hangul_11172 = mbcs_to_wcs(cp949_hangul_11172, 949);
+
+    assert(unicode_hangul_11172 == mbcs_to_wcs(cp949_hangul_11172, 949));
+    assert(cp949_hangul_11172 == wcs_to_mbcs(unicode_hangul_11172, 949));
 
 
+    //-----------------------------------------------------------------------
+    std::string cp949_special_1128;
+	std::wstring unicode_special_1128;
+
+    cp949_special_1128 = generate_cp949_special_1128();
+	std::cout << "cp949_special_1128 length: " << cp949_special_1128.length() << "/2\n";
+    unicode_special_1128 = mbcs_to_wcs(cp949_special_1128, 949);
+    assert(unicode_special_1128 == mbcs_to_wcs(cp949_special_1128, 949));
+	//assert(cp949_special_1128 == wcs_to_mbcs(unicode_special_1128, 949)); // assertion failed
+
+    unicode_special_1128 = generate_unicode_special_1128();
+    std::cout << "unicode_special_1128 length: " << unicode_special_1128.length() << "\n";
+    cp949_special_1128 = wcs_to_mbcs(unicode_special_1128, 949);
+    assert(unicode_special_1128 == mbcs_to_wcs(cp949_special_1128, 949));
+    assert(cp949_special_1128 == wcs_to_mbcs(unicode_special_1128, 949));
+
+
+    //-----------------------------------------------------------------------
+    std::string cp949_hanja_4888;
+    std::wstring unicode_hanja_4888; 
+
+    cp949_hanja_4888 = generate_cp949_hanja_4888();
+    unicode_hanja_4888  = mbcs_to_wcs(cp949_hanja_4888, 949);
+	assert(unicode_hanja_4888 == mbcs_to_wcs(cp949_hanja_4888, 949));
+	assert(cp949_hanja_4888 == wcs_to_mbcs(unicode_hanja_4888, 949));
+
+
+    //-----------------------------------------------------------------------
     std::string utf8_hangul_51    = wcs_to_utf8(unicode_hangul_51);
     std::string utf8_hangul_11172 = wcs_to_utf8(unicode_hangul_11172);
     std::string utf8_special_1128 = wcs_to_utf8(unicode_special_1128);
     std::string utf8_hanja_4888   = wcs_to_utf8(unicode_hanja_4888);
-
 
     _windows_unicode_hangul_51    = unicode_hangul_51   ;
     _windows_unicode_hangul_11172 = unicode_hangul_11172;
@@ -428,8 +498,8 @@ void test_2()
         (krc_wchar_t*)_windows_unicode_special_1128.data(), _windows_unicode_special_1128.length(),
         (krc_char_t*)_krc_cp949_special_1128.data(), _krc_cp949_special_1128.length()
     );
-    //assert(_windows_cp949_special_1128.length() == result);
-    //assert(_windows_cp949_special_1128 == _krc_cp949_special_1128);
+    assert(_windows_cp949_special_1128.length() == result);
+    assert(_windows_cp949_special_1128 == _krc_cp949_special_1128);
 
 
     result = krc_unicode_to_cp949(
@@ -508,8 +578,8 @@ void test_4()
         (krc_char_t*)_windows_utf8_special_1128.data(), _windows_utf8_special_1128.length(),
         (krc_char_t*)_krc_cp949_special_1128.data(), _krc_cp949_special_1128.length()
     );
-    //assert(_windows_cp949_special_1128.length() == result);
-    //assert(_windows_cp949_special_1128 == _krc_cp949_special_1128);
+    assert(_windows_cp949_special_1128.length() == result);
+    assert(_windows_cp949_special_1128 == _krc_cp949_special_1128);
 
 
     result = krc_utf8_to_cp949(

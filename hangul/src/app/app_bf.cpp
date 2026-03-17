@@ -432,7 +432,7 @@ static void test1()
 	text_canvas c;
 
 
-	c.draw_cp949_string(0u, 0u, "A 한글 똠방각하 안녕?\n!ф詰");
+	c.draw_cp949_string(0u, 0u, "A 한글 똠방각하!\n!ф詰★♥");
 	c.output();
 
 
