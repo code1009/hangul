@@ -92,7 +92,6 @@ END
 
 3 TEXTINCLUDE DISCARDABLE 
 BEGIN
-    "CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST ""res\\\\Code1009E.exe.manifest""\r\n"
     "\0"
 END
 
@@ -221,7 +220,6 @@ END
 //
 // Generated from the TEXTINCLUDE 3 resource.
 //
-CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "res\\Code1009E.exe.manifest"
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
