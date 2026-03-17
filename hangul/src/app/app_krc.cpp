@@ -128,7 +128,7 @@ std::string generate_cp949_hangul_ex_a_5696()
     page_count = 0u;
     for (page = 0x8100u; page <= 0xA000u; page += 0x0100u, page_count++)
     {
-        // 유효 2nd 바이트: 0x41~0x5A(26) + 0x61~0x7A(26) + 0x81~0xFE(126)
+        // 유효 바이트: 0x41~0x5A(26) + 0x61~0x7A(26) + 0x81~0xFE(126)
         code_count = 0u;
         for (offset = 0x41u; offset <= 0x5Au; offset++, code_count++) // 26자
         {
@@ -170,7 +170,7 @@ std::string generate_cp949_hangul_ex_b_3108()
     page_count = 0u;
     for (page = 0xA100u; page <= 0xC500u; page += 0x0100u, page_count++)
     {
-        // 유효 2nd 바이트: 0x41~0x5A(26) + 0x61~0x7A(26) + 0x81~0xA0(32)
+        // 유효 바이트: 0x41~0x5A(26) + 0x61~0x7A(26) + 0x81~0xA0(32)
         code_count = 0u;
         for (offset = 0x41u; offset <= 0x5Au; offset++, code_count++) // 26자
         {
