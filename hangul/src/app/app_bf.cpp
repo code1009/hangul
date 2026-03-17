@@ -145,6 +145,211 @@ public:
 		}
 	}
 
+	uint32_t inline tab_width(void)
+	{
+		return 8u * 8u;
+	}
+
+	uint32_t calc_cp949_backspace_width(bf_context_t* ctx, const char* str, const char* pos)
+	{
+		const char* p = pos - 1;
+		int depth = 0;
+		uint32_t bs_width = 8u;
+		while (p >= str)
+		{
+			unsigned char c = (unsigned char)*p;
+			if (c == '\b')
+			{
+				depth++;
+				p--;
+			}
+			else if (c == '\t')
+			{
+				if (depth == 0) { bs_width = tab_width(); break; }
+				depth--;
+				p--;
+			}
+			else if (c < 0x80u)
+			{
+				bf_uint16_t code = (c < 0x20u || c == 0x7Fu) ? (bf_uint16_t)'?' : (bf_uint16_t)c;
+				if (depth == 0)
+				{
+					bf_font_bitmap_t prev_bm;
+					bf_get_cp949_bitmap(ctx, code, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				depth--;
+				p--;
+			}
+			else
+			{
+				if (p > str && (unsigned char)*(p - 1) >= 0x80u)
+				{
+					if (depth == 0)
+					{
+						bf_uint16_t code = ((bf_uint16_t)(unsigned char)*(p - 1) << 8) | (bf_uint16_t)c;
+						bf_font_bitmap_t prev_bm;
+						bf_get_cp949_bitmap(ctx, code, &prev_bm);
+						bs_width = prev_bm.font_bitmap_cx;
+						break;
+					}
+					depth--;
+					p -= 2;
+				}
+				else
+				{
+					if (depth == 0) { break; }
+					depth--;
+					p--;
+				}
+			}
+		}
+		return bs_width;
+	}
+
+	uint32_t calc_unicode_backspace_width(bf_context_t* ctx, const wchar_t* str, const wchar_t* pos)
+	{
+		const wchar_t* p = pos - 1;
+		int depth = 0;
+		uint32_t bs_width = 8u;
+		while (p >= str)
+		{
+			wchar_t c = *p;
+			if (c == L'\b')
+			{
+				depth++;
+				p--;
+			}
+			else if (c == L'\t')
+			{
+				if (depth == 0) { bs_width = tab_width(); break; }
+				depth--;
+				p--;
+			}
+			else
+			{
+				bf_uint16_t code = (c < 0x20 || c == 0x7F) ? (bf_uint16_t)'?' : (bf_uint16_t)c;
+				if (depth == 0)
+				{
+					bf_font_bitmap_t prev_bm;
+					bf_get_unicode_bitmap(ctx, code, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				depth--;
+				p--;
+			}
+		}
+		return bs_width;
+	}
+
+	uint32_t calc_utf8l_backspace_width(bf_context_t* ctx, const uint8_t* str, const uint8_t* pos)
+	{
+		const uint8_t* p = pos - 1;
+		int depth = 0;
+		uint32_t bs_width = 8u;
+		while (p >= str)
+		{
+			uint8_t c = *p;
+			if (c == '\b')
+			{
+				depth++;
+				p--;
+			}
+			else if (c == '\t')
+			{
+				if (depth == 0) { bs_width = tab_width(); break; }
+				depth--;
+				p--;
+			}
+			else if (c < 0x20u || c == 0x7Fu)
+			{
+				if (depth == 0)
+				{
+					uint8_t dummy = '?';
+					bf_font_bitmap_t prev_bm;
+					bf_get_utf8l_bitmap(ctx, &dummy, 1u, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				depth--;
+				p--;
+			}
+			else
+			{
+				const uint8_t* char_start = p;
+				while (char_start > str && (*char_start & 0xC0u) == 0x80u)
+					char_start--;
+				uint32_t char_len = (uint32_t)krc_utf8_char_size((const krc_char_t*)char_start);
+				if (char_len == 0u) char_len = 1u;
+				if (depth == 0)
+				{
+					bf_font_bitmap_t prev_bm;
+					bf_get_utf8l_bitmap(ctx, char_start, char_len, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				depth--;
+				p = char_start - 1;
+			}
+		}
+		return bs_width;
+	}
+
+	uint32_t calc_utf8_backspace_width(bf_context_t* ctx, const uint8_t* str, const uint8_t* pos)
+	{
+		const uint8_t* p = pos - 1;
+		int depth = 0;
+		uint32_t bs_width = 8u;
+		while (p >= str)
+		{
+			uint8_t c = *p;
+			if (c == '\b')
+			{
+				depth++;
+				p--;
+			}
+			else if (c == '\t')
+			{
+				if (depth == 0) { bs_width = tab_width(); break; }
+				depth--;
+				p--;
+			}
+			else if (c < 0x20u || c == 0x7Fu)
+			{
+				if (depth == 0)
+				{
+					uint8_t dummy = '?';
+					bf_font_bitmap_t prev_bm;
+					bf_get_utf8_bitmap(ctx, &dummy, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				depth--;
+				p--;
+			}
+			else
+			{
+				const uint8_t* char_start = p;
+				while (char_start > str && (*char_start & 0xC0u) == 0x80u)
+					char_start--;
+				if (depth == 0)
+				{
+					bf_font_bitmap_t prev_bm;
+					bf_get_utf8_bitmap(ctx, char_start, &prev_bm);
+					bs_width = prev_bm.font_bitmap_cx;
+					break;
+				}
+				uint32_t char_len = (uint32_t)krc_utf8_char_size((const krc_char_t*)char_start);
+				if (char_len == 0u) char_len = 1u;
+				depth--;
+				p = char_start - 1;
+			}
+		}
+		return bs_width;
+	}
+
 	void draw_cp949_string(const uint32_t start_x, const uint32_t start_y, const char* str)
 	{
 		bf_context_t* ctx = bf_context_default_get();
@@ -154,8 +359,8 @@ public:
 		uint32_t y = 0u;
 
 		const char* src = str;
+		const char* line_start = str;
 		bool font_bitmap_drawn = false;
-		uint32_t backspace;
 
 		while (*src)
 		{
@@ -168,24 +373,26 @@ public:
 					x = 0u;
 					y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 					src += 1u;
+					line_start = src;
 					continue;
 				}
 				else if (*src == '\r')
 				{
 					x = 0u;
 					src += 1u;
+					line_start = src;
 					continue;
 				}
 				else if (*src == '\t')
 				{
-					x += 8*8u;
+					x += tab_width();
 					src += 1u;
 					continue;
 				}
 				else if (*src == '\b')
 				{
-					backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-					x = (x < backspace) ? 0u : (x - backspace);
+					uint32_t bs_width = calc_cp949_backspace_width(ctx, line_start, src);
+					x = (x < bs_width) ? 0u : (x - bs_width);
 					src += 1u;
 					continue;
 				}
@@ -236,8 +443,8 @@ public:
 		uint32_t y = 0u;
 
 		const wchar_t* src = str;
+		const wchar_t* line_start = str;
 		bool font_bitmap_drawn = false;
-		uint32_t backspace;
 
 		while (*src)
 		{
@@ -247,24 +454,26 @@ public:
 				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\r')
 			{
 				x = 0u;
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\t')
 			{
-				x += 8u * 8u;
+				x += tab_width();
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\b')
 			{
-				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-				x = (x < backspace) ? 0u : (x - backspace);
+				uint32_t bs_width = calc_unicode_backspace_width(ctx, line_start, src);
+				x = (x < bs_width) ? 0u : (x - bs_width);
 				src += 1u;
 				continue;
 			}
@@ -301,8 +510,8 @@ public:
 		uint32_t y = 0u;
 
 		const uint8_t* src = str;
+		const uint8_t* line_start = str;
 		bool font_bitmap_drawn = false;
-		uint32_t backspace;
 
 		while (*src)
 		{
@@ -315,24 +524,26 @@ public:
 				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\r')
 			{
 				x = 0u;
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\t')
 			{
-				x += 8u * 8u;
+				x += tab_width();
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\b')
 			{
-				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-				x = (x < backspace) ? 0u : (x - backspace);
+				uint32_t bs_width = calc_utf8l_backspace_width(ctx, line_start, src);
+				x = (x < bs_width) ? 0u : (x - bs_width);
 				src += 1u;
 				continue;
 			}
@@ -388,8 +599,8 @@ public:
 		uint32_t y = 0u;
 
 		const uint8_t* src = str;
+		const uint8_t* line_start = str;
 		bool font_bitmap_drawn = false;
-		uint32_t backspace;
 
 		while (*src)
 		{
@@ -401,24 +612,26 @@ public:
 				x = 0u;
 				y += (font_bitmap_drawn ? font_bitmap.font_bitmap_cy : 16u);
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\r')
 			{
 				x = 0u;
 				src += 1u;
+				line_start = src;
 				continue;
 			}
 			else if (*src == '\t')
 			{
-				x += 8u * 8u;
+				x += tab_width();
 				src += 1u;
 				continue;
 			}
 			else if (*src == '\b')
 			{
-				backspace = (font_bitmap_drawn ? font_bitmap.font_bitmap_cx : 8u);
-				x = (x < backspace) ? 0u : (x - backspace);
+				uint32_t bs_width = calc_utf8_backspace_width(ctx, line_start, src);
+				x = (x < bs_width) ? 0u : (x - bs_width);
 				src += 1u;
 				continue;
 			}
