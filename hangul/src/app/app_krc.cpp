@@ -331,15 +331,13 @@ void setup_window_charset(void)
     std::wstring unicode_hangul_11172;
     std::string  cp949_hangul_11172;
 
-    unicode_hangul_11172 = generate_unicode_hangul_11172();
-	cp949_hangul_11172 = wcs_to_mbcs(unicode_hangul_11172, 949);
-
+    cp949_hangul_11172 = cp949_hangul_2350 + cp949_hangul_ex_a_5696 + cp949_hangul_ex_b_3108 + cp949_hangul_ex_c_18;
+	unicode_hangul_11172 = mbcs_to_wcs(cp949_hangul_11172, 949);
     assert(unicode_hangul_11172 == mbcs_to_wcs(cp949_hangul_11172, 949));
     assert(cp949_hangul_11172 == wcs_to_mbcs(unicode_hangul_11172, 949));
 
-    cp949_hangul_11172 = cp949_hangul_2350 + cp949_hangul_ex_a_5696 + cp949_hangul_ex_b_3108 + cp949_hangul_ex_c_18;
-	unicode_hangul_11172 = mbcs_to_wcs(cp949_hangul_11172, 949);
-
+    unicode_hangul_11172 = generate_unicode_hangul_11172();
+    cp949_hangul_11172 = wcs_to_mbcs(unicode_hangul_11172, 949);
     assert(unicode_hangul_11172 == mbcs_to_wcs(cp949_hangul_11172, 949));
     assert(cp949_hangul_11172 == wcs_to_mbcs(unicode_hangul_11172, 949));
 
