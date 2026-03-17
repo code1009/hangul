@@ -18,8 +18,9 @@
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 KRC_API krc_bool_t krc_utf8_continuation(const krc_uchar8_t c);
-KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer);
 
+KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer);
+KRC_API krc_size_t krc_utf8l_char_size(const krc_char_t* utf8_pointer, const krc_size_t utf8_size);
 
 //===========================================================================
 KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_uchar32_t unicode, krc_char_t* utf8_pointer);
