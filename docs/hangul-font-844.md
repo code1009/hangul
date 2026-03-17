@@ -128,9 +128,9 @@ ctx->jongseong[set] // set: 0~3, 각 set의 종성 배열 시작 포인터
   bf_hangul_johab844_jongseong_set()
         ↓
   폰트 포인터 결정
-  font->choseong [choseong_set] + font_size * choseong
-  font->jungseong[jungseong_set] + font_size * jungseong
-  font->jongseong[jongseong_set] + font_size * (jongseong - 1)
+  font->choseong [choseong_set] + font_glyph_size * choseong
+  font->jungseong[jungseong_set] + font_glyph_size * jungseong
+  font->jongseong[jongseong_set] + font_glyph_size * (jongseong - 1)
         ↓
   비트맵 OR 합성 → font_bitmap_buffer[i]
         ↓
@@ -199,11 +199,10 @@ ctx->jongseong[set] // set: 0~3, 각 set의 종성 배열 시작 포인터
 ```c
 typedef struct {
     bf_uint8_t* font_bitmap_pointer;  // 비트맵 데이터 포인터
-    bf_uint32_t font_bitmap_size;     // 바이트 수 (cx_size × cy)
+    bf_uint32_t font_bitmap_size;     // 바이트 수 (stride × cy)
+    bf_uint32_t font_bitmap_stride;   // 행당 바이트 수 (⌈cx / 8⌉)
     bf_uint32_t font_bitmap_cx;       // 픽셀 너비
     bf_uint32_t font_bitmap_cy;       // 픽셀 높이
-    bf_uint32_t font_bitmap_cx_size;  // 행당 바이트 수 (cx / 8)
-    bf_uint32_t font_bitmap_cy_size;  // = font_bitmap_size
 } bf_font_bitmap_t;
 ```
 
