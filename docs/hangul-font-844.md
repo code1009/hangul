@@ -20,12 +20,12 @@
 
 ### 자소 분리 공식
 
-유니코드 코드포인트 `n`에서 초성/중성/종성 인덱스 추출:
+유니코드 코드포인트 `unicode`에서 초성/중성/종성 인덱스 추출:
 
 ```
-초성 index = (n - 0xAC00) / (21 × 28)
-중성 index = ((n - 0xAC00) % (21 × 28)) / 28
-종성 index = (n - 0xAC00) % 28
+초성 index =  (unicode - 0xAC00) / (21 × 28)
+중성 index = ((unicode - 0xAC00) % (21 × 28)) / 28
+종성 index =  (unicode - 0xAC00) % 28
 ```
 
 ---
@@ -48,19 +48,19 @@
 
 | 번호 |  0 |  1 |  2 |  3 |  4 |  5 |  6 |  7 |  8 |  9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 |
 |:----:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-| 종성 |(없)| ㄱ | ㄲ | ㄳ | ㄴ | ㄵ | ㄶ | ㄷ | ㄹ | ㄺ | ㄻ | ㄼ | ㄽ | ㄾ | ㄿ | ㅀ | ㅁ | ㅂ | ㅄ | ㅅ | ㅆ | ㅇ | ㅈ | ㅊ | ㅋ | ㅌ | ㅍ | ㅎ |
+| 종성 |(없음)| ㄱ | ㄲ | ㄳ | ㄴ | ㄵ | ㄶ | ㄷ | ㄹ | ㄺ | ㄻ | ㄼ | ㄽ | ㄾ | ㄿ | ㅀ | ㅁ | ㅂ | ㅄ | ㅅ | ㅆ | ㅇ | ㅈ | ㅊ | ㅋ | ㅌ | ㅍ | ㅎ |
 
 > 종성 0번은 "받침 없음"이며, 실제 폰트 데이터에는 포함되지 않는다.  
 > 따라서 폰트 배열 접근 시 `jongseong - 1`을 인덱스로 사용한다.
 
 ---
 
-## 벌 선택 규칙 (세트 결정 로직)
+## 초성/중성/종성 벌 규칙
 
 자소는 주변 자소의 조합에 따라 다른 모양(벌)을 사용한다.  
 `bf_font_bitmap_hangul_johab844.c`의 세 함수가 각각 벌 번호(0-based)를 반환한다.
 
-### 초성 벌 (`bf_hangul_johab844_choseong_set`)
+### 초성 8벌 (`bf_hangul_johab844_choseong_set`)
 
 | 벌 (set) | 조건 |
 |:--------:|------|
@@ -73,7 +73,7 @@
 | 6 | 종성 있음 + set이 1 또는 2였을 경우 |
 | 7 | 종성 있음 + set이 3 또는 4였을 경우 |
 
-### 중성 벌 (`bf_hangul_johab844_jungseong_set`)
+### 중성 4벌 (`bf_hangul_johab844_jungseong_set`)
 
 | 벌 (set) | 조건 |
 |:--------:|------|
@@ -82,7 +82,7 @@
 | 2 | 종성 있음 + 초성: ㄱ 또는 ㅋ (index 0, 1) |
 | 3 | 종성 있음 + 초성: 그 외 |
 
-### 종성 벌 (`bf_hangul_johab844_jongseong_set`)
+### 종성 4벌 (`bf_hangul_johab844_jongseong_set`)
 
 | 벌 (set) | 중성 |
 |:--------:|------|
@@ -187,8 +187,6 @@ ctx->jongseong[set] // set: 0~3, 각 set의 종성 배열 시작 포인터
 | `bf_context_default_get()` | 기본 컨텍스트 포인터 반환 |
 | `bf_get_cp949_bitmap(ctx, char_code, out)` | CP949 코드로 비트맵 조회 |
 | `bf_get_unicode_bitmap(ctx, char_unicode, out)` | 유니코드(UCS-16)로 비트맵 조회 |
-| `bf_get_utf8_bitmap(ctx, char_pointer, out)` | UTF-8 문자열 포인터로 비트맵 조회 |
-| `bf_get_utf8l_bitmap(ctx, pointer, length, out)` | UTF-8 문자 + 길이로 비트맵 조회 |
 | `bf_get_font_bitmap(font, index, out)` | 폰트 배열에서 index번 비트맵 포인터 반환 (경계 검사 없음, 호출자 책임) |
 | `bf_get_font_bitmap_hangul_johab844(font, cho, jung, jong, out, buf)` | 한글 완성자 비트맵 합성 |
 | `bf_get_font_bitmap_hangul_johab844_jamo_jaeum(font, index, out)` | 자음 낱글자 비트맵 조회 |
