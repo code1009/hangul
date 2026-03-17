@@ -137,7 +137,7 @@ public:
 		{
 			for (x = 0u; x < font_bitmap->font_bitmap_cx; x++)
 			{
-				if (font_bitmap->font_bitmap_pointer[y * font_bitmap->font_bitmap_cx_size + x / 8u] & mask[x % 8u])
+				if (font_bitmap->font_bitmap_pointer[y * font_bitmap->font_bitmap_stride + x / 8u] & mask[x % 8u])
 				{
 					draw_pixel(start_x + x, start_y + y, 1u);
 				}

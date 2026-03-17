@@ -21,10 +21,9 @@ typedef struct _bf_font_bitmap_t
 {
 	bf_uint8_t* font_bitmap_pointer;
 	bf_uint32_t font_bitmap_size;
+	bf_uint32_t font_bitmap_stride;
 	bf_uint32_t font_bitmap_cx;
 	bf_uint32_t font_bitmap_cy;
-	bf_uint32_t font_bitmap_cx_size;
-	bf_uint32_t font_bitmap_cy_size;
 }
 bf_font_bitmap_t;
 

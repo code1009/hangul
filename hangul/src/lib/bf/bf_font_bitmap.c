@@ -43,12 +43,10 @@ BF_API void bf_get_font_bitmap(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	font_bitmap->font_bitmap_pointer = font->font_data_pointer + font->font_size * index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = font->font_data_pointer + font->font_glyph_size * index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }

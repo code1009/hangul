@@ -227,15 +227,15 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 	bf_uint8_t* font_bitmap_pointer_jongseong;
 
 
-	font_bitmap_pointer_choseong  = font->choseong [choseong_set ] + font->font_size * choseong;
-	font_bitmap_pointer_jungseong = font->jungseong[jungseong_set] + font->font_size * jungseong;
+	font_bitmap_pointer_choseong  = font->choseong [choseong_set ] + font->font_glyph_size * choseong;
+	font_bitmap_pointer_jungseong = font->jungseong[jungseong_set] + font->font_glyph_size * jungseong;
 	if (0u == jongseong)
 	{
 		font_bitmap_pointer_jongseong = BF_NULL_PTR;
 	}
 	else
 	{
-		font_bitmap_pointer_jongseong = font->jongseong[jongseong_set] + font->font_size * (jongseong - 1u);
+		font_bitmap_pointer_jongseong = font->jongseong[jongseong_set] + font->font_glyph_size * (jongseong - 1u);
 	}
 
 
@@ -245,7 +245,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 	bf_uint32_t i;
 
 	font_bitmap_pointer = font_bitmap_buffer;
-	font_bitmap_size = font->font_size;
+	font_bitmap_size = font->font_glyph_size;
 
 	if (0u == jongseong)
 	{
@@ -270,13 +270,11 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 
 	//-----------------------------------------------------------------------
 	font_bitmap->font_bitmap_pointer = font_bitmap_buffer;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }
 
 
@@ -291,14 +289,12 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_choseong(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	font_bitmap->font_bitmap_pointer = font->choseong[0] + font->font_size * index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = font->choseong[0] + font->font_glyph_size * index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }
 
 BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jungseong(
@@ -307,14 +303,12 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jungseong(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	font_bitmap->font_bitmap_pointer = font->jungseong[0] + font->font_size * index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = font->jungseong[0] + font->font_glyph_size * index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }
 
 BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jongseong(
@@ -323,14 +317,12 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jongseong(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	font_bitmap->font_bitmap_pointer = font->jongseong[0] + font->font_size * index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = font->jongseong[0] + font->font_glyph_size * index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }
 
 
@@ -345,14 +337,12 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_moeum(
 	bf_font_bitmap_t* font_bitmap
 )
 {
-	font_bitmap->font_bitmap_pointer = font->jungseong[0] + font->font_size * index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = font->jungseong[0] + font->font_glyph_size * index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }
 
 BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jaeum(
@@ -407,12 +397,10 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jaeum(
 
 
 	//-----------------------------------------------------------------------
-	font_bitmap->font_bitmap_pointer = jamo + font->font_size * jamo_index;
-	font_bitmap->font_bitmap_size = font->font_size;
+	font_bitmap->font_bitmap_pointer = jamo + font->font_glyph_size * jamo_index;
+	font_bitmap->font_bitmap_size = font->font_glyph_size;
+	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 
 	font_bitmap->font_bitmap_cx = font->font_cx;
 	font_bitmap->font_bitmap_cy = font->font_cy;
-
-	font_bitmap->font_bitmap_cx_size = font->font_cx_size;
-	font_bitmap->font_bitmap_cy_size = font->font_cy_size;
 }

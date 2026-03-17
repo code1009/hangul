@@ -34,11 +34,10 @@ typedef struct _bf_font_t
 	bf_uint32_t font_data_size;
 	bf_uint32_t font_type;
 	bf_uint32_t font_count;
-	bf_uint32_t font_size;
+	bf_uint32_t font_glyph_size;
+	bf_uint32_t font_glyph_stride;
 	bf_uint32_t font_cx;
 	bf_uint32_t font_cy;
-	bf_uint32_t font_cx_size;
-	bf_uint32_t font_cy_size;
 }
 bf_font_t;
 
@@ -48,11 +47,10 @@ typedef struct _bf_font_hangul_johab844_t
 	bf_uint32_t font_data_size;
 	bf_uint32_t font_type;
 	bf_uint32_t font_count;
-	bf_uint32_t font_size;
+	bf_uint32_t font_glyph_size;
+	bf_uint32_t font_glyph_stride;
 	bf_uint32_t font_cx;
 	bf_uint32_t font_cy;
-	bf_uint32_t font_cx_size;
-	bf_uint32_t font_cy_size;
 
 	bf_uint8_t* choseong [8];
 	bf_uint8_t* jungseong[4];
