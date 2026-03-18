@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\app\app_bf.cpp" />
     <ClCompile Include="src\app\app_krc.cpp" />
+    <ClCompile Include="src\app\app_krc_input.cpp" />
     <ClCompile Include="src\app\windows_charset.cpp" />
     <ClCompile Include="src\lib\bf\bf_char_bitmap.c" />
     <ClCompile Include="src\lib\bf\bf_font.c" />
@@ -42,6 +43,7 @@
   <ItemGroup>
     <ClInclude Include="src\app\app_bf.hpp" />
     <ClInclude Include="src\app\app_krc.hpp" />
+    <ClInclude Include="src\app\app_krc_input.hpp" />
     <ClInclude Include="src\app\windows_charset.hpp" />
     <ClInclude Include="src\lib\bf\bf.h" />
     <ClInclude Include="src\lib\bf\bf_api.h" />
@@ -74,6 +76,7 @@
     <ClInclude Include="src\lib\krc\krc_stream.h" />
     <ClInclude Include="src\lib\krc\krc_type.h" />
     <ClInclude Include="src\lib\krc\krc_unicode_conversion.h" />
+    <ClInclude Include="src\lib\krc_input\krc_input.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_config.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_key.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_type.h" />
