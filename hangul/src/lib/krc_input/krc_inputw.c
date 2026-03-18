@@ -1196,8 +1196,10 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	krc_uint32_t key_code = KRC_INPUT_KEY_CODE(key);
 	krc_uint32_t key_modifier = KRC_INPUT_KEY_MODIFIER(key);
 	krc_bool_t shift = KRC_FALSE;
-	
-	if ( (key_modifier == KRC_INPUT_KEY_LSHIFT) || (key_modifier == KRC_INPUT_KEY_RSHIFT) )
+
+	/* key_modifier 는 KRC_INPUT_KEY_MODIFIER_VALUE(x) 의 x 값이 추출된 비트 필드 */
+	/* 여러 수정자가 OR 조합될 수 있으므로 & 비트 연산으로 확인 */
+	if (key_modifier & (KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) | KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT)))
 	{
 		shift = KRC_TRUE;
 	}
@@ -1236,7 +1238,17 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	case KRC_INPUT_KEY_RIGHT:     krc_inputw_key_right(ctx);     break;
 	case KRC_INPUT_KEY_UP:        krc_inputw_key_up(ctx);        break;
 	case KRC_INPUT_KEY_DOWN:      krc_inputw_key_down(ctx);      break;
-	default: break;
+
+	case KRC_INPUT_KEY_ESC:
+		/* 조합 취소 — 확정하지 않고 중단 */
+		krc_inputw_composing_stop(ctx);
+		break;
+
+	default:
+		/* 그 외 특수키 (PAGEUP, PAGEDOWN, F1~F12, CAPSLOCK 등) */
+		/* 조합 중이면 확정 후 진행 */
+		krc_inputw_commit_composing(ctx);
+		break;
 	}
 
 	krc_inputw_cursor_update_pos(ctx);
