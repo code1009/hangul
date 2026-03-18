@@ -27,7 +27,7 @@
 #include "krc_input_config.h"
 #include "krc_input_type.h"
 #include "krc_input_key.h"
-#include "krc_input_unicode.h"
+#include "krc_inputw.h"
 
 
 
@@ -818,7 +818,7 @@ static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar
 //-----------------------------------------------------------------------------
 // 커서 위치(cursor_line, cursor_column) 갱신
 //-----------------------------------------------------------------------------
-static void krc_input_cursor_update_pos(krc_input_unicode_t* ctx)
+static void krc_input_cursor_update_pos(krc_inputw_t* ctx)
 {
 	const krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t pos    = 0u;
@@ -845,7 +845,7 @@ static void krc_input_cursor_update_pos(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 조합 중 여부 확인
 //-----------------------------------------------------------------------------
-static krc_bool_t krc_input_is_composing(const krc_input_unicode_t* ctx)
+static krc_bool_t krc_input_is_composing(const krc_inputw_t* ctx)
 {
 	return ctx->hangul_composing;
 }
@@ -853,7 +853,7 @@ static krc_bool_t krc_input_is_composing(const krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 조합 시작
 //-----------------------------------------------------------------------------
-static void krc_input_composing_start(krc_input_unicode_t* ctx)
+static void krc_input_composing_start(krc_inputw_t* ctx)
 {
 	ctx->hangul_composing = KRC_TRUE;
 }
@@ -861,7 +861,7 @@ static void krc_input_composing_start(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 조합 중단
 //-----------------------------------------------------------------------------
-static void krc_input_composing_stop(krc_input_unicode_t* ctx)
+static void krc_input_composing_stop(krc_inputw_t* ctx)
 {
 	ctx->hangul_composing = KRC_FALSE;
 }
@@ -869,7 +869,7 @@ static void krc_input_composing_stop(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 커서 함수
 //-----------------------------------------------------------------------------
-static void krc_input_cursor_advance(krc_input_unicode_t* ctx)
+static void krc_input_cursor_advance(krc_inputw_t* ctx)
 {
 	if (ctx->cursor < ctx->buffer_size - 1u)
 	{
@@ -877,7 +877,7 @@ static void krc_input_cursor_advance(krc_input_unicode_t* ctx)
 	}
 }
 
-static void krc_input_cursor_back(krc_input_unicode_t* ctx)
+static void krc_input_cursor_back(krc_inputw_t* ctx)
 {
 	if (ctx->cursor > 0u)
 	{
@@ -885,7 +885,7 @@ static void krc_input_cursor_back(krc_input_unicode_t* ctx)
 	}
 }
 
-static void krc_input_cursor_set(krc_input_unicode_t* ctx, krc_size_t pos)
+static void krc_input_cursor_set(krc_inputw_t* ctx, krc_size_t pos)
 {
 	if (pos <= ctx->buffer_size - 1u)
 	{
@@ -893,12 +893,12 @@ static void krc_input_cursor_set(krc_input_unicode_t* ctx, krc_size_t pos)
 	}
 }
 
-static void krc_input_cursor_reset(krc_input_unicode_t* ctx)
+static void krc_input_cursor_reset(krc_inputw_t* ctx)
 {
 	ctx->cursor = 0u;
 }
 
-static void krc_input_cursor_set_end(krc_input_unicode_t* ctx)
+static void krc_input_cursor_set_end(krc_inputw_t* ctx)
 {
 	ctx->cursor = krc_string_length_w(ctx->buffer_pointer, ctx->buffer_size);
 }
@@ -906,7 +906,7 @@ static void krc_input_cursor_set_end(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 한글 조합 종료 — 커서 전진 후 composing 해제
 //-----------------------------------------------------------------------------
-static void krc_input_commit_composing(krc_input_unicode_t* ctx)
+static void krc_input_commit_composing(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -918,7 +918,7 @@ static void krc_input_commit_composing(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // put_char 서브 핸들러 — 조합 중 + 모음 입력 실패
 //-----------------------------------------------------------------------------
-static void krc_input_put_char_fail_vowel(krc_input_unicode_t* ctx,
+static void krc_input_put_char_fail_vowel(krc_inputw_t* ctx,
 	krc_wchar_t char_code, krc_wchar_t composing_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
@@ -959,7 +959,7 @@ static void krc_input_put_char_fail_vowel(krc_input_unicode_t* ctx,
 //-----------------------------------------------------------------------------
 // put_char 서브 핸들러 — 조합 중 + 자음 입력 실패
 //-----------------------------------------------------------------------------
-static void krc_input_put_char_fail_consonant(krc_input_unicode_t* ctx,
+static void krc_input_put_char_fail_consonant(krc_inputw_t* ctx,
 	krc_wchar_t composing_code, krc_wchar_t result_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
@@ -981,7 +981,7 @@ static void krc_input_put_char_fail_consonant(krc_input_unicode_t* ctx,
 //-----------------------------------------------------------------------------
 // put_char 서브 핸들러 — 한글 조합 진행 중
 //-----------------------------------------------------------------------------
-static void krc_input_put_char_hangul_composing(krc_input_unicode_t* ctx, krc_wchar_t char_code)
+static void krc_input_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_wchar_t  composing_code = text[ctx->cursor];
@@ -1011,7 +1011,7 @@ static void krc_input_put_char_hangul_composing(krc_input_unicode_t* ctx, krc_wc
 //-----------------------------------------------------------------------------
 // put_char 서브 핸들러 — 한글 조합 시작
 //-----------------------------------------------------------------------------
-static void krc_input_put_char_hangul_new(krc_input_unicode_t* ctx, krc_wchar_t char_code)
+static void krc_input_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -1033,7 +1033,7 @@ static void krc_input_put_char_hangul_new(krc_input_unicode_t* ctx, krc_wchar_t 
 //-----------------------------------------------------------------------------
 // put_char 서브 핸들러 — 비한글 문자(영문/숫자/특수문자 등)
 //-----------------------------------------------------------------------------
-static void krc_input_put_char_non_hangul(krc_input_unicode_t* ctx, krc_wchar_t char_code)
+static void krc_input_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -1050,7 +1050,7 @@ static void krc_input_put_char_non_hangul(krc_input_unicode_t* ctx, krc_wchar_t 
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Backspace
 //-----------------------------------------------------------------------------
-static void krc_input_key_backspace(krc_input_unicode_t* ctx)
+static void krc_input_key_backspace(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -1092,7 +1092,7 @@ static void krc_input_key_backspace(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Enter
 //-----------------------------------------------------------------------------
-static void krc_input_key_enter(krc_input_unicode_t* ctx)
+static void krc_input_key_enter(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -1116,7 +1116,7 @@ static void krc_input_key_enter(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Delete
 //-----------------------------------------------------------------------------
-static void krc_input_key_delete(krc_input_unicode_t* ctx)
+static void krc_input_key_delete(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -1135,7 +1135,7 @@ static void krc_input_key_delete(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Left
 //-----------------------------------------------------------------------------
-static void krc_input_key_left(krc_input_unicode_t* ctx)
+static void krc_input_key_left(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -1150,7 +1150,7 @@ static void krc_input_key_left(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Right
 //-----------------------------------------------------------------------------
-static void krc_input_key_right(krc_input_unicode_t* ctx)
+static void krc_input_key_right(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t   text_len;
@@ -1173,7 +1173,7 @@ static void krc_input_key_right(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 다중라인 커서 이동 — 윗 줄 목표 행/열 위치로 이동
 //-----------------------------------------------------------------------------
-static void krc_input_move_cursor_up(krc_input_unicode_t* ctx)
+static void krc_input_move_cursor_up(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text        = ctx->buffer_pointer;
 	krc_size_t   target_line = ctx->cursor_line - 1u;
@@ -1209,7 +1209,7 @@ static void krc_input_move_cursor_up(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 다중라인 커서 이동 — 아랫 줄 목표 행/열 위치로 이동
 //-----------------------------------------------------------------------------
-static void krc_input_move_cursor_down(krc_input_unicode_t* ctx)
+static void krc_input_move_cursor_down(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text        = ctx->buffer_pointer;
 	krc_size_t   target_line = ctx->cursor_line + 1u;
@@ -1256,7 +1256,7 @@ static void krc_input_move_cursor_down(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Up
 //-----------------------------------------------------------------------------
-static void krc_input_key_up(krc_input_unicode_t* ctx)
+static void krc_input_key_up(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -1271,7 +1271,7 @@ static void krc_input_key_up(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Down
 //-----------------------------------------------------------------------------
-static void krc_input_key_down(krc_input_unicode_t* ctx)
+static void krc_input_key_down(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -1286,7 +1286,7 @@ static void krc_input_key_down(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Home
 //-----------------------------------------------------------------------------
-static void krc_input_key_home(krc_input_unicode_t* ctx)
+static void krc_input_key_home(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 
@@ -1311,7 +1311,7 @@ static void krc_input_key_home(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — End
 //-----------------------------------------------------------------------------
-static void krc_input_key_end(krc_input_unicode_t* ctx)
+static void krc_input_key_end(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t   text_len;
@@ -1340,7 +1340,7 @@ static void krc_input_key_end(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Insert (삽입/덮어쓰기 모드 전환)
 //-----------------------------------------------------------------------------
-static void krc_input_key_insert(krc_input_unicode_t* ctx)
+static void krc_input_key_insert(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -1352,7 +1352,7 @@ static void krc_input_key_insert(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — Shift (LSHIFT / RSHIFT 토글)
 //-----------------------------------------------------------------------------
-static void krc_input_key_shift(krc_input_unicode_t* ctx)
+static void krc_input_key_shift(krc_inputw_t* ctx)
 {
 	ctx->shift_state = (ctx->shift_state == KRC_TRUE) ? KRC_FALSE : KRC_TRUE;
 }
@@ -1360,7 +1360,7 @@ static void krc_input_key_shift(krc_input_unicode_t* ctx)
 //-----------------------------------------------------------------------------
 // 키 핸들러 — 한/영 전환 (HANGUL = RALT)
 //-----------------------------------------------------------------------------
-static void krc_input_key_hangul(krc_input_unicode_t* ctx)
+static void krc_input_key_hangul(krc_inputw_t* ctx)
 {
 	if (krc_input_is_composing(ctx) == KRC_TRUE)
 	{
@@ -1379,7 +1379,7 @@ static void krc_input_key_hangul(krc_input_unicode_t* ctx)
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API void krc_input_unicode_init(krc_input_unicode_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline)
+KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline)
 {
 	ctx->buffer_pointer = buffer;
 	ctx->buffer_size    = buffer_size;
@@ -1400,12 +1400,12 @@ KRC_API void krc_input_unicode_init(krc_input_unicode_t* ctx, krc_wchar_t* buffe
 }
 
 //-----------------------------------------------------------------------------
-// krc_input_unicode_put_char()
+// krc_inputw_put_char()
 //
 //   유니코드 문자 하나를 현재 커서 위치에 삽입한다.
 //   한글 낱글자(0x3131~0x3163)인 경우 한글 조합을 수행한다.
 //-----------------------------------------------------------------------------
-KRC_API void krc_input_unicode_put_char(krc_input_unicode_t* ctx, krc_wchar_t char_code)
+KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 
@@ -1441,13 +1441,13 @@ KRC_API void krc_input_unicode_put_char(krc_input_unicode_t* ctx, krc_wchar_t ch
 }
 
 //-----------------------------------------------------------------------------
-// krc_input_unicode_put_key()
+// krc_inputw_put_key()
 //
 //   KRC_INPUT_KEY_* 키 입력을 처리한다.
 //   문자 키(GRAVE~SPACE 범위)는 put_char()에 위임하고,
 //   특수 키(방향키, BACKSPACE, ENTER 등)는 내부에서 처리한다.
 //-----------------------------------------------------------------------------
-KRC_API void krc_input_unicode_put_key(krc_input_unicode_t* ctx, krc_uint32_t key)
+KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 {
 	krc_wchar_t* text     = ctx->buffer_pointer;
 	krc_wchar_t  char_code;
@@ -1475,7 +1475,7 @@ KRC_API void krc_input_unicode_put_key(krc_input_unicode_t* ctx, krc_uint32_t ke
 
 		if (char_code != 0x0000)
 		{
-			krc_input_unicode_put_char(ctx, char_code);
+			krc_inputw_put_char(ctx, char_code);
 			return;
 		}
 	}
@@ -1487,7 +1487,7 @@ KRC_API void krc_input_unicode_put_key(krc_input_unicode_t* ctx, krc_uint32_t ke
 	{
 	case KRC_INPUT_KEY_BACKSPACE: krc_input_key_backspace(ctx); break;
 	case KRC_INPUT_KEY_ENTER:     krc_input_key_enter(ctx);     break;
-	case KRC_INPUT_KEY_TAB:       krc_input_unicode_put_char(ctx, '\t'); return;
+	case KRC_INPUT_KEY_TAB:       krc_inputw_put_char(ctx, '\t'); return;
 
 	case KRC_INPUT_KEY_HANGUL:    krc_input_key_hangul(ctx);    break;
 	case KRC_INPUT_KEY_LSHIFT:

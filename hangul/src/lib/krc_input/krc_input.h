@@ -22,7 +22,7 @@
 #include "krc_input_config.h"
 #include "krc_input_type.h"
 #include "krc_input_key.h"
-#include "krc_input_unicode.h"
+#include "krc_inputw.h"
 
 
 

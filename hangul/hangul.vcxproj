@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -37,7 +37,7 @@
     <ClCompile Include="src\lib\krc\krc_cp949_utf8.c" />
     <ClCompile Include="src\lib\krc\krc_stream.c" />
     <ClCompile Include="src\lib\krc\krc_unicode_conversion.c" />
-    <ClCompile Include="src\lib\krc_input\krc_input_unicode.c" />
+    <ClCompile Include="src\lib\krc_input\krc_inputw.c" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -80,7 +80,7 @@
     <ClInclude Include="src\lib\krc_input\krc_input_config.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_key.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_type.h" />
-    <ClInclude Include="src\lib\krc_input\krc_input_unicode.h" />
+    <ClInclude Include="src\lib\krc_input\krc_inputw.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -1,5 +1,5 @@
-﻿#ifndef __krc_input_unicode__h__
-#define __krc_input_unicode__h__
+#ifndef __krc_inputw__h__
+#define __krc_inputw__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -26,7 +26,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-typedef struct _krc_input_unicode_t
+typedef struct _krc_inputw_t
 {
 	krc_wchar_t* buffer_pointer;
 	krc_size_t buffer_size;
@@ -39,7 +39,7 @@ typedef struct _krc_input_unicode_t
 	krc_bool_t insert_mode;
 	krc_uint32_t keyboard_set;
 	krc_bool_t hangul_composing;
-} krc_input_unicode_t;
+} krc_inputw_t;
 
 
 
@@ -47,9 +47,9 @@ typedef struct _krc_input_unicode_t
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API void krc_input_unicode_init(krc_input_unicode_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline);
-KRC_API void krc_input_unicode_put_char(krc_input_unicode_t* ctx, krc_wchar_t char_code);
-KRC_API void krc_input_unicode_put_key(krc_input_unicode_t* ctx, krc_uint32_t key);
+KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline);
+KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code);
+KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key);
 
 
 
