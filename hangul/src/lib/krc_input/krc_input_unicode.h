@@ -1,4 +1,4 @@
-﻿#ifndef __krc_input_unicode__h__
+#ifndef __krc_input_unicode__h__
 #define __krc_input_unicode__h__
 
 /////////////////////////////////////////////////////////////////////////////
@@ -17,8 +17,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define KRC_INPUT_KEYBOARD_SET_ENGLISH 1
-#define KRC_INPUT_KEYBOARD_SET_KOREAN  2
+#define KRC_INPUT_KEYBOARD_SET_LATIN 1
+#define KRC_INPUT_KEYBOARD_SET_HANGUL  2
 
 
 
@@ -32,12 +32,13 @@ typedef struct _krc_input_unicode_t
 	krc_size_t buffer_size;
 	krc_bool_t multiline;
 	krc_size_t length;
-	krc_bool_t insert_mode;
 	krc_size_t cursor;
 	krc_size_t cursor_line;
 	krc_size_t cursor_column;
+	krc_bool_t shift_state;
+	krc_bool_t insert_mode;
 	krc_uint32_t keyboard_set;
-	krc_bool_t hangul_union;
+	krc_bool_t hangul_composing;
 } krc_input_unicode_t;
 
 
