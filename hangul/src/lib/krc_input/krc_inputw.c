@@ -1100,6 +1100,13 @@ static void krc_input_key_hangul(krc_inputw_t* ctx)
 }
 
 
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// API
+// 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline)
