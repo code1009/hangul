@@ -75,6 +75,7 @@
     <ClInclude Include="src\lib\krc\krc_type.h" />
     <ClInclude Include="src\lib\krc\krc_unicode_conversion.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_config.h" />
+    <ClInclude Include="src\lib\krc_input\krc_input_key.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_type.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_unicode.h" />
   </ItemGroup>

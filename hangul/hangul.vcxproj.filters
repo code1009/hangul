@@ -197,5 +197,8 @@
     <ClInclude Include="src\lib\krc_input\krc_input_type.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\krc_input\krc_input_key.h">
+      <Filter>src\lib\krc_input</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
