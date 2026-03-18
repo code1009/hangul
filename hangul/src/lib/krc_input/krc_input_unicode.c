@@ -496,18 +496,18 @@ static krc_bool_t krc_string_put_char_w(krc_wchar_t* str, krc_size_t text_length
 //-----------------------------------------------------------------------------
 
 /* 음절 코드 → (초성, 중성, 종성) 인덱스 분해 */
-static void krc_hangul_syllable_to_indices(krc_wchar_t code, int* chosung, int* jungsung, int* jongsung)
+static void krc_hangul_syllable_to_indices(krc_wchar_t code, int* choseong, int* jungseong, int* jongseong)
 {
 	int offset = (int)(code - 0xac00);
-	*jongsung = offset % 28;
-	*jungsung = (offset / 28) % 21;
-	*chosung  = offset / (28 * 21);
+	*jongseong = offset % 28;
+	*jungseong = (offset / 28) % 21;
+	*choseong  = offset / (28 * 21);
 }
 
 /* (초성, 중성, 종성) 인덱스 → 음절 코드 */
-static krc_wchar_t krc_hangul_indices_to_syllable(int chosung, int jungsung, int jongsung)
+static krc_wchar_t krc_hangul_indices_to_syllable(int choseong, int jungseong, int jongseong)
 {
-	return 0xac00 + (krc_wchar_t)(chosung * 21 * 28 + jungsung * 28 + jongsung);
+	return 0xac00 + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
 }
 
 /* 자음 자모 여부: 0x3131 ~ 0x314e */
@@ -523,30 +523,30 @@ static krc_bool_t krc_hangul_is_vowel_jamo(krc_wchar_t code)
 }
 
 //-----------------------------------------------------------------------------
-// 겹받침 조합: jongsung_cur + jongsung_add → 겹받침 인덱스  (-1 = 조합 불가)
+// 겹받침 조합: jongseong_cur + jongseong_add → 겹받침 인덱스  (-1 = 조합 불가)
 //-----------------------------------------------------------------------------
-static int krc_hangul_try_jongsung_compound(int jongsung_cur, int jongsung_add)
+static int krc_hangul_try_jongseong_compound(int jongseong_cur, int jongseong_add)
 {
-	switch (jongsung_cur)
+	switch (jongseong_cur)
 	{
 	case 1:
-		if (jongsung_add == 19) return  3; /* ㄱ+ㅅ=ㄳ */
+		if (jongseong_add == 19) return  3; /* ㄱ+ㅅ=ㄳ */
 		break;
 	case 4:
-		if (jongsung_add == 22) return  5; /* ㄴ+ㅈ=ㄵ */
-		if (jongsung_add == 27) return  6; /* ㄴ+ㅎ=ㄶ */
+		if (jongseong_add == 22) return  5; /* ㄴ+ㅈ=ㄵ */
+		if (jongseong_add == 27) return  6; /* ㄴ+ㅎ=ㄶ */
 		break;
 	case 8:
-		if (jongsung_add ==  1) return  9; /* ㄹ+ㄱ=ㄺ */
-		if (jongsung_add == 16) return 10; /* ㄹ+ㅁ=ㄻ */
-		if (jongsung_add == 17) return 11; /* ㄹ+ㅂ=ㄼ */
-		if (jongsung_add == 19) return 12; /* ㄹ+ㅅ=ㄽ */
-		if (jongsung_add == 25) return 13; /* ㄹ+ㅌ=ㄾ */
-		if (jongsung_add == 26) return 14; /* ㄹ+ㅍ=ㄿ */
-		if (jongsung_add == 27) return 15; /* ㄹ+ㅎ=ㅀ */
+		if (jongseong_add ==  1) return  9; /* ㄹ+ㄱ=ㄺ */
+		if (jongseong_add == 16) return 10; /* ㄹ+ㅁ=ㄻ */
+		if (jongseong_add == 17) return 11; /* ㄹ+ㅂ=ㄼ */
+		if (jongseong_add == 19) return 12; /* ㄹ+ㅅ=ㄽ */
+		if (jongseong_add == 25) return 13; /* ㄹ+ㅌ=ㄾ */
+		if (jongseong_add == 26) return 14; /* ㄹ+ㅍ=ㄿ */
+		if (jongseong_add == 27) return 15; /* ㄹ+ㅎ=ㅀ */
 		break;
 	case 17:
-		if (jongsung_add == 19) return 18; /* ㅂ+ㅅ=ㅄ */
+		if (jongseong_add == 19) return 18; /* ㅂ+ㅅ=ㅄ */
 		break;
 	default:
 		break;
@@ -555,24 +555,24 @@ static int krc_hangul_try_jongsung_compound(int jongsung_cur, int jongsung_add)
 }
 
 //-----------------------------------------------------------------------------
-// 복합 중성 조합: jungsung_cur + jungsung_add → 복합 중성 인덱스  (-1 = 조합 불가)
+// 복합 중성 조합: jungseong_cur + jungseong_add → 복합 중성 인덱스  (-1 = 조합 불가)
 //-----------------------------------------------------------------------------
-static int krc_hangul_try_jungsung_compound(int jungsung_cur, int jungsung_add)
+static int krc_hangul_try_jungseong_compound(int jungseong_cur, int jungseong_add)
 {
-	switch (jungsung_cur)
+	switch (jungseong_cur)
 	{
 	case 8: /* ㅗ */
-		if (jungsung_add ==  0) return  9; /* ㅗ+ㅏ=ㅘ */
-		if (jungsung_add ==  1) return 10; /* ㅗ+ㅐ=ㅙ */
-		if (jungsung_add == 20) return 11; /* ㅗ+ㅣ=ㅚ */
+		if (jungseong_add ==  0) return  9; /* ㅗ+ㅏ=ㅘ */
+		if (jungseong_add ==  1) return 10; /* ㅗ+ㅐ=ㅙ */
+		if (jungseong_add == 20) return 11; /* ㅗ+ㅣ=ㅚ */
 		break;
 	case 13: /* ㅜ */
-		if (jungsung_add ==  4) return 14; /* ㅜ+ㅓ=ㅝ */
-		if (jungsung_add ==  5) return 15; /* ㅜ+ㅔ=ㅞ */
-		if (jungsung_add == 20) return 16; /* ㅜ+ㅣ=ㅟ */
+		if (jungseong_add ==  4) return 14; /* ㅜ+ㅓ=ㅝ */
+		if (jungseong_add ==  5) return 15; /* ㅜ+ㅔ=ㅞ */
+		if (jungseong_add == 20) return 16; /* ㅜ+ㅣ=ㅟ */
 		break;
 	case 18: /* ㅡ */
-		if (jungsung_add == 20) return 19; /* ㅡ+ㅣ=ㅢ */
+		if (jungseong_add == 20) return 19; /* ㅡ+ㅣ=ㅢ */
 		break;
 	default:
 		break;
@@ -581,11 +581,11 @@ static int krc_hangul_try_jungsung_compound(int jungsung_cur, int jungsung_add)
 }
 
 //-----------------------------------------------------------------------------
-// 겹받침 분리: jongsung_index → (*out_base, *out_add)  반환: TRUE = 겹받침
+// 겹받침 분리: jongseong_index → (*out_base, *out_add)  반환: TRUE = 겹받침
 //-----------------------------------------------------------------------------
-static krc_bool_t krc_hangul_try_jongsung_decompose(int jongsung_index, int* out_base, int* out_add)
+static krc_bool_t krc_hangul_try_jongseong_decompose(int jongseong_index, int* out_base, int* out_add)
 {
-	switch (jongsung_index)
+	switch (jongseong_index)
 	{
 	case  3: *out_base =  1; *out_add = 19; return KRC_TRUE; /* ㄳ → ㄱ+ㅅ */
 	case  5: *out_base =  4; *out_add = 22; return KRC_TRUE; /* ㄵ → ㄴ+ㅈ */
@@ -603,11 +603,11 @@ static krc_bool_t krc_hangul_try_jongsung_decompose(int jongsung_index, int* out
 }
 
 //-----------------------------------------------------------------------------
-// 복합 중성 분리: jungsung_index → (*out_base, *out_add)  반환: TRUE = 복합 중성
+// 복합 중성 분리: jungseong_index → (*out_base, *out_add)  반환: TRUE = 복합 중성
 //-----------------------------------------------------------------------------
-static krc_bool_t krc_hangul_try_jungsung_decompose(int jungsung_index, int* out_base, int* out_add)
+static krc_bool_t krc_hangul_try_jungseong_decompose(int jungseong_index, int* out_base, int* out_add)
 {
-	switch (jungsung_index)
+	switch (jungseong_index)
 	{
 	case  9: *out_base =  8; *out_add =  0; return KRC_TRUE; /* ㅘ → ㅗ+ㅏ */
 	case 10: *out_base =  8; *out_add =  1; return KRC_TRUE; /* ㅙ → ㅗ+ㅐ */
@@ -623,28 +623,28 @@ static krc_bool_t krc_hangul_try_jungsung_decompose(int jungsung_index, int* out
 //-----------------------------------------------------------------------------
 // 음절 + 자음 → 종성 추가 또는 겹받침  (반환: KRC_TRUE = 성공)
 //-----------------------------------------------------------------------------
-static krc_bool_t krc_hangul_add_consonant_to_syllable(int chosung, int jungsung, int jongsung,
+static krc_bool_t krc_hangul_add_consonant_to_syllable(int choseong, int jungseong, int jongseong,
 	krc_wchar_t element_code, krc_wchar_t* result_code)
 {
-	int jongsung_add = _krc_hangul_jongseong_index_table[element_code - 0x3131];
+	int jongseong_add = _krc_hangul_jongseong_index_table[element_code - 0x3131];
 	int compound;
 
-	if (jongsung == 0)
+	if (jongseong == 0)
 	{
 		/* 종성 없음: 가 + ㄱ = 각 */
-		if (jongsung_add != -1)
+		if (jongseong_add != -1)
 		{
-			*result_code = krc_hangul_indices_to_syllable(chosung, jungsung, jongsung_add);
+			*result_code = krc_hangul_indices_to_syllable(choseong, jungseong, jongseong_add);
 			return KRC_TRUE;
 		}
 	}
 	else
 	{
 		/* 겹받침 시도 */
-		compound = krc_hangul_try_jongsung_compound(jongsung, jongsung_add);
+		compound = krc_hangul_try_jongseong_compound(jongseong, jongseong_add);
 		if (compound != -1)
 		{
-			*result_code = krc_hangul_indices_to_syllable(chosung, jungsung, compound);
+			*result_code = krc_hangul_indices_to_syllable(choseong, jungseong, compound);
 			return KRC_TRUE;
 		}
 	}
@@ -654,15 +654,15 @@ static krc_bool_t krc_hangul_add_consonant_to_syllable(int chosung, int jungsung
 //-----------------------------------------------------------------------------
 // 음절(종성 없음) + 모음 → 복합 중성  (반환: KRC_TRUE = 성공)
 //-----------------------------------------------------------------------------
-static krc_bool_t krc_hangul_add_vowel_to_syllable(int chosung, int jungsung,
+static krc_bool_t krc_hangul_add_vowel_to_syllable(int choseong, int jungseong,
 	krc_wchar_t element_code, krc_wchar_t* result_code)
 {
-	int jungsung_add = (int)(element_code - 0x314f);
-	int compound = krc_hangul_try_jungsung_compound(jungsung, jungsung_add);
+	int jungseong_add = (int)(element_code - 0x314f);
+	int compound = krc_hangul_try_jungseong_compound(jungseong, jungseong_add);
 
 	if (compound != -1)
 	{
-		*result_code = krc_hangul_indices_to_syllable(chosung, compound, 0);
+		*result_code = krc_hangul_indices_to_syllable(choseong, compound, 0);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -674,12 +674,12 @@ static krc_bool_t krc_hangul_add_vowel_to_syllable(int chosung, int jungsung,
 static krc_bool_t krc_hangul_compose_jamo(krc_wchar_t consonant, krc_wchar_t vowel,
 	krc_wchar_t* result_code)
 {
-	int chosung_index  = _krc_hangul_choseong_index_table[consonant - 0x3131];
+	int choseong_index  = _krc_hangul_choseong_index_table[consonant - 0x3131];
 
-	if (chosung_index != -1)
+	if (choseong_index != -1)
 	{
-		int jungsung_index = (int)(vowel - 0x314f);
-		*result_code   = krc_hangul_indices_to_syllable(chosung_index, jungsung_index, 0);
+		int jungseong_index = (int)(vowel - 0x314f);
+		*result_code   = krc_hangul_indices_to_syllable(choseong_index, jungseong_index, 0);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -699,7 +699,7 @@ static krc_bool_t krc_hangul_compose_jamo(krc_wchar_t consonant, krc_wchar_t vow
 //-----------------------------------------------------------------------------
 static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_wchar_t element_code, krc_wchar_t* result_code)
 {
-	int chosung, jungsung, jongsung;
+	int choseong, jungseong, jongseong;
 
 	if (0x3131 <= element_code && element_code <= 0x3163)
 	{
@@ -708,16 +708,16 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 		//=====================================================================
 		if (0xac00 <= composing_code && composing_code <= 0xd7a3)
 		{
-			krc_hangul_syllable_to_indices(composing_code, &chosung, &jungsung, &jongsung);
+			krc_hangul_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
 
 			if (krc_hangul_is_consonant_jamo(element_code))
 			{
-				if (krc_hangul_add_consonant_to_syllable(chosung, jungsung, jongsung, element_code, result_code))
+				if (krc_hangul_add_consonant_to_syllable(choseong, jungseong, jongseong, element_code, result_code))
 					return KRC_TRUE;
 			}
-			else if (jongsung == 0)
+			else if (jongseong == 0)
 			{
-				if (krc_hangul_add_vowel_to_syllable(chosung, jungsung, element_code, result_code))
+				if (krc_hangul_add_vowel_to_syllable(choseong, jungseong, element_code, result_code))
 					return KRC_TRUE;
 			}
 		}
@@ -759,29 +759,29 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 //-----------------------------------------------------------------------------
 static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar_t* result_code, krc_wchar_t* pop_back_code)
 {
-	int chosung, jungsung, jongsung;
+	int choseong, jungseong, jongseong;
 	int base, add_idx;
 
 	if (0xac00 <= composing_code && composing_code <= 0xd7a3)
 	{
-		krc_hangul_syllable_to_indices(composing_code, &chosung, &jungsung, &jongsung);
+		krc_hangul_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
 
 		//=====================================================================
 		// 종성 없음
 		//=====================================================================
-		if (jongsung == 0)
+		if (jongseong == 0)
 		{
-			if (krc_hangul_try_jungsung_decompose(jungsung, &base, &add_idx))
+			if (krc_hangul_try_jungseong_decompose(jungseong, &base, &add_idx))
 			{
 				/* 복합 중성 분리: [초성+단순중성] + [단순모음] */
-				*result_code   = krc_hangul_indices_to_syllable(chosung, base, 0);
+				*result_code   = krc_hangul_indices_to_syllable(choseong, base, 0);
 				*pop_back_code = 0x314f + (krc_wchar_t)add_idx;
 			}
 			else
 			{
 				/* 단순 중성 분리: [초성] + [중성모음] */
-				*result_code   = _krc_hangul_choseong_code_table[chosung];
-				*pop_back_code = 0x314f + (krc_wchar_t)jungsung;
+				*result_code   = _krc_hangul_choseong_code_table[choseong];
+				*pop_back_code = 0x314f + (krc_wchar_t)jungseong;
 			}
 		}
 
@@ -790,17 +790,17 @@ static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar
 		//=====================================================================
 		else
 		{
-			if (krc_hangul_try_jongsung_decompose(jongsung, &base, &add_idx))
+			if (krc_hangul_try_jongseong_decompose(jongseong, &base, &add_idx))
 			{
 				/* 겹받침 분리: [초성+중성+단자음종성] + [겹받침의 두번째 자음] */
-				*result_code   = krc_hangul_indices_to_syllable(chosung, jungsung, base);
+				*result_code   = krc_hangul_indices_to_syllable(choseong, jungseong, base);
 				*pop_back_code = _krc_hangul_jongseong_code_table[add_idx];
 			}
 			else
 			{
 				/* 단받침 분리: [초성+중성] + [종성자음] */
-				*result_code   = krc_hangul_indices_to_syllable(chosung, jungsung, 0);
-				*pop_back_code = _krc_hangul_jongseong_code_table[jongsung];
+				*result_code   = krc_hangul_indices_to_syllable(choseong, jungseong, 0);
+				*pop_back_code = _krc_hangul_jongseong_code_table[jongseong];
 			}
 		}
 
