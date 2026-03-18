@@ -1,4 +1,4 @@
-#ifndef __krc_input_unicode__h__
+﻿#ifndef __krc_input_unicode__h__
 #define __krc_input_unicode__h__
 
 /////////////////////////////////////////////////////////////////////////////
