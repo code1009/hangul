@@ -1488,17 +1488,20 @@ KRC_API void krc_input_unicode_put_key(krc_input_unicode_t* ctx, krc_uint32_t ke
 	case KRC_INPUT_KEY_BACKSPACE: krc_input_key_backspace(ctx); break;
 	case KRC_INPUT_KEY_ENTER:     krc_input_key_enter(ctx);     break;
 	case KRC_INPUT_KEY_TAB:       krc_input_unicode_put_char(ctx, '\t'); return;
+
+	case KRC_INPUT_KEY_HANGUL:    krc_input_key_hangul(ctx);    break;
+	case KRC_INPUT_KEY_LSHIFT:
+	case KRC_INPUT_KEY_RSHIFT:    krc_input_key_shift(ctx);     break;
+
+	case KRC_INPUT_KEY_INSERT:    krc_input_key_insert(ctx);    break;
+	case KRC_INPUT_KEY_HOME:      krc_input_key_home(ctx);      break;
 	case KRC_INPUT_KEY_DELETE:    krc_input_key_delete(ctx);    break;
+	case KRC_INPUT_KEY_END:       krc_input_key_end(ctx);       break;
+
 	case KRC_INPUT_KEY_LEFT:      krc_input_key_left(ctx);      break;
 	case KRC_INPUT_KEY_RIGHT:     krc_input_key_right(ctx);     break;
 	case KRC_INPUT_KEY_UP:        krc_input_key_up(ctx);        break;
 	case KRC_INPUT_KEY_DOWN:      krc_input_key_down(ctx);      break;
-	case KRC_INPUT_KEY_HOME:      krc_input_key_home(ctx);      break;
-	case KRC_INPUT_KEY_END:       krc_input_key_end(ctx);       break;
-	case KRC_INPUT_KEY_INSERT:    krc_input_key_insert(ctx);    break;
-	case KRC_INPUT_KEY_HANGUL:    krc_input_key_hangul(ctx);    break;
-	case KRC_INPUT_KEY_LSHIFT:
-	case KRC_INPUT_KEY_RSHIFT:    krc_input_key_shift(ctx);     break;
 	default: break;
 	}
 
