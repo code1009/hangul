@@ -113,16 +113,24 @@
 //===========================================================================
 // 수정자 키 (Modifier Keys)
 //===========================================================================
-#define KRC_INPUT_MODIFIER 0x80000000u
+#define KRC_INPUT_KEY_MODIFIER_FLAG 0x80000000u
+#define KRC_INPUT_KEY_MODIFIER_CODE(x) (KRC_INPUT_KEY_MODIFIER_FLAG | ((x)<<16))
+
+#define KRC_INPUT_KEY_MODIFIER_MASK 0xFFFF0000u
+#define KRC_INPUT_KEY_MODIFIER(x) (((x) & KRC_INPUT_KEY_MODIFIER_MASK) >> 16 )
+
+#define KRC_INPUT_KEY_CODE_MASK 0x0000FFFFu
+#define KRC_INPUT_KEY_CODE(x) ((x) & (KRC_INPUT_KEY_CODE_MASK))
+
 //===========================================================================
 
-#define KRC_INPUT_KEY_LSHIFT (KRC_INPUT_MODIFIER | 79)
-#define KRC_INPUT_KEY_LALT   (KRC_INPUT_MODIFIER | 80)
-#define KRC_INPUT_KEY_LCTRL  (KRC_INPUT_MODIFIER | 81)
+#define KRC_INPUT_KEY_LSHIFT (KRC_INPUT_KEY_MODIFIER_CODE(79))
+#define KRC_INPUT_KEY_LALT   (KRC_INPUT_KEY_MODIFIER_CODE(80))
+#define KRC_INPUT_KEY_LCTRL  (KRC_INPUT_KEY_MODIFIER_CODE(81))
 
-#define KRC_INPUT_KEY_RSHIFT (KRC_INPUT_MODIFIER | 82)
-#define KRC_INPUT_KEY_RALT   (KRC_INPUT_MODIFIER | 83)
-#define KRC_INPUT_KEY_RCTRL  (KRC_INPUT_MODIFIER | 84)
+#define KRC_INPUT_KEY_RSHIFT (KRC_INPUT_KEY_MODIFIER_CODE(82))
+#define KRC_INPUT_KEY_RALT   (KRC_INPUT_KEY_MODIFIER_CODE(83))
+#define KRC_INPUT_KEY_RCTRL  (KRC_INPUT_KEY_MODIFIER_CODE(84))
 
 //===========================================================================
 // 변환키

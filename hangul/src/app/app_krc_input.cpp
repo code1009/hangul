@@ -66,7 +66,7 @@ static void init_ctx(krc_inputw_t& ctx, krc_wchar_t* buf, krc_size_t size,
 
 static void set_hangul(krc_inputw_t& ctx)
 {
-    if (ctx.keyboard_set != KRC_INPUT_KEYBOARD_SET_HANGUL)
+    if (ctx.keyboard_type != KRC_INPUT_KEYBOARD_TYPE_HANGUL)
         krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
 }
 
@@ -499,10 +499,10 @@ static void test_hangul_latin_toggle()
     krc_inputw_t ctx;
     init_ctx(ctx, buf, 64);
 
-    check("init: LATIN", ctx.keyboard_set == KRC_INPUT_KEYBOARD_SET_LATIN);
+    check("init: LATIN", ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN);
 
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
-    check("toggle->HANGUL", ctx.keyboard_set == KRC_INPUT_KEYBOARD_SET_HANGUL);
+    check("toggle->HANGUL", ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_HANGUL);
 
     // 가 입력 (composing, cursor=0)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
@@ -511,7 +511,7 @@ static void test_hangul_latin_toggle()
 
     // 영문 전환 -> 조합 해제, cursor 유지
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
-    check("toggle->LATIN", ctx.keyboard_set == KRC_INPUT_KEYBOARD_SET_LATIN);
+    check("toggle->LATIN", ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN);
     check("composing stopped on toggle", ctx.hangul_composing == KRC_FALSE);
 
     // cursor=0에서 영문 'r' -> 삽입 모드이므로 가 앞에 삽입

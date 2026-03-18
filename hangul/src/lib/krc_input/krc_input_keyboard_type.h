@@ -1,9 +1,9 @@
-﻿#ifndef __krc_input__h__
-#define __krc_input__h__
+﻿#ifndef __krc_input_keyboard_type__h__
+#define __krc_input_keyboard_type__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_input.h
+// File: krc_input_keyboard_type.h
 //
 // Created by MOON, Eui-kwon.
 // Created on Nov-14th, 2019.
@@ -17,14 +17,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#include "../krc/krc.h"
-
-#include "krc_input_config.h"
-#include "krc_input_type.h"
-
-#include "krc_input_key.h"
-#include "krc_input_keyboard_type.h"
-#include "krc_inputw.h"
+#define KRC_INPUT_KEYBOARD_TYPE_LATIN 1
+#define KRC_INPUT_KEYBOARD_TYPE_HANGUL  2
 
 
 
