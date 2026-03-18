@@ -46,7 +46,7 @@
 //---------------------------------------------------------------------------
 // 문자열 길이 계산 (NULL terminator 이전까지의 글자 수, 최대 max_length)
 //---------------------------------------------------------------------------
-static krc_size_t krc_text_length_w(const krc_wchar_t* text, krc_size_t max_length)
+static krc_size_t krc_textw_length(const krc_wchar_t* text, krc_size_t max_length)
 {
 	krc_size_t i;
 
@@ -70,7 +70,7 @@ static krc_bool_t krc_text_remove_char_w(krc_wchar_t* text, krc_size_t text_leng
 
 	if (text_length == (krc_size_t)(-1))
 	{
-		text_length = krc_text_length_w(text, max_length);
+		text_length = krc_textw_length(text, max_length);
 	}
 
 	if (text_length == 0u)
@@ -94,13 +94,13 @@ static krc_bool_t krc_text_remove_char_w(krc_wchar_t* text, krc_size_t text_leng
 //---------------------------------------------------------------------------
 // 문자열의 index 위치에 글자 하나를 삽입
 //---------------------------------------------------------------------------
-static krc_bool_t krc_text_insert_char_w(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index, krc_wchar_t ch)
+static krc_bool_t krc_textw_insert_char(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index, krc_wchar_t ch)
 {
 	krc_size_t i;
 
 	if (text_length == (krc_size_t)(-1))
 	{
-		text_length = krc_text_length_w(text, max_length);
+		text_length = krc_textw_length(text, max_length);
 	}
 
 	if (text_length >= max_length)
@@ -126,17 +126,17 @@ static krc_bool_t krc_text_insert_char_w(krc_wchar_t* text, krc_size_t text_leng
 //---------------------------------------------------------------------------
 // insert_mode 에 따라 삽입 또는 덮어쓰기
 //---------------------------------------------------------------------------
-static krc_bool_t krc_text_put_char_w(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index, krc_wchar_t ch, krc_bool_t insert_mode)
+static krc_bool_t krc_textw_put_char(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index, krc_wchar_t ch, krc_bool_t insert_mode)
 {
 	if (insert_mode == KRC_TRUE)
 	{
-		return krc_text_insert_char_w(text, text_length, max_length, index, ch);
+		return krc_textw_insert_char(text, text_length, max_length, index, ch);
 	}
 
 	/* 덮어쓰기 모드 */
 	if (text_length == (krc_size_t)(-1))
 	{
-		text_length = krc_text_length_w(text, max_length);
+		text_length = krc_textw_length(text, max_length);
 	}
 
 	if (index > text_length)
@@ -174,7 +174,7 @@ static krc_bool_t krc_text_put_char_w(krc_wchar_t* text, krc_size_t text_length,
 //---------------------------------------------------------------------------
 // 음절 코드 → (초성, 중성, 종성) 인덱스 분해
 //---------------------------------------------------------------------------
-static void krc_hangul_syllable_to_indices(krc_wchar_t code, int* choseong, int* jungseong, int* jongseong)
+static void krc_hangulw_syllable_to_indices(krc_wchar_t code, int* choseong, int* jungseong, int* jongseong)
 {
 	int offset = (int)(code - 0xac00);
 	*jongseong = offset % 28;
@@ -185,7 +185,7 @@ static void krc_hangul_syllable_to_indices(krc_wchar_t code, int* choseong, int*
 //---------------------------------------------------------------------------
 // (초성, 중성, 종성) 인덱스 → 음절 코드
 //---------------------------------------------------------------------------
-static krc_wchar_t krc_hangul_indices_to_syllable(int choseong, int jungseong, int jongseong)
+static krc_wchar_t krc_hangulw_indices_to_syllable(int choseong, int jungseong, int jongseong)
 {
 	return 0xac00 + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
 }
@@ -193,7 +193,7 @@ static krc_wchar_t krc_hangul_indices_to_syllable(int choseong, int jungseong, i
 //---------------------------------------------------------------------------
 // 자음 자모 여부: 0x3131 ~ 0x314e
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_is_consonant_jamo(krc_wchar_t code)
+static krc_bool_t krc_hangulw_is_consonant_jamo(krc_wchar_t code)
 {
 	return (0x3131 <= code && code <= 0x314e) ? KRC_TRUE : KRC_FALSE;
 }
@@ -201,7 +201,7 @@ static krc_bool_t krc_hangul_is_consonant_jamo(krc_wchar_t code)
 //---------------------------------------------------------------------------
 // 모음 자모 여부: 0x314f ~ 0x3163
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_is_vowel_jamo(krc_wchar_t code)
+static krc_bool_t krc_hangulw_is_vowel_jamo(krc_wchar_t code)
 {
 	return (0x314f <= code && code <= 0x3163) ? KRC_TRUE : KRC_FALSE;
 }
@@ -209,7 +209,7 @@ static krc_bool_t krc_hangul_is_vowel_jamo(krc_wchar_t code)
 //---------------------------------------------------------------------------
 // 겹받침 조합: jongseong_base + jongseong_add → 겹받침 인덱스 (-1 = 조합 불가)
 //---------------------------------------------------------------------------
-static int krc_hangul_try_jongseong_compound(int jongseong_base, int jongseong_add)
+static int krc_hangulw_try_jongseong_compound(int jongseong_base, int jongseong_add)
 {
 	switch (jongseong_base)
 	{
@@ -241,7 +241,7 @@ static int krc_hangul_try_jongseong_compound(int jongseong_base, int jongseong_a
 //---------------------------------------------------------------------------
 // 복합 중성 조합: jungseong_base + jungseong_add → 복합 중성 인덱스 (-1 = 조합 불가)
 //---------------------------------------------------------------------------
-static int krc_hangul_try_jungseong_compound(int jungseong_base, int jungseong_add)
+static int krc_hangulw_try_jungseong_compound(int jungseong_base, int jungseong_add)
 {
 	switch (jungseong_base)
 	{
@@ -267,7 +267,7 @@ static int krc_hangul_try_jungseong_compound(int jungseong_base, int jungseong_a
 //---------------------------------------------------------------------------
 // 겹받침 분리: jongseong_index → (*jongseong_base, *jongseong_add)  반환: TRUE = 겹받침
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_try_jongseong_decompose(int jongseong_index, int* jongseong_base, int* jongseong_add)
+static krc_bool_t krc_hangulw_try_jongseong_decompose(int jongseong_index, int* jongseong_base, int* jongseong_add)
 {
 	switch (jongseong_index)
 	{
@@ -290,7 +290,7 @@ static krc_bool_t krc_hangul_try_jongseong_decompose(int jongseong_index, int* j
 //---------------------------------------------------------------------------
 // 복합 중성 분리: jungseong_index → (*jungseong_base, *jungseong_add)  반환: TRUE = 복합 중성
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_try_jungseong_decompose(int jungseong_index, int* jungseong_base, int* jungseong_add)
+static krc_bool_t krc_hangulw_try_jungseong_decompose(int jungseong_index, int* jungseong_base, int* jungseong_add)
 {
 	switch (jungseong_index)
 	{
@@ -308,7 +308,7 @@ static krc_bool_t krc_hangul_try_jungseong_decompose(int jungseong_index, int* j
 //---------------------------------------------------------------------------
 // 음절 + 자음 → 종성 추가 또는 겹받침  (반환: KRC_TRUE = 성공)
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_add_consonant_to_syllable(int choseong, int jungseong, int jongseong,	krc_wchar_t element_code, krc_wchar_t* result_code)
+static krc_bool_t krc_hangulw_add_consonant_to_syllable(int choseong, int jungseong, int jongseong,	krc_wchar_t element_code, krc_wchar_t* result_code)
 {
 	int jongseong_add = _krc_inputw_hangul_jongseong_index_table[element_code - 0x3131];
 	int compound;
@@ -318,17 +318,17 @@ static krc_bool_t krc_hangul_add_consonant_to_syllable(int choseong, int jungseo
 		/* 종성 없음: 가 + ㄱ = 각 */
 		if (jongseong_add != -1)
 		{
-			*result_code = krc_hangul_indices_to_syllable(choseong, jungseong, jongseong_add);
+			*result_code = krc_hangulw_indices_to_syllable(choseong, jungseong, jongseong_add);
 			return KRC_TRUE;
 		}
 	}
 	else
 	{
 		/* 겹받침 시도 */
-		compound = krc_hangul_try_jongseong_compound(jongseong, jongseong_add);
+		compound = krc_hangulw_try_jongseong_compound(jongseong, jongseong_add);
 		if (compound != -1)
 		{
-			*result_code = krc_hangul_indices_to_syllable(choseong, jungseong, compound);
+			*result_code = krc_hangulw_indices_to_syllable(choseong, jungseong, compound);
 			return KRC_TRUE;
 		}
 	}
@@ -338,14 +338,14 @@ static krc_bool_t krc_hangul_add_consonant_to_syllable(int choseong, int jungseo
 //---------------------------------------------------------------------------
 // 음절(종성 없음) + 모음 → 복합 중성  (반환: KRC_TRUE = 성공)
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_add_vowel_to_syllable(int choseong, int jungseong,	krc_wchar_t element_code, krc_wchar_t* result_code)
+static krc_bool_t krc_hangulw_add_vowel_to_syllable(int choseong, int jungseong,	krc_wchar_t element_code, krc_wchar_t* result_code)
 {
 	int jungseong_add = (int)(element_code - 0x314f);
-	int compound = krc_hangul_try_jungseong_compound(jungseong, jungseong_add);
+	int compound = krc_hangulw_try_jungseong_compound(jungseong, jungseong_add);
 
 	if (compound != -1)
 	{
-		*result_code = krc_hangul_indices_to_syllable(choseong, compound, 0);
+		*result_code = krc_hangulw_indices_to_syllable(choseong, compound, 0);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -354,14 +354,14 @@ static krc_bool_t krc_hangul_add_vowel_to_syllable(int choseong, int jungseong,	
 //---------------------------------------------------------------------------
 // 단독 자음(초성) + 모음 → 새 음절  (반환: KRC_TRUE = 성공)
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_compose_jamo(krc_wchar_t consonant, krc_wchar_t vowel,	krc_wchar_t* result_code)
+static krc_bool_t krc_hangulw_compose_jamo(krc_wchar_t consonant, krc_wchar_t vowel,	krc_wchar_t* result_code)
 {
 	int choseong_index  = _krc_inputw_hangul_choseong_index_table[consonant - 0x3131];
 
 	if (choseong_index != -1)
 	{
 		int jungseong_index = (int)(vowel - 0x314f);
-		*result_code   = krc_hangul_indices_to_syllable(choseong_index, jungseong_index, 0);
+		*result_code   = krc_hangulw_indices_to_syllable(choseong_index, jungseong_index, 0);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -374,7 +374,7 @@ static krc_bool_t krc_hangul_compose_jamo(krc_wchar_t consonant, krc_wchar_t vow
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 //---------------------------------------------------------------------------
-// krc_hangul_get_composing_code()
+// krc_hangulw_get_composing_code()
 //
 //   조합 중인 코드(composing_code)에 낱글자(element_code)를 추가하여
 //   조합된 코드(*result_code)를 만든다.
@@ -382,7 +382,7 @@ static krc_bool_t krc_hangul_compose_jamo(krc_wchar_t consonant, krc_wchar_t vow
 //   반환값: KRC_TRUE  — 조합 성공 (조합이 계속 진행중)
 //           KRC_FALSE — 조합 불가 (새 글자 시작)
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_wchar_t element_code, krc_wchar_t* result_code)
+static krc_bool_t krc_hangulw_get_composing_code(krc_wchar_t composing_code, krc_wchar_t element_code, krc_wchar_t* result_code)
 {
 	int choseong, jungseong, jongseong;
 
@@ -393,16 +393,16 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 		//===================================================================
 		if (0xac00 <= composing_code && composing_code <= 0xd7a3)
 		{
-			krc_hangul_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
+			krc_hangulw_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
 
-			if (krc_hangul_is_consonant_jamo(element_code))
+			if (krc_hangulw_is_consonant_jamo(element_code))
 			{
-				if (krc_hangul_add_consonant_to_syllable(choseong, jungseong, jongseong, element_code, result_code))
+				if (krc_hangulw_add_consonant_to_syllable(choseong, jungseong, jongseong, element_code, result_code))
 					return KRC_TRUE;
 			}
 			else if (jongseong == 0)
 			{
-				if (krc_hangul_add_vowel_to_syllable(choseong, jungseong, element_code, result_code))
+				if (krc_hangulw_add_vowel_to_syllable(choseong, jungseong, element_code, result_code))
 					return KRC_TRUE;
 			}
 		}
@@ -410,11 +410,11 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 		//===================================================================
 		// composing_code 가 자음 낱글자 — 모음과 결합하여 글자 완성
 		//===================================================================
-		else if (krc_hangul_is_consonant_jamo(composing_code))
+		else if (krc_hangulw_is_consonant_jamo(composing_code))
 		{
-			if (krc_hangul_is_vowel_jamo(element_code))
+			if (krc_hangulw_is_vowel_jamo(element_code))
 			{
-				if (krc_hangul_compose_jamo(composing_code, element_code, result_code))
+				if (krc_hangulw_compose_jamo(composing_code, element_code, result_code))
 					return KRC_TRUE;
 			}
 		}
@@ -434,7 +434,7 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 }
 
 //---------------------------------------------------------------------------
-// krc_hangul_pop_back_code()
+// krc_hangulw_pop_back_code()
 //
 //   조합된 한글 코드(composing_code)에서 마지막 입력 요소를 분리한다.
 //   composing_code = *result_code + *pop_back_code
@@ -442,24 +442,24 @@ static krc_bool_t krc_hangul_get_composing_code(krc_wchar_t composing_code, krc_
 //   반환값: KRC_TRUE  — 분리 성공 (*result_code 에 조합 잔여분)
 //           KRC_FALSE — 분리 불가 (*result_code = 0, *pop_back_code = composing_code)
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar_t* result_code, krc_wchar_t* pop_back_code)
+static krc_bool_t krc_hangulw_pop_back_code(krc_wchar_t composing_code, krc_wchar_t* result_code, krc_wchar_t* pop_back_code)
 {
 	int choseong, jungseong, jongseong;
 	int base, add_idx;
 
 	if (0xac00 <= composing_code && composing_code <= 0xd7a3)
 	{
-		krc_hangul_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
+		krc_hangulw_syllable_to_indices(composing_code, &choseong, &jungseong, &jongseong);
 
 		//===================================================================
 		// 종성 없음
 		//===================================================================
 		if (jongseong == 0)
 		{
-			if (krc_hangul_try_jungseong_decompose(jungseong, &base, &add_idx))
+			if (krc_hangulw_try_jungseong_decompose(jungseong, &base, &add_idx))
 			{
 				/* 복합 중성 분리: [초성+단순중성] + [단순모음] */
-				*result_code   = krc_hangul_indices_to_syllable(choseong, base, 0);
+				*result_code   = krc_hangulw_indices_to_syllable(choseong, base, 0);
 				*pop_back_code = 0x314f + (krc_wchar_t)add_idx;
 			}
 			else
@@ -475,16 +475,16 @@ static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar
 		//===================================================================
 		else
 		{
-			if (krc_hangul_try_jongseong_decompose(jongseong, &base, &add_idx))
+			if (krc_hangulw_try_jongseong_decompose(jongseong, &base, &add_idx))
 			{
 				/* 겹받침 분리: [초성+중성+단자음종성] + [겹받침의 두번째 자음] */
-				*result_code   = krc_hangul_indices_to_syllable(choseong, jungseong, base);
+				*result_code   = krc_hangulw_indices_to_syllable(choseong, jungseong, base);
 				*pop_back_code = _krc_inputw_hangul_jongseong_code_table[add_idx];
 			}
 			else
 			{
 				/* 단받침 분리: [초성+중성] + [종성자음] */
-				*result_code   = krc_hangul_indices_to_syllable(choseong, jungseong, 0);
+				*result_code   = krc_hangulw_indices_to_syllable(choseong, jungseong, 0);
 				*pop_back_code = _krc_inputw_hangul_jongseong_code_table[jongseong];
 			}
 		}
@@ -510,7 +510,7 @@ static krc_bool_t krc_hangul_pop_back_code(krc_wchar_t composing_code, krc_wchar
 //---------------------------------------------------------------------------
 // 조합 중 여부 확인
 //---------------------------------------------------------------------------
-static krc_bool_t krc_input_is_composing(const krc_inputw_t* ctx)
+static krc_bool_t krc_inputw_is_composing(const krc_inputw_t* ctx)
 {
 	return ctx->hangul_composing;
 }
@@ -518,7 +518,7 @@ static krc_bool_t krc_input_is_composing(const krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 조합 시작
 //---------------------------------------------------------------------------
-static void krc_input_composing_start(krc_inputw_t* ctx)
+static void krc_inputw_composing_start(krc_inputw_t* ctx)
 {
 	ctx->hangul_composing = KRC_TRUE;
 }
@@ -526,7 +526,7 @@ static void krc_input_composing_start(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 조합 중단
 //---------------------------------------------------------------------------
-static void krc_input_composing_stop(krc_inputw_t* ctx)
+static void krc_inputw_composing_stop(krc_inputw_t* ctx)
 {
 	ctx->hangul_composing = KRC_FALSE;
 }
@@ -544,7 +544,7 @@ static void krc_input_composing_stop(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 커서 위치(cursor_line, cursor_column) 갱신
 //---------------------------------------------------------------------------
-static void krc_input_cursor_update_pos(krc_inputw_t* ctx)
+static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
 {
 	const krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t pos    = 0u;
@@ -571,7 +571,7 @@ static void krc_input_cursor_update_pos(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 커서 함수
 //---------------------------------------------------------------------------
-static void krc_input_cursor_advance(krc_inputw_t* ctx)
+static void krc_inputw_cursor_advance(krc_inputw_t* ctx)
 {
 	if (ctx->cursor < ctx->buffer_size - 1u)
 	{
@@ -579,7 +579,7 @@ static void krc_input_cursor_advance(krc_inputw_t* ctx)
 	}
 }
 
-static void krc_input_cursor_back(krc_inputw_t* ctx)
+static void krc_inputw_cursor_back(krc_inputw_t* ctx)
 {
 	if (ctx->cursor > 0u)
 	{
@@ -587,7 +587,7 @@ static void krc_input_cursor_back(krc_inputw_t* ctx)
 	}
 }
 
-static void krc_input_cursor_set(krc_inputw_t* ctx, krc_size_t pos)
+static void krc_inputw_cursor_set(krc_inputw_t* ctx, krc_size_t pos)
 {
 	if (pos <= ctx->buffer_size - 1u)
 	{
@@ -595,14 +595,14 @@ static void krc_input_cursor_set(krc_inputw_t* ctx, krc_size_t pos)
 	}
 }
 
-static void krc_input_cursor_reset(krc_inputw_t* ctx)
+static void krc_inputw_cursor_reset(krc_inputw_t* ctx)
 {
 	ctx->cursor = 0u;
 }
 
-static void krc_input_cursor_set_end(krc_inputw_t* ctx)
+static void krc_inputw_cursor_set_end(krc_inputw_t* ctx)
 {
-	ctx->cursor = krc_text_length_w(ctx->buffer_pointer, ctx->buffer_size);
+	ctx->cursor = krc_textw_length(ctx->buffer_pointer, ctx->buffer_size);
 }
 
 
@@ -618,12 +618,12 @@ static void krc_input_cursor_set_end(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 한글 조합 종료 — 커서 전진 후 composing 해제
 //---------------------------------------------------------------------------
-static void krc_input_commit_composing(krc_inputw_t* ctx)
+static void krc_inputw_commit_composing(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
-		krc_input_cursor_advance(ctx);
+		krc_inputw_composing_stop(ctx);
+		krc_inputw_cursor_advance(ctx);
 	}
 }
 
@@ -640,7 +640,7 @@ static void krc_input_commit_composing(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 조합 중 + 모음 입력 실패
 //---------------------------------------------------------------------------
-static void krc_input_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_code, krc_wchar_t composing_code)
+static void krc_inputw_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_code, krc_wchar_t composing_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -648,30 +648,30 @@ static void krc_input_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_co
 	krc_wchar_t  pop_back_code;
 	krc_wchar_t  new_composing;
 
-	krc_hangul_pop_back_code(composing_code, &result_code, &pop_back_code);
+	krc_hangulw_pop_back_code(composing_code, &result_code, &pop_back_code);
 
-	if (krc_hangul_is_consonant_jamo(pop_back_code))
+	if (krc_hangulw_is_consonant_jamo(pop_back_code))
 	{
 		/* 갓 + ㅏ = 가 + 사 */
 		text[ctx->cursor] = result_code;
-		krc_input_cursor_advance(ctx);
-		krc_hangul_get_composing_code(pop_back_code, char_code, &new_composing);
-		krc_input_composing_stop(ctx);
-		if (krc_text_put_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, new_composing, ctx->insert_mode))
+		krc_inputw_cursor_advance(ctx);
+		krc_hangulw_get_composing_code(pop_back_code, char_code, &new_composing);
+		krc_inputw_composing_stop(ctx);
+		if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor, new_composing, ctx->insert_mode))
 		{
-			krc_input_composing_start(ctx);
+			krc_inputw_composing_start(ctx);
 		}
 	}
 	else
 	{
 		/* 가 + ㅏ = 가 + ㅏ  (조합 불가) */
-		krc_input_cursor_advance(ctx);
-		krc_input_composing_stop(ctx);
-		if (krc_text_put_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, result_code, ctx->insert_mode))
+		krc_inputw_cursor_advance(ctx);
+		krc_inputw_composing_stop(ctx);
+		if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor, result_code, ctx->insert_mode))
 		{
-			if (krc_hangul_is_consonant_jamo(result_code))
+			if (krc_hangulw_is_consonant_jamo(result_code))
 			{
-				krc_input_composing_start(ctx);
+				krc_inputw_composing_start(ctx);
 			}
 		}
 	}
@@ -680,7 +680,7 @@ static void krc_input_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_co
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 조합 중 + 자음 입력 실패
 //---------------------------------------------------------------------------
-static void krc_input_put_char_fail_consonant(krc_inputw_t* ctx,
+static void krc_inputw_put_char_fail_consonant(krc_inputw_t* ctx,
 	krc_wchar_t composing_code, krc_wchar_t result_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
@@ -688,13 +688,13 @@ static void krc_input_put_char_fail_consonant(krc_inputw_t* ctx,
 
 	/* 각 + ㄱ = 각 + ㄱ */
 	text[ctx->cursor] = composing_code;
-	krc_input_cursor_advance(ctx);
-	krc_input_composing_stop(ctx);
-	if (krc_text_put_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, result_code, ctx->insert_mode))
+	krc_inputw_cursor_advance(ctx);
+	krc_inputw_composing_stop(ctx);
+	if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor, result_code, ctx->insert_mode))
 	{
-		if (krc_hangul_is_consonant_jamo(result_code))
+		if (krc_hangulw_is_consonant_jamo(result_code))
 		{
-			krc_input_composing_start(ctx);
+			krc_inputw_composing_start(ctx);
 		}
 	}
 }
@@ -702,29 +702,29 @@ static void krc_input_put_char_fail_consonant(krc_inputw_t* ctx,
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 한글 조합 진행 중
 //---------------------------------------------------------------------------
-static void krc_input_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t char_code)
+static void krc_inputw_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_wchar_t  composing_code = text[ctx->cursor];
 	krc_wchar_t  result_code;
 
-	if (krc_hangul_get_composing_code(composing_code, char_code, &result_code) == KRC_TRUE)
+	if (krc_hangulw_get_composing_code(composing_code, char_code, &result_code) == KRC_TRUE)
 	{
-		krc_input_composing_start(ctx);
+		krc_inputw_composing_start(ctx);
 		/* 조합 성공: 가 + ㄱ = 각 */
 		text[ctx->cursor] = result_code;
 	}
 	else
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 		/* 조합 실패 */
-		if (krc_hangul_is_vowel_jamo(char_code))
+		if (krc_hangulw_is_vowel_jamo(char_code))
 		{
-			krc_input_put_char_fail_vowel(ctx, char_code, composing_code);
+			krc_inputw_put_char_fail_vowel(ctx, char_code, composing_code);
 		}
 		else
 		{
-			krc_input_put_char_fail_consonant(ctx, composing_code, result_code);
+			krc_inputw_put_char_fail_consonant(ctx, composing_code, result_code);
 		}
 	}
 }
@@ -732,21 +732,21 @@ static void krc_input_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t c
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 한글 조합 시작
 //---------------------------------------------------------------------------
-static void krc_input_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_code)
+static void krc_inputw_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 
-	if (krc_text_put_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, char_code, ctx->insert_mode))
+	if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor, char_code, ctx->insert_mode))
 	{
-		if (krc_hangul_is_consonant_jamo(char_code))
+		if (krc_hangulw_is_consonant_jamo(char_code))
 		{
-			krc_input_composing_start(ctx);
+			krc_inputw_composing_start(ctx);
 		}
 		else
 		{
-			krc_input_composing_stop(ctx);
-			krc_input_cursor_advance(ctx);
+			krc_inputw_composing_stop(ctx);
+			krc_inputw_cursor_advance(ctx);
 		}
 	}
 }
@@ -754,18 +754,18 @@ static void krc_input_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_co
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 비한글 문자(영문/숫자/특수문자 등)
 //---------------------------------------------------------------------------
-static void krc_input_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_code)
+static void krc_inputw_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 
-	krc_input_commit_composing(ctx);
+	krc_inputw_commit_composing(ctx);
 
-	if (krc_text_put_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, char_code, ctx->insert_mode))
+	if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor, char_code, ctx->insert_mode))
 	{
-		krc_input_cursor_advance(ctx);
+		krc_inputw_cursor_advance(ctx);
 	}
-	krc_input_composing_stop(ctx);
+	krc_inputw_composing_stop(ctx);
 }
 
 
@@ -781,7 +781,7 @@ static void krc_input_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_co
 //---------------------------------------------------------------------------
 // 키 핸들러 — Backspace
 //---------------------------------------------------------------------------
-static void krc_input_key_backspace(krc_inputw_t* ctx)
+static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -789,114 +789,114 @@ static void krc_input_key_backspace(krc_inputw_t* ctx)
 	krc_wchar_t  result_code;
 	krc_wchar_t  pop_back_code;
 
-	if (ctx->cursor == 0u && krc_input_is_composing(ctx) == KRC_FALSE)
+	if (ctx->cursor == 0u && krc_inputw_is_composing(ctx) == KRC_FALSE)
 	{
 		return;
 	}
 
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_hangul_pop_back_code(composing_code, &result_code, &pop_back_code);
+		krc_hangulw_pop_back_code(composing_code, &result_code, &pop_back_code);
 		if (result_code != 0x0000)
 		{
 			text[ctx->cursor] = result_code;
-			krc_input_composing_start(ctx);
+			krc_inputw_composing_start(ctx);
 		}
 		else
 		{
 			krc_text_remove_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor);
-			krc_input_composing_stop(ctx);
+			krc_inputw_composing_stop(ctx);
 		}
 	}
 	else
 	{
 		if (ctx->cursor > 0u)
 		{
-			krc_input_cursor_back(ctx);
+			krc_inputw_cursor_back(ctx);
 			krc_text_remove_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor);
 		}
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
-	ctx->length = krc_text_length_w(text, ctx->buffer_size);
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Enter
 //---------------------------------------------------------------------------
-static void krc_input_key_enter(krc_inputw_t* ctx)
+static void krc_inputw_key_enter(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 
-	krc_input_commit_composing(ctx);
+	krc_inputw_commit_composing(ctx);
 
 	if (ctx->multiline == KRC_TRUE)
 	{
-		if (krc_text_insert_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, '\r'))
+		if (krc_textw_insert_char(text, (krc_size_t)(-1), max_length, ctx->cursor, '\r'))
 		{
-			krc_input_cursor_advance(ctx);
+			krc_inputw_cursor_advance(ctx);
 		}
-		if (krc_text_insert_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor, '\n'))
+		if (krc_textw_insert_char(text, (krc_size_t)(-1), max_length, ctx->cursor, '\n'))
 		{
-			krc_input_cursor_advance(ctx);
+			krc_inputw_cursor_advance(ctx);
 		}
-		ctx->length = krc_text_length_w(text, ctx->buffer_size);
+		ctx->length = krc_textw_length(text, ctx->buffer_size);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Delete
 //---------------------------------------------------------------------------
-static void krc_input_key_delete(krc_inputw_t* ctx)
+static void krc_inputw_key_delete(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 	krc_size_t   text_len;
 
-	krc_input_commit_composing(ctx);
+	krc_inputw_commit_composing(ctx);
 
-	text_len = krc_text_length_w(text, ctx->buffer_size);
+	text_len = krc_textw_length(text, ctx->buffer_size);
 	if (ctx->cursor < text_len)
 	{
 		krc_text_remove_char_w(text, text_len, max_length, ctx->cursor);
 	}
-	ctx->length = krc_text_length_w(text, ctx->buffer_size);
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Left
 //---------------------------------------------------------------------------
-static void krc_input_key_left(krc_inputw_t* ctx)
+static void krc_inputw_key_left(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	else if (ctx->cursor > 0u)
 	{
-		krc_input_cursor_back(ctx);
+		krc_inputw_cursor_back(ctx);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Right
 //---------------------------------------------------------------------------
-static void krc_input_key_right(krc_inputw_t* ctx)
+static void krc_inputw_key_right(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t   text_len;
 
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
-		krc_input_cursor_advance(ctx);
+		krc_inputw_composing_stop(ctx);
+		krc_inputw_cursor_advance(ctx);
 	}
 	else
 	{
-		text_len = krc_text_length_w(text, ctx->buffer_size);
+		text_len = krc_textw_length(text, ctx->buffer_size);
 		if (ctx->cursor < text_len)
 		{
-			krc_input_cursor_advance(ctx);
+			krc_inputw_cursor_advance(ctx);
 		}
 	}
 }
@@ -904,7 +904,7 @@ static void krc_input_key_right(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 다중라인 커서 이동 — 윗 줄 목표 행/열 위치로 이동
 //---------------------------------------------------------------------------
-static void krc_input_move_cursor_up(krc_inputw_t* ctx)
+static void krc_inputw_move_cursor_up(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text        = ctx->buffer_pointer;
 	krc_size_t   target_line = ctx->cursor_line - 1u;
@@ -913,12 +913,12 @@ static void krc_input_move_cursor_up(krc_inputw_t* ctx)
 	krc_size_t   line   = 0u;
 	krc_size_t   column = 0u;
 
-	krc_input_cursor_reset(ctx);
+	krc_inputw_cursor_reset(ctx);
 	while (text[pos] != 0x0000)
 	{
 		if (line == target_line && column == target_col)
 		{
-			krc_input_cursor_set(ctx, pos);
+			krc_inputw_cursor_set(ctx, pos);
 			break;
 		}
 		if (text[pos] == '\n')
@@ -940,7 +940,7 @@ static void krc_input_move_cursor_up(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 다중라인 커서 이동 — 아랫 줄 목표 행/열 위치로 이동
 //---------------------------------------------------------------------------
-static void krc_input_move_cursor_down(krc_inputw_t* ctx)
+static void krc_inputw_move_cursor_down(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text        = ctx->buffer_pointer;
 	krc_size_t   target_line = ctx->cursor_line + 1u;
@@ -954,7 +954,7 @@ static void krc_input_move_cursor_down(krc_inputw_t* ctx)
 	{
 		if (line == target_line && column == target_col)
 		{
-			krc_input_cursor_set(ctx, pos);
+			krc_inputw_cursor_set(ctx, pos);
 			found = 1u;
 			break;
 		}
@@ -962,7 +962,7 @@ static void krc_input_move_cursor_down(krc_inputw_t* ctx)
 		{
 			if (line == target_line) /* 줄 끝 도달 */
 			{
-				krc_input_cursor_set(ctx, pos);
+				krc_inputw_cursor_set(ctx, pos);
 				found = 1u;
 				break;
 			}
@@ -980,102 +980,102 @@ static void krc_input_move_cursor_down(krc_inputw_t* ctx)
 	}
 	if (found == 0u && line == target_line)
 	{
-		krc_input_cursor_set(ctx, pos); /* 마지막 줄 끝 */
+		krc_inputw_cursor_set(ctx, pos); /* 마지막 줄 끝 */
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Up
 //---------------------------------------------------------------------------
-static void krc_input_key_up(krc_inputw_t* ctx)
+static void krc_inputw_key_up(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	if (ctx->multiline == KRC_TRUE && ctx->cursor_line > 0u)
 	{
-		krc_input_move_cursor_up(ctx);
+		krc_inputw_move_cursor_up(ctx);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Down
 //---------------------------------------------------------------------------
-static void krc_input_key_down(krc_inputw_t* ctx)
+static void krc_inputw_key_down(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	if (ctx->multiline == KRC_TRUE)
 	{
-		krc_input_move_cursor_down(ctx);
+		krc_inputw_move_cursor_down(ctx);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Home
 //---------------------------------------------------------------------------
-static void krc_input_key_home(krc_inputw_t* ctx)
+static void krc_inputw_key_home(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	if (ctx->multiline == KRC_TRUE)
 	{
 		/* 현재 줄의 맨 앞으로 이동 */
 		while (ctx->cursor > 0u && text[ctx->cursor - 1u] != '\n')
 		{
-			krc_input_cursor_back(ctx);
+			krc_inputw_cursor_back(ctx);
 		}
 	}
 	else
 	{
-		krc_input_cursor_reset(ctx);
+		krc_inputw_cursor_reset(ctx);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — End
 //---------------------------------------------------------------------------
-static void krc_input_key_end(krc_inputw_t* ctx)
+static void krc_inputw_key_end(krc_inputw_t* ctx)
 {
 	krc_wchar_t* text = ctx->buffer_pointer;
 	krc_size_t   text_len;
 
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	if (ctx->multiline == KRC_TRUE)
 	{
 		/* 현재 줄의 맨 끝으로 이동 */
-		text_len = krc_text_length_w(text, ctx->buffer_size);
+		text_len = krc_textw_length(text, ctx->buffer_size);
 		while (ctx->cursor < text_len
 			&& text[ctx->cursor] != '\r'
 			&& text[ctx->cursor] != '\n')
 		{
-			krc_input_cursor_advance(ctx);
+			krc_inputw_cursor_advance(ctx);
 		}
 	}
 	else
 	{
-		krc_input_cursor_set_end(ctx);
+		krc_inputw_cursor_set_end(ctx);
 	}
 }
 
 //---------------------------------------------------------------------------
 // 키 핸들러 — Insert (삽입/덮어쓰기 모드 전환)
 //---------------------------------------------------------------------------
-static void krc_input_key_insert(krc_inputw_t* ctx)
+static void krc_inputw_key_insert(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	ctx->insert_mode = (ctx->insert_mode == KRC_TRUE) ? KRC_FALSE : KRC_TRUE;
 }
@@ -1083,11 +1083,11 @@ static void krc_input_key_insert(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 // 키 핸들러 — 한/영 전환 (HANGUL = RALT)
 //---------------------------------------------------------------------------
-static void krc_input_key_hangul(krc_inputw_t* ctx)
+static void krc_inputw_key_hangul(krc_inputw_t* ctx)
 {
-	if (krc_input_is_composing(ctx) == KRC_TRUE)
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		krc_input_composing_stop(ctx);
+		krc_inputw_composing_stop(ctx);
 	}
 	if (ctx->keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN)
 	{
@@ -1121,7 +1121,7 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	ctx->shift_state    = KRC_FALSE;
 	ctx->insert_mode    = KRC_TRUE;
 	ctx->keyboard_type   = KRC_INPUT_KEYBOARD_TYPE_LATIN;
-	krc_input_composing_stop(ctx);
+	krc_inputw_composing_stop(ctx);
 
 	if (buffer != (krc_wchar_t*)0 && buffer_size > 0u)
 	{
@@ -1149,13 +1149,13 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	//=======================================================================
 	if (0x3131 <= char_code && char_code <= 0x3163)
 	{
-		if (krc_input_is_composing(ctx) == KRC_TRUE)
+		if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 		{
-			krc_input_put_char_hangul_composing(ctx, char_code);
+			krc_inputw_put_char_hangul_composing(ctx, char_code);
 		}
 		else
 		{
-			krc_input_put_char_hangul_new(ctx, char_code);
+			krc_inputw_put_char_hangul_new(ctx, char_code);
 		}
 	}
 	//=======================================================================
@@ -1163,11 +1163,11 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	//=======================================================================
 	else
 	{
-		krc_input_put_char_non_hangul(ctx, char_code);
+		krc_inputw_put_char_non_hangul(ctx, char_code);
 	}
 
-	ctx->length = krc_text_length_w(text, ctx->buffer_size);
-	krc_input_cursor_update_pos(ctx);
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
+	krc_inputw_cursor_update_pos(ctx);
 }
 
 //---------------------------------------------------------------------------
@@ -1221,25 +1221,25 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	//=======================================================================
 	switch (key)
 	{
-	case KRC_INPUT_KEY_BACKSPACE: krc_input_key_backspace(ctx); break;
-	case KRC_INPUT_KEY_ENTER:     krc_input_key_enter(ctx);     break;
+	case KRC_INPUT_KEY_BACKSPACE: krc_inputw_key_backspace(ctx); break;
+	case KRC_INPUT_KEY_ENTER:     krc_inputw_key_enter(ctx);     break;
 	case KRC_INPUT_KEY_TAB:       krc_inputw_put_char(ctx, '\t'); return;
 
-	case KRC_INPUT_KEY_HANGUL:    krc_input_key_hangul(ctx);    break;
+	case KRC_INPUT_KEY_HANGUL:    krc_inputw_key_hangul(ctx);    break;
 
-	case KRC_INPUT_KEY_INSERT:    krc_input_key_insert(ctx);    break;
-	case KRC_INPUT_KEY_HOME:      krc_input_key_home(ctx);      break;
-	case KRC_INPUT_KEY_DELETE:    krc_input_key_delete(ctx);    break;
-	case KRC_INPUT_KEY_END:       krc_input_key_end(ctx);       break;
+	case KRC_INPUT_KEY_INSERT:    krc_inputw_key_insert(ctx);    break;
+	case KRC_INPUT_KEY_HOME:      krc_inputw_key_home(ctx);      break;
+	case KRC_INPUT_KEY_DELETE:    krc_inputw_key_delete(ctx);    break;
+	case KRC_INPUT_KEY_END:       krc_inputw_key_end(ctx);       break;
 
-	case KRC_INPUT_KEY_LEFT:      krc_input_key_left(ctx);      break;
-	case KRC_INPUT_KEY_RIGHT:     krc_input_key_right(ctx);     break;
-	case KRC_INPUT_KEY_UP:        krc_input_key_up(ctx);        break;
-	case KRC_INPUT_KEY_DOWN:      krc_input_key_down(ctx);      break;
+	case KRC_INPUT_KEY_LEFT:      krc_inputw_key_left(ctx);      break;
+	case KRC_INPUT_KEY_RIGHT:     krc_inputw_key_right(ctx);     break;
+	case KRC_INPUT_KEY_UP:        krc_inputw_key_up(ctx);        break;
+	case KRC_INPUT_KEY_DOWN:      krc_inputw_key_down(ctx);      break;
 	default: break;
 	}
 
-	krc_input_cursor_update_pos(ctx);
+	krc_inputw_cursor_update_pos(ctx);
 }
 
 KRC_API void krc_inputw_shift(krc_inputw_t* ctx, krc_bool_t shift)
