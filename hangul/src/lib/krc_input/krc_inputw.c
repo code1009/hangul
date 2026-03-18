@@ -64,7 +64,7 @@ static krc_size_t krc_textw_length(const krc_wchar_t* text, krc_size_t max_lengt
 //---------------------------------------------------------------------------
 // 문자열에서 index 위치의 글자 하나를 삭제
 //---------------------------------------------------------------------------
-static krc_bool_t krc_text_remove_char_w(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index)
+static krc_bool_t krc_textw_remove_char(krc_wchar_t* text, krc_size_t text_length, krc_size_t max_length, krc_size_t index)
 {
 	krc_size_t i;
 
@@ -804,7 +804,7 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 		}
 		else
 		{
-			krc_text_remove_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor);
+			krc_textw_remove_char(text, (krc_size_t)(-1), max_length, ctx->cursor);
 			krc_inputw_composing_stop(ctx);
 		}
 	}
@@ -813,7 +813,7 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 		if (ctx->cursor > 0u)
 		{
 			krc_inputw_cursor_back(ctx);
-			krc_text_remove_char_w(text, (krc_size_t)(-1), max_length, ctx->cursor);
+			krc_textw_remove_char(text, (krc_size_t)(-1), max_length, ctx->cursor);
 		}
 		krc_inputw_composing_stop(ctx);
 	}
@@ -858,7 +858,7 @@ static void krc_inputw_key_delete(krc_inputw_t* ctx)
 	text_len = krc_textw_length(text, ctx->buffer_size);
 	if (ctx->cursor < text_len)
 	{
-		krc_text_remove_char_w(text, text_len, max_length, ctx->cursor);
+		krc_textw_remove_char(text, text_len, max_length, ctx->cursor);
 	}
 	ctx->length = krc_textw_length(text, ctx->buffer_size);
 }
