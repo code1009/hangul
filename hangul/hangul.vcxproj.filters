@@ -22,6 +22,9 @@
     <Filter Include="src\lib\bf\bf_font_data">
       <UniqueIdentifier>{7872b7b3-9429-4c28-9c3e-8790d1c12f4c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\lib\krc_input">
+      <UniqueIdentifier>{8662a105-6be1-4751-8b7a-7ce013e696e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -77,6 +80,9 @@
     </ClCompile>
     <ClCompile Include="src\app\windows_charset.cpp">
       <Filter>src\app</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lib\krc_input\krc_input_unicode.c">
+      <Filter>src\lib\krc_input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +187,15 @@
     </ClInclude>
     <ClInclude Include="src\app\windows_charset.hpp">
       <Filter>src\app</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc_input\krc_input_unicode.h">
+      <Filter>src\lib\krc_input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc_input\krc_input_config.h">
+      <Filter>src\lib\krc_input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lib\krc_input\krc_input_type.h">
+      <Filter>src\lib\krc_input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
