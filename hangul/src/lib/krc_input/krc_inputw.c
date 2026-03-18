@@ -1197,9 +1197,9 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	krc_uint32_t key_modifier = KRC_INPUT_KEY_MODIFIER(key);
 	krc_bool_t shift = KRC_FALSE;
 
-	/* key_modifier 는 KRC_INPUT_KEY_MODIFIER_VALUE(x) 의 x 값이 추출된 비트 필드 */
-	/* 여러 수정자가 OR 조합될 수 있으므로 & 비트 연산으로 확인 */
-	if (key_modifier & (KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) | KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT)))
+	/* shift 단독 수정자일 때만 문자 입력에 반영 (Ctrl+Shift 등 다른 modifier와 조합은 제외) */
+	if (key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) ||
+		key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT))
 	{
 		shift = KRC_TRUE;
 	}
