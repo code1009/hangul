@@ -445,7 +445,8 @@ static krc_bool_t krc_hangulw_get_composing_code(krc_wchar_t composing_code, krc
 static krc_bool_t krc_hangulw_pop_back_code(krc_wchar_t composing_code, krc_wchar_t* result_code, krc_wchar_t* pop_back_code)
 {
 	int choseong, jungseong, jongseong;
-	int base, add_idx;
+	int jungseong_base, jungseong_add;
+	int jongseong_base, jongseong_add;
 
 	if (0xac00 <= composing_code && composing_code <= 0xd7a3)
 	{
@@ -456,11 +457,11 @@ static krc_bool_t krc_hangulw_pop_back_code(krc_wchar_t composing_code, krc_wcha
 		//===================================================================
 		if (jongseong == 0)
 		{
-			if (krc_hangulw_try_jungseong_decompose(jungseong, &base, &add_idx))
+			if (krc_hangulw_try_jungseong_decompose(jungseong, &jungseong_base, &jungseong_add))
 			{
 				/* 복합 중성 분리: [초성+단순중성] + [단순모음] */
-				*result_code   = krc_hangulw_indices_to_syllable(choseong, base, 0);
-				*pop_back_code = 0x314f + (krc_wchar_t)add_idx;
+				*result_code   = krc_hangulw_indices_to_syllable(choseong, jungseong_base, 0);
+				*pop_back_code = 0x314f + (krc_wchar_t)jungseong_add;
 			}
 			else
 			{
@@ -475,11 +476,11 @@ static krc_bool_t krc_hangulw_pop_back_code(krc_wchar_t composing_code, krc_wcha
 		//===================================================================
 		else
 		{
-			if (krc_hangulw_try_jongseong_decompose(jongseong, &base, &add_idx))
+			if (krc_hangulw_try_jongseong_decompose(jongseong, &jongseong_base, &jongseong_add))
 			{
 				/* 겹받침 분리: [초성+중성+단자음종성] + [겹받침의 두번째 자음] */
-				*result_code   = krc_hangulw_indices_to_syllable(choseong, jungseong, base);
-				*pop_back_code = _krc_inputw_hangul_jongseong_code_table[add_idx];
+				*result_code   = krc_hangulw_indices_to_syllable(choseong, jungseong, jongseong_base);
+				*pop_back_code = _krc_inputw_hangul_jongseong_code_table[jongseong_add];
 			}
 			else
 			{
