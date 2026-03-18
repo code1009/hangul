@@ -111,18 +111,18 @@
 #define KRC_INPUT_KEY_DOWN       78
 
 //===========================================================================
-// 조합키
+// 수정자 키 (Modifier Keys)
 //===========================================================================
-#define KRC_INPUT_KEYFLAG 0x80000000u
+#define KRC_INPUT_MODIFIER 0x80000000u
 //===========================================================================
 
-#define KRC_INPUT_KEY_LSHIFT (KRC_INPUT_KEYFLAG | 79)
-#define KRC_INPUT_KEY_LALT   (KRC_INPUT_KEYFLAG | 80)
-#define KRC_INPUT_KEY_LCTRL  (KRC_INPUT_KEYFLAG | 81)
+#define KRC_INPUT_KEY_LSHIFT (KRC_INPUT_MODIFIER | 79)
+#define KRC_INPUT_KEY_LALT   (KRC_INPUT_MODIFIER | 80)
+#define KRC_INPUT_KEY_LCTRL  (KRC_INPUT_MODIFIER | 81)
 
-#define KRC_INPUT_KEY_RSHIFT (KRC_INPUT_KEYFLAG | 82)
-#define KRC_INPUT_KEY_RALT   (KRC_INPUT_KEYFLAG | 83)
-#define KRC_INPUT_KEY_RCTRL  (KRC_INPUT_KEYFLAG | 84)
+#define KRC_INPUT_KEY_RSHIFT (KRC_INPUT_MODIFIER | 82)
+#define KRC_INPUT_KEY_RALT   (KRC_INPUT_MODIFIER | 83)
+#define KRC_INPUT_KEY_RCTRL  (KRC_INPUT_MODIFIER | 84)
 
 //===========================================================================
 // 변환키
