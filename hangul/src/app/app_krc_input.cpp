@@ -803,6 +803,317 @@ static void test_cursor_pos_multiline()
 
 
 /////////////////////////////////////////////////////////////////////////////
+// 테스트 18: 버그 #1 수정 검증 — 조합 중 자음 연속 입력 커서 위치
+//
+//   krc_inputw_put_char_hangul_fail_jaeum() 에 cursor_advance() 가 추가되어
+//   조합 완료된 글자를 지나쳐 커서가 이동한 후 새 자음이 삽입되어야 한다.
+//
+//   수정 전: 각(cursor=0) + ㄱ → buffer="ㄱ각"  cursor=0  (ㄱ이 앞으로 밀고 들어감)
+//   수정 후: 각(cursor=0) + ㄱ → buffer="각ㄱ"  cursor=1  (올바른 순서)
+/////////////////////////////////////////////////////////////////////////////
+static void test_fix_fail_jaeum()
+{
+    std::cout << "[test_fix_fail_jaeum]\n";
+    krc_wchar_t buf[64] = {};
+    krc_inputw_t ctx;
+
+    // ----- 1) 음절(각) + 조합 불가 자음(ㄱ) -----
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // 각
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // 각 + ㄱ → 각ㄱ
+    print_buf("각ㄱ", ctx);
+    check("fail_jaeum: buf==\"각ㄱ\"",        buf_equals(buf, L"\xAC01\x3131")); // 각=0xAC01, ㄱ=0x3131
+    check("fail_jaeum: length==2",           ctx.length == 2);
+    check("fail_jaeum: cursor==1",           ctx.cursor_offset == 1);  // ← 버그 수정 핵심 검증
+    check("fail_jaeum: composing=true",      ctx.hangul_composing == KRC_TRUE);
+
+    // ----- 2) 각ㄱ에서 ㅏ → 각가 (새 자음이 올바른 위치에 있으므로 정상 조합) -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // ㄱ+ㅏ → 가
+    print_buf("각가", ctx);
+    check("fail_jaeum+ㅏ: buf==\"각가\"",    buf_equals(buf, L"\xAC01\xAC00"));
+    check("fail_jaeum+ㅏ: cursor==1",        ctx.cursor_offset == 1);
+    check("fail_jaeum+ㅏ: composing=true",   ctx.hangul_composing == KRC_TRUE);
+
+    // ----- 3) 각가 + ㄴ → 각간 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_S); // ㅏ + ㄴ → 간
+    print_buf("각간", ctx);
+    check("fail_jaeum+ㄴ: buf==\"각간\"",    buf_equals(buf, L"\xAC01\xAC04"));
+    check("fail_jaeum+ㄴ: cursor==1",        ctx.cursor_offset == 1);
+
+    // ----- 4) 각간 + ㅏ → 각가나 (간의 ㄴ이 나의 초성으로 분리) -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);
+    print_buf("각가나", ctx);
+    check("fail_jaeum 최종: buf==\"각가나\"", buf_equals(buf, L"\xAC01\xAC00\xB098"));
+    check("fail_jaeum 최종: length==3",       ctx.length == 3);
+    check("fail_jaeum 최종: cursor==2",        ctx.cursor_offset == 2);
+
+    // ----- 5) 단독 자음 + 조합 불가 자음: ㄱ(composing) + ㄷ → ㄱㄷ -----
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ (composing, cursor=0)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E); // ㄷ — ㄱ과 조합 불가 → ㄱㄷ
+    print_buf("ㄱㄷ", ctx);
+    check("단독ㄱ+ㄷ: buf==\"ㄱㄷ\"",        buf_equals(buf, L"\x3131\x3137"));
+    check("단독ㄱ+ㄷ: length==2",             ctx.length == 2);
+    check("단독ㄱ+ㄷ: cursor==1",             ctx.cursor_offset == 1);
+    check("단독ㄱ+ㄷ: composing=true",        ctx.hangul_composing == KRC_TRUE);
+
+    // ----- 6) 연속 자음 3개: ㄱ → ㄷ → ㅅ → ㄱㄷㅅ -----
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E); // ㄷ → ㄱㄷ, cursor=1
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_T); // ㅅ → ㄱㄷㅅ, cursor=2
+    print_buf("ㄱㄷㅅ", ctx);
+    check("연속ㄱㄷㅅ: buf==\"ㄱㄷㅅ\"",     buf_equals(buf, L"\x3131\x3137\x3145"));
+    check("연속ㄱㄷㅅ: length==3",            ctx.length == 3);
+    check("연속ㄱㄷㅅ: cursor==2",            ctx.cursor_offset == 2);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 테스트 19: ESC 키
+/////////////////////////////////////////////////////////////////////////////
+static void test_esc_key()
+{
+    std::cout << "[test_esc_key]\n";
+    krc_wchar_t buf[64] = {};
+    krc_inputw_t ctx;
+
+    // 가(composing) + ESC → composing=false, 글자 유지, cursor=0
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);   // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);   // 가 (composing)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ESC);
+    print_buf("가(ESC후)", ctx);
+    check("ESC: buf==\"가\"",        buf_equals(buf, L"\xAC00"));
+    check("ESC: composing=false",    ctx.hangul_composing == KRC_FALSE);
+    check("ESC: cursor==0",          ctx.cursor_offset == 0);
+    check("ESC: length==1",          ctx.length == 1);
+
+    // ESC 후 영문 입력 → cursor=0에서 insert → '가' 앞에 삽입
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL); // 영문 전환
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);      // 'a' at cursor=0 → "a가"
+    print_buf("a가", ctx);
+    check("ESC후 latin: buf==\"a가\"", buf_equals(buf, L"a\xAC00"));
+    check("ESC후 latin: cursor==1",    ctx.cursor_offset == 1);
+    check("ESC후 latin: length==2",    ctx.length == 2);
+
+    // 조합 없는 상태에서 ESC → no-op (글자, 커서, 길이 변화 없음)
+    init_ctx(ctx, buf, 64);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ESC);
+    check("ESC no-op: buf==\"a\"",   buf_equals(buf, L"a"));
+    check("ESC no-op: cursor==1",    ctx.cursor_offset == 1);
+    check("ESC no-op: composing=false", ctx.hangul_composing == KRC_FALSE);
+
+    // 종성 포함 음절에서 ESC → 그대로 유지
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_S); // 간 (composing)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ESC);
+    check("ESC 간: buf==\"간\"",          buf_equals(buf, L"\xAC04"));
+    check("ESC 간: composing=false",      ctx.hangul_composing == KRC_FALSE);
+    check("ESC 간: cursor==0",            ctx.cursor_offset == 0);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 테스트 20: CapsLock
+/////////////////////////////////////////////////////////////////////////////
+static void test_capslock()
+{
+    std::cout << "[test_capslock]\n";
+    krc_wchar_t buf[64] = {};
+    krc_inputw_t ctx;
+    init_ctx(ctx, buf, 64);
+
+    check("init: capslock=false", ctx.capslock_mode == KRC_FALSE);
+
+    // CAPSLOCK ON → 영문 대문자
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_CAPSLOCK);
+    check("CAPSLOCK ON: capslock=true", ctx.capslock_mode == KRC_TRUE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_H); // H
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_I); // I
+    print_buf("HI", ctx);
+    check("CAPSLOCK: buf==\"HI\"",  buf_equals(buf, L"HI"));
+    check("CAPSLOCK: length==2",    ctx.length == 2);
+
+    // CAPSLOCK OFF → 소문자 복귀
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_CAPSLOCK);
+    check("CAPSLOCK OFF: capslock=false", ctx.capslock_mode == KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_H); // h
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_I); // i
+    print_buf("HIhi", ctx);
+    check("CAPSLOCK OFF: buf==\"HIhi\"", buf_equals(buf, L"HIhi"));
+
+    // 한글 모드에서 CAPSLOCK → shift 미적용 (한글에는 대소문자 없음)
+    //   key_mode==HANGUL 이면 capslock 조건 불충족 → shift=false → ㄱ (ㄲ 아님)
+    init_ctx(ctx, buf, 64);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_CAPSLOCK); // capslock ON
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // 한글 모드: shift 없으므로 ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // ㅏ → 가
+    print_buf("가(capslock in hangul)", ctx);
+    check("CAPSLOCK in hangul: buf==\"가\"",      buf_equals(buf, L"\xAC00")); // ㄲ(0x3132) 아닌 ㄱ(0x3131)
+    check("CAPSLOCK in hangul: composing=true",   ctx.hangul_composing == KRC_TRUE);
+
+    // set_capslock_mode API 직접 호출 검증
+    init_ctx(ctx, buf, 64);
+    krc_inputw_set_capslock_mode(&ctx, KRC_TRUE);
+    check("set_capslock TRUE: capslock=true", ctx.capslock_mode == KRC_TRUE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A); // 'A'
+    check("set_capslock: buf[0]=='A'",        buf[0] == L'A');
+    krc_inputw_set_capslock_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A); // 'a'
+    check("set_capslock off: buf[1]=='a'",    buf[1] == L'a');
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 테스트 21: Tab 키
+/////////////////////////////////////////////////////////////////////////////
+static void test_tab_key()
+{
+    std::cout << "[test_tab_key]\n";
+    krc_wchar_t buf[64] = {};
+    krc_inputw_t ctx;
+    init_ctx(ctx, buf, 64);
+
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_TAB);
+    check("TAB: buf[0]=='\\t'",  buf[0] == L'\t');
+    check("TAB: length==1",      ctx.length == 1);
+    check("TAB: cursor==1",      ctx.cursor_offset == 1);
+
+    // 탭 연속 3개
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_TAB);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_TAB);
+    check("TAB x3: length==3",   ctx.length == 3);
+    check("TAB x3: cursor==3",   ctx.cursor_offset == 3);
+
+    // 한글 조합 중 TAB → 조합 commit 후 탭 삽입
+    //   가(composing, cursor=0) + TAB → commit(cursor=1) → insert '\t' at 1 → cursor=2
+    init_ctx(ctx, buf, 64);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가 (composing, cursor=0)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_TAB);
+    print_buf("가\\t", ctx);
+    check("TAB after hangul: buf[0]==가",     buf[0] == 0xAC00);
+    check("TAB after hangul: buf[1]=='\\t'",  buf[1] == L'\t');
+    check("TAB after hangul: length==2",      ctx.length == 2);
+    check("TAB after hangul: cursor==2",      ctx.cursor_offset == 2);
+    check("TAB after hangul: composing=false", ctx.hangul_composing == KRC_FALSE);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 테스트 22: 버그 #5 수정 검증 — 멀티라인 줄 합침 후 cursor_line
+//
+//   Backspace/Delete로 개행(\n)을 삭제한 후 cursor_line이 올바르게 계산되는지 검증.
+//   current_line_offset 캐시가 무효화된 상태에서 partial scan이 방지되어야 한다.
+/////////////////////////////////////////////////////////////////////////////
+static void test_multiline_line_merge()
+{
+    std::cout << "[test_multiline_line_merge]\n";
+    krc_wchar_t buf[128] = {};
+    krc_inputw_t ctx;
+
+    // ----- 1) Backspace로 줄 합침 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    // "ab\r\ncd" 구성
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_C);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_D);
+    check("setup: line==1",   ctx.cursor_line == 1);
+    check("setup: col==2",    ctx.cursor_column == 2);
+    check("setup: length==6", ctx.length == 6); // a,b,\r,\n,c,d
+
+    // HOME(line1) → cursor=4, BS → \n 삭제 → "ab\rcd"
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
+    print_buf("BS removes \\n", ctx);
+    check("BS \\n: line==0",    ctx.cursor_line == 0);
+    check("BS \\n: length==5",  ctx.length == 5);
+
+    // BS → \r 삭제 → "abcd" (단일 라인)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
+    print_buf("BS removes \\r", ctx);
+    check("BS \\r: line==0",    ctx.cursor_line == 0);
+    check("BS \\r: col==2",     ctx.cursor_column == 2);
+    check("BS \\r: length==4",  ctx.length == 4);
+
+    // END → 줄 끝 (line=0, col=4)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
+    check("end after merge: line==0", ctx.cursor_line == 0);
+    check("end after merge: col==4",  ctx.cursor_column == 4);
+
+    // ----- 2) Delete로 줄 합침 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    // "a\r\nb" 구성
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B);
+    // cursor=3(end, line=1, col=1)
+
+    // UP → line0, END → cursor at '\r' (col=1)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
+    check("del setup: line==0",  ctx.cursor_line == 0);
+    check("del setup: col==1",   ctx.cursor_column == 1);
+
+    // DELETE × 2 → \r 삭제 후 \n 삭제 → "ab"
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \r 삭제
+    check("DEL \\r: line==0",    ctx.cursor_line == 0);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \n 삭제
+    print_buf("после DEL merges lines", ctx);
+    check("DEL \\n: line==0",    ctx.cursor_line == 0);
+    check("DEL \\n: length==2",  ctx.length == 2);
+    check("DEL \\n: col==1",     ctx.cursor_column == 1);
+
+    // RIGHT → 'b' 위치 (col=2, line=0)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_RIGHT);
+    check("RIGHT after merge: line==0", ctx.cursor_line == 0);
+    check("RIGHT after merge: col==2",  ctx.cursor_column == 2);
+
+    // ----- 3) 3줄 → 가운데 줄을 Delete로 합침 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    // "a\r\nb\r\nc"
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_C);
+    check("3line: line==2",   ctx.cursor_line == 2);
+    check("3line: col==1",    ctx.cursor_column == 1);
+
+    // UP×2 → line0, END → at '\r'
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
+    check("3line up: line==0",   ctx.cursor_line == 0);
+
+    // DELETE×2 → \r,\n 삭제 → "ab\r\nc" (line0="ab", line1="c")
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
+    check("3line DEL: line==0",    ctx.cursor_line == 0);
+    check("3line DEL: length==5",  ctx.length == 5); // a,\r,\n,b,\r,\n,c(7) → \r,\n 삭제 → ab\r\nc(5)
+
+    // DOWN → line1 (c)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DOWN);
+    check("3line down: line==1",   ctx.cursor_line == 1);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 void krc_input_main()
 {
@@ -826,6 +1137,11 @@ void krc_input_main()
     test_put_char_direct();           std::cout << "\n";
     test_cursor_pos_singleline();     std::cout << "\n";
     test_cursor_pos_multiline();      std::cout << "\n";
+    test_fix_fail_jaeum();            std::cout << "\n";
+    test_esc_key();                   std::cout << "\n";
+    test_capslock();                  std::cout << "\n";
+    test_tab_key();                   std::cout << "\n";
+    test_multiline_line_merge();      std::cout << "\n";
 
     std::cout << "===== 결과: PASS=" << s_pass << "  FAIL=" << s_fail << " =====\n";
 }
