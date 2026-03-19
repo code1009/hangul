@@ -23,7 +23,7 @@
 #include "krc_input_type.h"
 
 #include "krc_input_key.h"
-#include "krc_input_keyboard_type.h"
+#include "krc_input_key_mode.h"
 #include "krc_inputw.h"
 
 

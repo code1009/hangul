@@ -27,7 +27,7 @@
 #include "krc_input_config.h"
 #include "krc_input_type.h"
 #include "krc_input_key.h"
-#include "krc_input_keyboard_type.h"
+#include "krc_input_key_mode.h"
 #include "krc_inputw_key_char_table.h"
 
 
@@ -42,7 +42,7 @@
   - 인덱스 47 = KRC_INPUT_KEY_SPACE(48)
 
 # 테이블 선택:
-  - keyboard_set × shift_state 조합으로 결정 
+  - key_mode × shift 조합으로 결정 
 */
 
 //===========================================================================
@@ -283,7 +283,7 @@ static const krc_wchar_t _krc_inputw_key_char_table_hangul_shift[48] =
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t keyboard_type, krc_bool_t shift)
+KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t key_mode, krc_bool_t shift)
 {
 	if (index >= KRC_INPUT_KEY_CHAR_COUNT)
 	{
@@ -293,7 +293,7 @@ KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t keyboard_
 
 	const krc_wchar_t* table;
 
-	if (keyboard_type == KRC_INPUT_KEYBOARD_TYPE_HANGUL)
+	if (key_mode == KRC_INPUT_KEY_MODE_HANGUL)
 	{
 		table = (shift == KRC_TRUE) ? _krc_inputw_key_char_table_hangul_shift : _krc_inputw_key_char_table_hangul;
 	}

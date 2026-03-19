@@ -78,13 +78,16 @@
     <ClInclude Include="src\lib\krc\krc_type.h" />
     <ClInclude Include="src\lib\krc\krc_unicode_conversion.h" />
     <ClInclude Include="src\lib\krc_input\krc_input.h" />
+    <ClInclude Include="src\lib\krc_input\krc_inputw.h" />
     <ClInclude Include="src\lib\krc_input\krc_inputw_key_char_table.h" />
     <ClInclude Include="src\lib\krc_input\krc_inputw_table.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_config.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_key.h" />
-    <ClInclude Include="src\lib\krc_input\krc_input_keyboard_type.h" />
+    <ClInclude Include="src\lib\krc_input\krc_input_key_mode.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_type.h" />
-    <ClInclude Include="src\lib\krc_input\krc_inputw.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\lib\krc_input\todo.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

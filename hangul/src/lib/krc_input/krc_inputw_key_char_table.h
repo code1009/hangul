@@ -17,7 +17,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t keyboard_type, krc_bool_t shift);
+KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t key_mode, krc_bool_t shift);
 
 
 

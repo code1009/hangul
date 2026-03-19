@@ -66,7 +66,7 @@ static void init_ctx(krc_inputw_t& ctx, krc_wchar_t* buf, krc_size_t size,
 
 static void set_hangul(krc_inputw_t& ctx)
 {
-    if (ctx.keyboard_type != KRC_INPUT_KEYBOARD_TYPE_HANGUL)
+    if (ctx.key_mode != KRC_INPUT_KEY_MODE_HANGUL)
         krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
 }
 
@@ -110,7 +110,7 @@ static void test_latin_basic()
 
 /////////////////////////////////////////////////////////////////////////////
 // 테스트 2: 영문 SHIFT 입력
-// krc_inputw_shift() API 를 사용하여 shift_state 를 직접 제어
+// krc_inputw_set_shift_mode() API 를 사용하여 shift_mode 를 직접 제어
 /////////////////////////////////////////////////////////////////////////////
 static void test_latin_shift()
 {
@@ -119,19 +119,19 @@ static void test_latin_shift()
     krc_inputw_t ctx;
     init_ctx(ctx, buf, 64);
 
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_H);   // H
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_I);   // I
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_SPACE);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_1);       // !
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_2);       // @
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_3);       // #
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_GRAVE);   // ~
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_MINUS);   // _
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_EQUAL);   // +
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     print_buf("HI !@#~_+", ctx);
     check("buffer == \"HI !@#~_+\"", buf_equals(buf, L"HI !@#~_+"));
     check("length == 9", ctx.length == 9);
@@ -314,7 +314,7 @@ static void test_hangul_compound_jungseong()
 
 /////////////////////////////////////////////////////////////////////////////
 // 테스트 8: 한글 SHIFT (쌍자음, 겹모음)
-// krc_inputw_shift() API 를 사용하여 shift_state 를 직접 제어
+// krc_inputw_set_shift_mode() API 를 사용하여 shift_mode 를 직접 제어
 /////////////////////////////////////////////////////////////////////////////
 static void test_hangul_shift()
 {
@@ -325,9 +325,9 @@ static void test_hangul_shift()
     // shift+R(ㄲ) + K(ㅏ) → 까 U+AE4C
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);  // ㄲ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);  // ㅏ
     print_buf("까", ctx);
     check("shift+R, K -> 까(0xAE4C)",   buf_equals(buf, L"\xAE4C"));
@@ -335,9 +335,9 @@ static void test_hangul_shift()
     // shift+E(ㄸ) + J(ㅓ) → 떠 U+B5A0
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E);  // ㄸ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_J);  // ㅓ
     print_buf("떠", ctx);
     check("shift+E, J -> 떠(0xB5A0)",   buf_equals(buf, L"\xB5A0"));
@@ -345,9 +345,9 @@ static void test_hangul_shift()
     // shift+T(ㅆ) + L(ㅣ) → 씨 U+C528
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_T);  // ㅆ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_L);  // ㅣ
     print_buf("씨", ctx);
     check("shift+T, L -> 씨(0xC528)",   buf_equals(buf, L"\xC528"));
@@ -355,18 +355,18 @@ static void test_hangul_shift()
     // shift+Q(ㅃ) 단독 → 자음이므로 composing
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_Q);  // ㅃ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     check("shift+Q -> ㅃ composing",    ctx.hangul_composing == KRC_TRUE);
     check("shift+Q: buf[0]==0x3143",     buf[0] == 0x3143);
 
     // shift+O(ㅒ) → 단독 모음이므로 cursor 전진
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_O);  // ㅒ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     print_buf("ㅒ", ctx);
     check("shift+O -> ㅒ(0x3152)",      buf[0] == 0x3152);
     check("shift+O: cursor==1",         ctx.cursor == 1);
@@ -375,9 +375,9 @@ static void test_hangul_shift()
     // shift+P(ㅖ) → 단독 모음
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_shift(&ctx, KRC_TRUE);
+    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_P);  // ㅖ
-    krc_inputw_shift(&ctx, KRC_FALSE);
+    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     check("shift+P -> ㅖ(0x3156)",      buf[0] == 0x3156);
     check("shift+P: cursor==1",         ctx.cursor == 1);
 }
@@ -563,10 +563,10 @@ static void test_hangul_latin_toggle()
     krc_inputw_t ctx;
     init_ctx(ctx, buf, 64);
 
-    check("init: LATIN",    ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN);
+    check("init: LATIN",    ctx.key_mode == KRC_INPUT_KEY_MODE_LATIN);
 
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
-    check("toggle->HANGUL", ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_HANGUL);
+    check("toggle->HANGUL", ctx.key_mode == KRC_INPUT_KEY_MODE_HANGUL);
 
     // 가 입력 (composing=true, cursor=0)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
@@ -576,7 +576,7 @@ static void test_hangul_latin_toggle()
 
     // 영문 전환 → composing 해제만, cursor 전진 없음(=0 유지)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
-    check("toggle->LATIN",                      ctx.keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN);
+    check("toggle->LATIN",                      ctx.key_mode == KRC_INPUT_KEY_MODE_LATIN);
     check("composing stopped",                  ctx.hangul_composing == KRC_FALSE);
     check("cursor unchanged after toggle==0",   ctx.cursor == 0);
 

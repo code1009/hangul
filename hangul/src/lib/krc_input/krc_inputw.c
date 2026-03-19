@@ -27,7 +27,7 @@
 #include "krc_input_config.h"
 #include "krc_input_type.h"
 #include "krc_input_key.h"
-#include "krc_input_keyboard_type.h"
+#include "krc_input_key_mode.h"
 #include "krc_inputw_key_char_table.h"
 #include "krc_inputw_table.h"
 #include "krc_inputw.h"
@@ -1082,6 +1082,14 @@ static void krc_inputw_key_insert(krc_inputw_t* ctx)
 }
 
 //---------------------------------------------------------------------------
+// 키 핸들러 — Caps Lock (토글)
+//---------------------------------------------------------------------------
+static void krc_inputw_key_capslock(krc_inputw_t* ctx)
+{
+	ctx->capslock_mode = (ctx->capslock_mode == KRC_TRUE) ? KRC_FALSE : KRC_TRUE;
+}
+
+//---------------------------------------------------------------------------
 // 키 핸들러 — 한/영 전환 (HANGUL = RALT)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_hangul(krc_inputw_t* ctx)
@@ -1090,13 +1098,13 @@ static void krc_inputw_key_hangul(krc_inputw_t* ctx)
 	{
 		krc_inputw_composing_stop(ctx);
 	}
-	if (ctx->keyboard_type == KRC_INPUT_KEYBOARD_TYPE_LATIN)
+	if (ctx->key_mode == KRC_INPUT_KEY_MODE_LATIN)
 	{
-		ctx->keyboard_type = KRC_INPUT_KEYBOARD_TYPE_HANGUL;
+		ctx->key_mode = KRC_INPUT_KEY_MODE_HANGUL;
 	}
 	else
 	{
-		ctx->keyboard_type = KRC_INPUT_KEYBOARD_TYPE_LATIN;
+		ctx->key_mode = KRC_INPUT_KEY_MODE_LATIN;
 	}
 }
 
@@ -1119,9 +1127,10 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	ctx->cursor         = 0u;
 	ctx->cursor_line    = 0u;
 	ctx->cursor_column  = 0u;
-	ctx->shift_state    = KRC_FALSE;
+	ctx->shift_mode      = KRC_FALSE;
+	ctx->capslock_mode   = KRC_FALSE;
 	ctx->insert_mode    = KRC_TRUE;
-	ctx->keyboard_type   = KRC_INPUT_KEYBOARD_TYPE_LATIN;
+	ctx->key_mode        = KRC_INPUT_KEY_MODE_LATIN;
 	krc_inputw_composing_stop(ctx);
 
 	if (buffer != (krc_wchar_t*)0 && buffer_size > 0u)
@@ -1191,7 +1200,7 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 
 	//=======================================================================
 	// 문자 키 처리 — put_char() 에 위임
-	// keyboard_type × shift 조합으로 4개 테이블 중 하나를 선택
+	// key_mode × shift 조합으로 4개 테이블 중 하나를 선택
 	// KRC_INPUT_KEY_1(1) ~ KRC_INPUT_KEY_SPACE(48) 범위
 	//=======================================================================
 	krc_uint32_t key_code = KRC_INPUT_KEY_CODE(key);
@@ -1204,14 +1213,18 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	{
 		shift = KRC_TRUE;
 	}
-	if (ctx->shift_state == KRC_TRUE)
+	if (ctx->shift_mode == KRC_TRUE)
+	{
+		shift = KRC_TRUE;
+	}
+	if ((ctx->capslock_mode == KRC_TRUE) && (ctx->key_mode == KRC_INPUT_KEY_MODE_LATIN))
 	{
 		shift = KRC_TRUE;
 	}
 
 	if (key_code >= KRC_INPUT_KEY_1 && key_code <= KRC_INPUT_KEY_SPACE)
 	{
-		char_code = krc_inputw_key_char(key_code - KRC_INPUT_KEY_1, ctx->keyboard_type, shift);
+		char_code = krc_inputw_key_char(key_code - KRC_INPUT_KEY_1, ctx->key_mode, shift);
 		if (char_code != 0x0000u)
 		{
 			krc_inputw_put_char(ctx, char_code);
@@ -1229,6 +1242,7 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	case KRC_INPUT_KEY_TAB:       krc_inputw_put_char(ctx, '\t'); return;
 
 	case KRC_INPUT_KEY_HANGUL:    krc_inputw_key_hangul(ctx);    break;
+	case KRC_INPUT_KEY_CAPSLOCK:  krc_inputw_key_capslock(ctx);  break;
 
 	case KRC_INPUT_KEY_INSERT:    krc_inputw_key_insert(ctx);    break;
 	case KRC_INPUT_KEY_HOME:      krc_inputw_key_home(ctx);      break;
@@ -1255,7 +1269,25 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	krc_inputw_cursor_update_pos(ctx);
 }
 
-KRC_API void krc_inputw_shift(krc_inputw_t* ctx, krc_bool_t shift)
+KRC_API void krc_inputw_set_shift_mode(krc_inputw_t* ctx, krc_bool_t mode)
 {
-	ctx->shift_state = shift;
+	ctx->shift_mode = mode;
+}
+
+KRC_API void krc_inputw_set_capslock_mode(krc_inputw_t* ctx, krc_bool_t mode)
+{
+	ctx->capslock_mode = mode;
+}
+
+KRC_API void krc_inputw_set_insert_mode(krc_inputw_t* ctx, krc_bool_t mode)
+{
+	ctx->insert_mode = mode;
+}
+
+KRC_API void krc_inputw_set_key_mode(krc_inputw_t* ctx, krc_uint32_t mode)
+{
+	if (mode == KRC_INPUT_KEY_MODE_LATIN || mode == KRC_INPUT_KEY_MODE_HANGUL)
+	{
+		ctx->key_mode = mode;
+	}
 }
