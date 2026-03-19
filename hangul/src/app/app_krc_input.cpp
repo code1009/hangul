@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 #include <assert.h>
 #include <Windows.h>
@@ -95,7 +95,7 @@ static void test_latin_basic()
     print_buf("hello 123", ctx);
     check("buffer == \"hello 123\"", buf_equals(buf, L"hello 123"));
     check("length == 9", ctx.length == 9);
-    check("cursor == 9", ctx.cursor == 9);
+    check("cursor == 9", ctx.cursor_offset == 9);
 
     // 특수문자
     init_ctx(ctx, buf, 64);
@@ -135,7 +135,7 @@ static void test_latin_shift()
     print_buf("HI !@#~_+", ctx);
     check("buffer == \"HI !@#~_+\"", buf_equals(buf, L"HI !@#~_+"));
     check("length == 9", ctx.length == 9);
-    check("cursor == 9", ctx.cursor == 9);
+    check("cursor == 9", ctx.cursor_offset == 9);
 }
 
 
@@ -153,14 +153,14 @@ static void test_hangul_syllable()
     // R(ㄱ) → 자음 단독, 조합 시작
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
     check("R(ㄱ): composing=true",    ctx.hangul_composing == KRC_TRUE);
-    check("R(ㄱ): cursor==0",         ctx.cursor == 0);
+    check("R(ㄱ): cursor==0",         ctx.cursor_offset == 0);
     check("R(ㄱ): buf[0]==0x3131",    buf[0] == 0x3131);
 
     // K(ㅏ) → ㄱ+ㅏ = 가
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);
     print_buf("가", ctx);
     check("RK -> 가(0xAC00)",          buf_equals(buf, L"\xAC00"));
-    check("RK: cursor==0 (조합중)",    ctx.cursor == 0);
+    check("RK: cursor==0 (조합중)",    ctx.cursor_offset == 0);
     check("RK: composing=true",        ctx.hangul_composing == KRC_TRUE);
 
     // D(ㅇ) + J(ㅓ) → 어
@@ -192,7 +192,7 @@ static void test_hangul_jongseong()
     print_buf("간", ctx);
     check("RKS -> 간(0xAC04)",  buf_equals(buf, L"\xAC04"));
     check("RKS: length==1",     ctx.length == 1);
-    check("RKS: cursor==0",     ctx.cursor == 0);
+    check("RKS: cursor==0",     ctx.cursor_offset == 0);
 
     // R(ㄱ) K(ㅏ) R(ㄱ) → 각
     init_ctx(ctx, buf, 64);
@@ -224,7 +224,7 @@ static void test_hangul_split_jongseong()
     print_buf("가나", ctx);
     check("RKSK -> 가나",       buf_equals(buf, L"\xAC00\xB098"));
     check("RKSK: length==2",    ctx.length == 2);
-    check("RKSK: cursor==1",    ctx.cursor == 1);
+    check("RKSK: cursor==1",    ctx.cursor_offset == 1);
 
     // G K S R M F → 한글
     init_ctx(ctx, buf, 64);
@@ -369,7 +369,7 @@ static void test_hangul_shift()
     krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     print_buf("ㅒ", ctx);
     check("shift+O -> ㅒ(0x3152)",      buf[0] == 0x3152);
-    check("shift+O: cursor==1",         ctx.cursor == 1);
+    check("shift+O: cursor==1",         ctx.cursor_offset == 1);
     check("shift+O: composing=false",   ctx.hangul_composing == KRC_FALSE);
 
     // shift+P(ㅖ) → 단독 모음
@@ -379,7 +379,7 @@ static void test_hangul_shift()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_P);  // ㅖ
     krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
     check("shift+P -> ㅖ(0x3156)",      buf[0] == 0x3156);
-    check("shift+P: cursor==1",         ctx.cursor == 1);
+    check("shift+P: cursor==1",         ctx.cursor_offset == 1);
 }
 
 
@@ -402,7 +402,7 @@ static void test_backspace()
     print_buf("간->가", ctx);
     check("BS: 간->가(0xAC00)",     buf_equals(buf, L"\xAC00"));
     check("BS: composing=true",     ctx.hangul_composing == KRC_TRUE);
-    check("BS: cursor==0",          ctx.cursor == 0);
+    check("BS: cursor==0",          ctx.cursor_offset == 0);
 
     // 가 → BS → ㄱ (중성 삭제)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
@@ -415,12 +415,12 @@ static void test_backspace()
     print_buf("ㄱ->empty", ctx);
     check("BS: ㄱ->empty",          buf_equals(buf, L""));
     check("BS: composing=false",    ctx.hangul_composing == KRC_FALSE);
-    check("BS: cursor==0",          ctx.cursor == 0);
+    check("BS: cursor==0",          ctx.cursor_offset == 0);
     check("BS: length==0",          ctx.length == 0);
 
     // 빈 상태에서 BS → no-op
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
-    check("BS on empty: cursor==0", ctx.cursor == 0);
+    check("BS on empty: cursor==0", ctx.cursor_offset == 0);
     check("BS on empty: length==0", ctx.length == 0);
 
     // 겹받침 BS 분리: 갃(ㄳ) → BS → 각
@@ -441,7 +441,7 @@ static void test_backspace()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
     print_buf("hi->h", ctx);
     check("latin BS: hi->h",        buf_equals(buf, L"h"));
-    check("latin BS: cursor==1",    ctx.cursor == 1);
+    check("latin BS: cursor==1",    ctx.cursor_offset == 1);
 }
 
 
@@ -462,7 +462,7 @@ static void test_delete_key()
     // cursor=끝(3) → DELETE → no-op
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
     check("DEL at end: length==3",      ctx.length == 3);
-    check("DEL at end: cursor==3",      ctx.cursor == 3);
+    check("DEL at end: cursor==3",      ctx.cursor_offset == 3);
 
     // HOME → DELETE → "bc"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
@@ -470,7 +470,7 @@ static void test_delete_key()
     print_buf("bc", ctx);
     check("DEL: abc->bc",               buf_equals(buf, L"bc"));
     check("DEL: length==2",             ctx.length == 2);
-    check("DEL: cursor==0",             ctx.cursor == 0);
+    check("DEL: cursor==0",             ctx.cursor_offset == 0);
 
     // DELETE 반복 → "" 
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
@@ -493,7 +493,7 @@ static void test_delete_key()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // 'b' 삭제 → "간"
     print_buf("간", ctx);
     check("DEL: b간->간(0xAC04)",        buf_equals(buf, L"\xAC04"));
-    check("DEL: cursor==0 after del",   ctx.cursor == 0);
+    check("DEL: cursor==0 after del",   ctx.cursor_offset == 0);
 }
 
 
@@ -510,28 +510,28 @@ static void test_cursor_movement()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_C);
-    check("abc: cursor==3",         ctx.cursor == 3);
+    check("abc: cursor==3",         ctx.cursor_offset == 3);
 
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LEFT);
-    check("left: cursor==2",        ctx.cursor == 2);
+    check("left: cursor==2",        ctx.cursor_offset == 2);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LEFT);
-    check("left: cursor==1",        ctx.cursor == 1);
+    check("left: cursor==1",        ctx.cursor_offset == 1);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_RIGHT);
-    check("right: cursor==2",       ctx.cursor == 2);
+    check("right: cursor==2",       ctx.cursor_offset == 2);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
-    check("home: cursor==0",        ctx.cursor == 0);
+    check("home: cursor==0",        ctx.cursor_offset == 0);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
-    check("end: cursor==3",         ctx.cursor == 3);
+    check("end: cursor==3",         ctx.cursor_offset == 3);
 
     // cursor=0에서 LEFT → no-op
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LEFT);
-    check("left at 0: cursor==0",   ctx.cursor == 0);
+    check("left at 0: cursor==0",   ctx.cursor_offset == 0);
 
     // cursor=끝에서 RIGHT → no-op
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_RIGHT);
-    check("right at end: cursor==3", ctx.cursor == 3);
+    check("right at end: cursor==3", ctx.cursor_offset == 3);
 
     // 한글 조합 중 LEFT → composing 해제, cursor 그대로(전진 없음)
     init_ctx(ctx, buf, 64);
@@ -540,7 +540,7 @@ static void test_cursor_movement()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가(composing, cursor=0)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LEFT);
     check("left during composing: composing=false", ctx.hangul_composing == KRC_FALSE);
-    check("left during composing: cursor==0",       ctx.cursor == 0);
+    check("left during composing: cursor==0",       ctx.cursor_offset == 0);
 
     // 한글 조합 중 RIGHT → composing 해제 + cursor 전진
     init_ctx(ctx, buf, 64);
@@ -549,7 +549,7 @@ static void test_cursor_movement()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가(composing, cursor=0)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_RIGHT);
     check("right during composing: composing=false", ctx.hangul_composing == KRC_FALSE);
-    check("right during composing: cursor==1",       ctx.cursor == 1);
+    check("right during composing: cursor==1",       ctx.cursor_offset == 1);
 }
 
 
@@ -572,13 +572,13 @@ static void test_hangul_latin_toggle()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);
     check("hangul: buf[0]==가(0xAC00)",         buf[0] == 0xAC00);
-    check("hangul: cursor==0",                  ctx.cursor == 0);
+    check("hangul: cursor==0",                  ctx.cursor_offset == 0);
 
     // 영문 전환 → composing 해제만, cursor 전진 없음(=0 유지)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
     check("toggle->LATIN",                      ctx.key_mode == KRC_INPUT_KEY_MODE_LATIN);
     check("composing stopped",                  ctx.hangul_composing == KRC_FALSE);
-    check("cursor unchanged after toggle==0",   ctx.cursor == 0);
+    check("cursor unchanged after toggle==0",   ctx.cursor_offset == 0);
 
     // cursor=0에서 영문 'r' → 삽입모드이므로 가 앞에 삽입 → "r가"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
@@ -612,7 +612,7 @@ static void test_insert_overwrite()
     print_buf("overwrite xbc", ctx);
     check("overwrite: buffer==\"xbc\"", buf_equals(buf, L"xbc"));
     check("overwrite: length==3",       ctx.length == 3);
-    check("overwrite: cursor==1",       ctx.cursor == 1);
+    check("overwrite: cursor==1",       ctx.cursor_offset == 1);
 
     // 삽입 모드 복귀 → cursor=1에서 'y' → "xybc"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_INSERT);
@@ -621,7 +621,7 @@ static void test_insert_overwrite()
     print_buf("insert xybc", ctx);
     check("insert: buffer==\"xybc\"",   buf_equals(buf, L"xybc"));
     check("insert: length==4",          ctx.length == 4);
-    check("insert: cursor==2",          ctx.cursor == 2);
+    check("insert: cursor==2",          ctx.cursor_offset == 2);
 }
 
 
@@ -642,7 +642,7 @@ static void test_buffer_limit()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E); // 5번째 → 거부
     print_buf("abcd (e 거부)", ctx);
     check("buffer limit: length==4",    ctx.length == 4);
-    check("buffer limit: cursor==4",    ctx.cursor == 4);
+    check("buffer limit: cursor==4",    ctx.cursor_offset == 4);
     check("buffer limit: buf[4]==0",    buf[4] == 0x0000);
 
     // HOME → 'z' 삽입 시도 → 거부 (버퍼 꽉 참)
@@ -669,13 +669,13 @@ static void test_put_char_direct()
     krc_inputw_put_char(&ctx, L'C');
     check("put_char ABC: buf",          buf_equals(buf, L"ABC"));
     check("put_char ABC: length==3",    ctx.length == 3);
-    check("put_char ABC: cursor==3",    ctx.cursor == 3);
+    check("put_char ABC: cursor==3",    ctx.cursor_offset == 3);
 
     // 한글 자모 직접 입력
     init_ctx(ctx, buf, 64);
     krc_inputw_put_char(&ctx, 0x3131);  // ㄱ
     check("put_char ㄱ: composing=true",    ctx.hangul_composing == KRC_TRUE);
-    check("put_char ㄱ: cursor==0",         ctx.cursor == 0);
+    check("put_char ㄱ: cursor==0",         ctx.cursor_offset == 0);
 
     krc_inputw_put_char(&ctx, 0x314F);  // ㅏ → ㄱ+ㅏ = 가
     print_buf("가", ctx);
@@ -689,7 +689,7 @@ static void test_put_char_direct()
     print_buf("가나", ctx);
     check("put_char 간+ㅏ -> 가나",        buf_equals(buf, L"\xAC00\xB098"));
     check("put_char 가나: length==2",       ctx.length == 2);
-    check("put_char 가나: cursor==1",       ctx.cursor == 1);
+    check("put_char 가나: cursor==1",       ctx.cursor_offset == 1);
 }
 
 

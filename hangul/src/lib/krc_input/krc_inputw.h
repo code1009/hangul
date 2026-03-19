@@ -1,4 +1,4 @@
-﻿#ifndef __krc_inputw__h__
+#ifndef __krc_inputw__h__
 #define __krc_inputw__h__
 
 /////////////////////////////////////////////////////////////////////////////
@@ -23,14 +23,15 @@ typedef struct _krc_inputw_t
 	krc_size_t buffer_size;
 	krc_bool_t multiline;
 	krc_size_t length;
-	krc_size_t cursor;
+	krc_size_t current_line_offset;
+	krc_size_t cursor_offset;
 	krc_size_t cursor_line;
 	krc_size_t cursor_column;
 	krc_bool_t shift_mode; // 한글/영어 모두에서 SHIFT
 	krc_bool_t capslock_mode; // 영문시 대문자
 	krc_bool_t insert_mode; // 삽입/덮어쓰기
 	krc_uint32_t key_mode; // 한/영
-	krc_bool_t hangul_composing;
+	krc_bool_t hangul_composing; // 한글 조합 중 여부 (초성/중성/종성 조합이 진행 중인지)
 } krc_inputw_t;
 
 
