@@ -42,13 +42,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define KRC_WCHAR_NULL           0x0000   /* 와이드 문자 NULL terminator */
-#define KRC_HANGULW_CHAR_BASE    0xAC00   /* 한글 음절 시작: 가          */
-#define KRC_HANGULW_CHAR_END     0xD7A3   /* 한글 음절 끝:   힣          */
-#define KRC_HANGULW_JAEUM_BASE   0x3131   /* 자음/자모 시작: ㄱ          */
-#define KRC_HANGULW_JAEUM_END    0x314E   /* 자음 끝:        ㅎ          */
-#define KRC_HANGULW_MOEUM_BASE   0x314F   /* 모음 시작:      ㅏ          */
-#define KRC_HANGULW_MOEUM_END    0x3163   /* 모음/자모 끝:   ㅣ          */
+#define KRC_WCHAR_NULL         0x0000 /* 와이드 문자 NULL terminator */
+#define KRC_HANGULW_CHAR_BASE  0xAC00 /* 한글 음절 시작: 가          */
+#define KRC_HANGULW_CHAR_END   0xD7A3 /* 한글 음절 끝:   힣          */
+#define KRC_HANGULW_JAEUM_BASE 0x3131 /* 자음/자모 시작: ㄱ          */
+#define KRC_HANGULW_JAEUM_END  0x314E /* 자음 끝:        ㅎ          */
+#define KRC_HANGULW_MOEUM_BASE 0x314F /* 모음 시작:      ㅏ          */
+#define KRC_HANGULW_MOEUM_END  0x3163 /* 모음/자모 끝:   ㅣ          */
 
 
 
@@ -1019,9 +1019,9 @@ static void krc_inputw_key_tab(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 {
-	krc_wchar_t  base_code;
-	krc_wchar_t  remaining_code;
-	krc_wchar_t  last_code;
+	krc_wchar_t base_code;
+	krc_wchar_t remaining_code;
+	krc_wchar_t last_code;
 
 	if (krc_inputw_cursor_get(ctx) == 0u && krc_inputw_is_composing(ctx) == KRC_FALSE)
 	{
