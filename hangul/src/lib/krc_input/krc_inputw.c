@@ -649,9 +649,9 @@ static void krc_inputw_commit_composing(krc_inputw_t* ctx)
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 //---------------------------------------------------------------------------
-// put_char 서브 핸들러 — 조합 중 + 모음 입력 실패
+// 조합 중 + 모음 입력 실패
 //---------------------------------------------------------------------------
-static void krc_inputw_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_code, krc_wchar_t composing_code)
+static void krc_inputw_put_char_hangul_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_code, krc_wchar_t composing_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -689,10 +689,9 @@ static void krc_inputw_put_char_fail_vowel(krc_inputw_t* ctx, krc_wchar_t char_c
 }
 
 //---------------------------------------------------------------------------
-// put_char 서브 핸들러 — 조합 중 + 자음 입력 실패
+// 조합 중 + 자음 입력 실패
 //---------------------------------------------------------------------------
-static void krc_inputw_put_char_fail_consonant(krc_inputw_t* ctx,
-	krc_wchar_t composing_code, krc_wchar_t result_code)
+static void krc_inputw_put_char_hangul_fail_consonant(krc_inputw_t* ctx, krc_wchar_t composing_code, krc_wchar_t result_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -731,13 +730,16 @@ static void krc_inputw_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t 
 		/* 조합 실패 */
 		if (krc_hangulw_is_vowel_jamo(char_code))
 		{
-			krc_inputw_put_char_fail_vowel(ctx, char_code, composing_code);
+			krc_inputw_put_char_hangul_fail_vowel(ctx, char_code, composing_code);
 		}
 		else
 		{
-			krc_inputw_put_char_fail_consonant(ctx, composing_code, result_code);
+			krc_inputw_put_char_hangul_fail_consonant(ctx, composing_code, result_code);
 		}
 	}
+	
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
+	krc_inputw_cursor_update_pos(ctx);
 }
 
 //---------------------------------------------------------------------------
@@ -760,12 +762,15 @@ static void krc_inputw_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_c
 			krc_inputw_cursor_advance(ctx);
 		}
 	}
+	
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
+	krc_inputw_cursor_update_pos(ctx);
 }
 
 //---------------------------------------------------------------------------
 // put_char 서브 핸들러 — 비한글 문자(영문/숫자/특수문자 등)
 //---------------------------------------------------------------------------
-static void krc_inputw_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_code)
+static void krc_inputw_put_char_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
@@ -777,6 +782,9 @@ static void krc_inputw_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_c
 		krc_inputw_cursor_advance(ctx);
 	}
 	krc_inputw_composing_stop(ctx);
+	
+	ctx->length = krc_textw_length(text, ctx->buffer_size);
+	krc_inputw_cursor_update_pos(ctx);
 }
 
 
@@ -789,6 +797,14 @@ static void krc_inputw_put_char_non_hangul(krc_inputw_t* ctx, krc_wchar_t char_c
 // 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+//---------------------------------------------------------------------------
+// 키 핸들러 — Tab
+//---------------------------------------------------------------------------
+static void krc_inputw_key_tab(krc_inputw_t* ctx)
+{
+	krc_inputw_put_char(ctx, '\t');
+}
+
 //---------------------------------------------------------------------------
 // 키 핸들러 — Backspace
 //---------------------------------------------------------------------------
@@ -1128,14 +1144,6 @@ static void krc_inputw_key_hangul(krc_inputw_t* ctx)
 }
 
 //---------------------------------------------------------------------------
-// 키 핸들러 — Tab
-//---------------------------------------------------------------------------
-static void krc_inputw_key_tab(krc_inputw_t* ctx)
-{
-	krc_inputw_put_char(ctx, '\t');
-}
-
-//---------------------------------------------------------------------------
 // 키 핸들러 — ESC (조합 취소 — 확정하지 않고 중단)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_esc(krc_inputw_t* ctx)
@@ -1225,11 +1233,8 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	//=======================================================================
 	else
 	{
-		krc_inputw_put_char_non_hangul(ctx, char_code);
+		krc_inputw_put_char_new(ctx, char_code);
 	}
-
-	ctx->length = krc_textw_length(text, ctx->buffer_size);
-	krc_inputw_cursor_update_pos(ctx);
 }
 
 //---------------------------------------------------------------------------
