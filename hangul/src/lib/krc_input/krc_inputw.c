@@ -38,17 +38,17 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// 유니코드 한글 범위 상수
+// 유니코드 상수
 //
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define KRC_WCHAR_NULL              0x0000   /* 와이드 문자 NULL terminator */
-#define KRC_HANGUL_SYLLABLE_BASE    0xAC00   /* 한글 음절 시작: 가          */
-#define KRC_HANGUL_SYLLABLE_END     0xD7A3   /* 한글 음절 끝:   힣          */
-#define KRC_HANGUL_JAEUM_BASE       0x3131   /* 자음/자모 시작: ㄱ          */
-#define KRC_HANGUL_JAEUM_END        0x314E   /* 자음 끝:        ㅎ          */
-#define KRC_HANGUL_MOEUM_BASE       0x314F   /* 모음 시작:      ㅏ          */
-#define KRC_HANGUL_MOEUM_END        0x3163   /* 모음/자모 끝:   ㅣ          */
+#define KRC_WCHAR_NULL           0x0000   /* 와이드 문자 NULL terminator */
+#define KRC_HANGULW_CHAR_BASE    0xAC00   /* 한글 음절 시작: 가          */
+#define KRC_HANGULW_CHAR_END     0xD7A3   /* 한글 음절 끝:   힣          */
+#define KRC_HANGULW_JAEUM_BASE   0x3131   /* 자음/자모 시작: ㄱ          */
+#define KRC_HANGULW_JAEUM_END    0x314E   /* 자음 끝:        ㅎ          */
+#define KRC_HANGULW_MOEUM_BASE   0x314F   /* 모음 시작:      ㅏ          */
+#define KRC_HANGULW_MOEUM_END    0x3163   /* 모음/자모 끝:   ㅣ          */
 
 
 
@@ -65,7 +65,7 @@
 //---------------------------------------------------------------------------
 static void krc_hangulw_code_to_index(krc_wchar_t code, int* choseong, int* jungseong, int* jongseong)
 {
-	int offset = (int)(code - KRC_HANGUL_SYLLABLE_BASE);
+	int offset = (int)(code - KRC_HANGULW_CHAR_BASE);
 	*jongseong = offset % 28;
 	*jungseong = (offset / 28) % 21;
 	*choseong  = offset / (28 * 21);
@@ -76,7 +76,7 @@ static void krc_hangulw_code_to_index(krc_wchar_t code, int* choseong, int* jung
 //---------------------------------------------------------------------------
 static krc_wchar_t krc_hangulw_index_to_code(int choseong, int jungseong, int jongseong)
 {
-	return KRC_HANGUL_SYLLABLE_BASE + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
+	return KRC_HANGULW_CHAR_BASE + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
 }
 
 //===========================================================================
@@ -181,35 +181,35 @@ static krc_bool_t krc_hangulw_decompose_jungseong_index(int jungseong_index, int
 
 //===========================================================================
 //---------------------------------------------------------------------------
-// 한글11172자 음절 여부: KRC_HANGUL_SYLLABLE_BASE ~ KRC_HANGUL_SYLLABLE_END
+// 한글11172자 음절 여부
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_is_char(krc_wchar_t code)
 {
-	return (KRC_HANGUL_SYLLABLE_BASE <= code && code <= KRC_HANGUL_SYLLABLE_END) ? KRC_TRUE : KRC_FALSE;
+	return (KRC_HANGULW_CHAR_BASE <= code && code <= KRC_HANGULW_CHAR_END) ? KRC_TRUE : KRC_FALSE;
 }
 
 //---------------------------------------------------------------------------
-// 한글 자모 여부: KRC_HANGUL_JAEUM_BASE ~ KRC_HANGUL_MOEUM_END
+// 한글 자모 여부
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_is_jamo(krc_wchar_t code)
 {
-	return (KRC_HANGUL_JAEUM_BASE <= code && code <= KRC_HANGUL_MOEUM_END) ? KRC_TRUE : KRC_FALSE;
+	return (KRC_HANGULW_JAEUM_BASE <= code && code <= KRC_HANGULW_MOEUM_END) ? KRC_TRUE : KRC_FALSE;
 }
 
 //---------------------------------------------------------------------------
-// 자음 자모 여부: KRC_HANGUL_JAEUM_BASE ~ KRC_HANGUL_JAEUM_END
+// 자음 자모 여부
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_is_jaeum(krc_wchar_t code)
 {
-	return (KRC_HANGUL_JAEUM_BASE <= code && code <= KRC_HANGUL_JAEUM_END) ? KRC_TRUE : KRC_FALSE;
+	return (KRC_HANGULW_JAEUM_BASE <= code && code <= KRC_HANGULW_JAEUM_END) ? KRC_TRUE : KRC_FALSE;
 }
 
 //---------------------------------------------------------------------------
-// 모음 자모 여부: KRC_HANGUL_MOEUM_BASE ~ KRC_HANGUL_MOEUM_END
+// 모음 자모 여부
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_is_moeum(krc_wchar_t code)
 {
-	return (KRC_HANGUL_MOEUM_BASE <= code && code <= KRC_HANGUL_MOEUM_END) ? KRC_TRUE : KRC_FALSE;
+	return (KRC_HANGULW_MOEUM_BASE <= code && code <= KRC_HANGULW_MOEUM_END) ? KRC_TRUE : KRC_FALSE;
 }
 
 //---------------------------------------------------------------------------
@@ -230,7 +230,7 @@ static krc_bool_t krc_hangulw_add_jongseong(krc_wchar_t base_code, krc_wchar_t a
 	int choseong, jungseong, jongseong;
 	krc_hangulw_code_to_index(base_code, &choseong, &jungseong, &jongseong);
 
-	int jongseong_additional = _krc_inputw_hangul_jongseong_index_table[additional_code - KRC_HANGUL_JAEUM_BASE];
+	int jongseong_additional = _krc_inputw_hangul_jongseong_index_table[additional_code - KRC_HANGULW_JAEUM_BASE];
 	int jongseong_compound;
 
 	if (jongseong == 0)
@@ -263,7 +263,7 @@ static krc_bool_t krc_hangulw_add_jungseong(krc_wchar_t base_code, krc_wchar_t a
 	int choseong, jungseong, jongseong;
 	krc_hangulw_code_to_index(base_code, &choseong, &jungseong, &jongseong);
 
-	int jungseong_additional = (int)(additional_code - KRC_HANGUL_MOEUM_BASE);
+	int jungseong_additional = (int)(additional_code - KRC_HANGULW_MOEUM_BASE);
 	int jungseong_compound = krc_hangulw_compose_jungseong_index(jungseong, jungseong_additional);
 
 	if (jungseong_compound != -1)
@@ -279,8 +279,8 @@ static krc_bool_t krc_hangulw_add_jungseong(krc_wchar_t base_code, krc_wchar_t a
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_compose_jamo(krc_wchar_t jaeum_code, krc_wchar_t moeum_code, krc_wchar_t* compound_code)
 {
-	int choseong = _krc_inputw_hangul_choseong_index_table[jaeum_code - KRC_HANGUL_JAEUM_BASE];
-	int jungseong = (int)(moeum_code - KRC_HANGUL_MOEUM_BASE);
+	int choseong = _krc_inputw_hangul_choseong_index_table[jaeum_code - KRC_HANGULW_JAEUM_BASE];
+	int jungseong = (int)(moeum_code - KRC_HANGULW_MOEUM_BASE);
 
 	if (choseong != -1)
 	{
@@ -387,13 +387,13 @@ static krc_bool_t krc_hangulw_decompose_last(krc_wchar_t base_code, krc_wchar_t*
 			{
 				/* 복합 중성 분리: [초성+단순중성] + [단순모음] */
 				*remaining_code = krc_hangulw_index_to_code(choseong, jungseong_base, 0);
-				*last_code = KRC_HANGUL_MOEUM_BASE + (krc_wchar_t)jungseong_additional;
+				*last_code = KRC_HANGULW_MOEUM_BASE + (krc_wchar_t)jungseong_additional;
 			}
 			else
 			{
 				/* 단순 중성 분리: [초성] + [중성모음] */
 				*remaining_code = _krc_inputw_hangul_choseong_code_table[choseong];
-				*last_code = KRC_HANGUL_MOEUM_BASE + (krc_wchar_t)jungseong;
+				*last_code = KRC_HANGULW_MOEUM_BASE + (krc_wchar_t)jungseong;
 			}
 		}
 
