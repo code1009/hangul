@@ -578,7 +578,8 @@ static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
 	krc_size_t line_start;
 	krc_size_t column = 0u;
 
-	if (ctx->current_line_offset <= ctx->cursor_offset)
+	if (ctx->current_line_offset <= ctx->cursor_offset
+		&& (ctx->current_line_offset == 0u || text[ctx->current_line_offset - 1u] == '\n'))
 	{
 		/* 순방향: 현재 줄 시작부터 스캔 */
 		pos        = ctx->current_line_offset;
@@ -587,7 +588,7 @@ static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
 	}
 	else
 	{
-		/* 역방향: 버퍼 처음부터 전체 스캔 */
+		/* 역방향: 버퍼 처음부터 전체 스캔 (역방향 커서 이동 또는 개행 삭제 후 캐시 무효) */
 		pos        = 0u;
 		line       = 0u;
 		line_start = 0u;
@@ -716,13 +717,12 @@ static void krc_inputw_put_char_hangul_fail_jaeum(krc_inputw_t* ctx, krc_wchar_t
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 
 	/* 각 + ㄱ = 각 + ㄱ */
+	krc_inputw_cursor_advance(ctx); /* 조합 완료된 글자를 지나쳐 커서 이동 */
+	krc_inputw_stop_composing(ctx);
 	if (krc_textw_put_char(text, (krc_size_t)(-1), max_length, ctx->cursor_offset, char_code, ctx->insert_mode))
 	{
 		krc_inputw_start_composing(ctx);
 	}
-
-	ctx->length = krc_textw_length(text, ctx->buffer_size);
-	krc_inputw_cursor_update_pos(ctx);
 }
 
 //---------------------------------------------------------------------------
