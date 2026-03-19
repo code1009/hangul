@@ -462,15 +462,57 @@ static void krc_inputw_cursor_set(krc_inputw_t* ctx, krc_size_t pos)
 	}
 }
 
-static void krc_inputw_cursor_reset(krc_inputw_t* ctx)
-{
-	ctx->cursor_offset = 0u;
-}
-
 static krc_size_t krc_inputw_cursor_get(krc_inputw_t* ctx)
 {
 	return ctx->cursor_offset;
 }
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 
+// 한글 조합 중
+// 
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+//---------------------------------------------------------------------------
+// 조합 중 여부 확인
+//---------------------------------------------------------------------------
+static krc_bool_t krc_inputw_is_composing(const krc_inputw_t* ctx)
+{
+	return ctx->hangul_composing;
+}
+
+//---------------------------------------------------------------------------
+// 조합 시작
+//---------------------------------------------------------------------------
+static void krc_inputw_start_composing(krc_inputw_t* ctx)
+{
+	ctx->hangul_composing = KRC_TRUE;
+}
+
+//---------------------------------------------------------------------------
+// 조합 중단
+//---------------------------------------------------------------------------
+static void krc_inputw_stop_composing(krc_inputw_t* ctx)
+{
+	ctx->hangul_composing = KRC_FALSE;
+}
+
+//---------------------------------------------------------------------------
+// 한글 조합 종료 — 커서 전진 후 composing 해제
+//---------------------------------------------------------------------------
+static void krc_inputw_commit_composing(krc_inputw_t* ctx)
+{
+	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
+	{
+		krc_inputw_stop_composing(ctx);
+		krc_inputw_cursor_advance(ctx);
+	}
+}
+
 
 
 
@@ -497,6 +539,11 @@ static krc_size_t krc_inputw_text_get_length(krc_inputw_t* ctx)
 	return ctx->length;
 }
 
+static krc_wchar_t krc_inputw_text_peek_char(krc_inputw_t* ctx, krc_size_t pos)
+{
+	return ctx->buffer_pointer[pos];
+}
+
 static krc_wchar_t krc_inputw_text_get_char(krc_inputw_t* ctx)
 {
 	if (ctx->cursor_offset < ctx->length)
@@ -518,34 +565,75 @@ static krc_bool_t krc_inputw_text_put_char(krc_inputw_t* ctx, krc_wchar_t char_c
 {
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
-	krc_size_t   length     = ctx->length;
-	krc_size_t   index      = ctx->cursor_offset;
 	krc_size_t   i;
 
 	if (ctx->insert_mode == KRC_TRUE)
 	{
 		/* 삽입 모드 */
-		if (length >= max_length) return KRC_FALSE;
-		if (index > length)       return KRC_FALSE;
+		if (ctx->length >= max_length)
+		{
+			krc_inputw_stop_composing(ctx);
+			return KRC_FALSE;
+		}
+		if (ctx->cursor_offset > ctx->length)
+		{
+			krc_inputw_stop_composing(ctx);
+			return KRC_FALSE;
+		}
 
-		for (i = length + 1u; i > index; i--) /* NULL terminator 포함 */
+		for (i = ctx->length + 1u; i > ctx->cursor_offset; i--) /* NULL terminator 포함 */
+		{
 			text[i] = text[i - 1u];
-		text[index] = char_code;
-		return KRC_TRUE;
-	}
+		}
+		text[ctx->cursor_offset] = char_code;
+		ctx->length++;
 
-	/* 덮어쓰기 모드 */
-	if (index > length) return KRC_FALSE;
-
-	if (index == length) /* 문자열 끝 — 확장 필요 */
-	{
-		if (length >= max_length) return KRC_FALSE;
-		text[index]      = char_code;
-		text[index + 1u] = KRC_WCHAR_NULL;
+		if (KRC_FALSE==krc_inputw_is_composing(ctx))
+		{
+			krc_inputw_cursor_advance(ctx);
+		}
+		/*
+		else
+		{
+			// 조합 중인 경우 커서 위치는 고정
+		}
+		*/
 	}
 	else
 	{
-		text[index] = char_code; /* 기존 글자 덮어쓰기 */
+		/* 덮어쓰기 모드 */
+		if (ctx->cursor_offset > ctx->length)
+		{
+			krc_inputw_stop_composing(ctx);
+			return KRC_FALSE;
+		}
+
+		if (ctx->cursor_offset == ctx->length) /* 문자열 끝 — 확장 필요 */
+		{
+			if (ctx->length >= max_length)
+			{
+				krc_inputw_stop_composing(ctx);
+				return KRC_FALSE;
+			}
+
+			text[ctx->cursor_offset] = char_code;
+			text[ctx->cursor_offset + 1u] = KRC_WCHAR_NULL;
+		}
+		else
+		{
+			text[ctx->cursor_offset] = char_code; /* 기존 글자 덮어쓰기 */
+		}
+
+		if (KRC_FALSE == krc_inputw_is_composing(ctx))
+		{
+			krc_inputw_cursor_advance(ctx);
+		}
+		/*
+		else
+		{
+			// 조합 중인 경우 커서 위치는 고정
+		}
+		*/
 	}
 	return KRC_TRUE;
 }
@@ -597,43 +685,6 @@ static void krc_inputw_text_clear(krc_inputw_t* ctx)
 	}
 }
 
-static void krc_inputw_text_new_line(krc_inputw_t* ctx)
-{
-	krc_inputw_text_put_char(ctx, '\r');
-	krc_inputw_text_put_char(ctx, '\n');
-}
-
-static void krc_inputw_text_move_line_end(krc_inputw_t* ctx)
-{
-	/* \r 또는 \n 바로 앞까지 이동 — key_end 와 동일 기준 */
-	while (ctx->cursor_offset < ctx->length)
-	{
-		if (ctx->buffer_pointer[ctx->cursor_offset] == '\r' || ctx->buffer_pointer[ctx->cursor_offset] == '\n')
-		{
-			break;
-		}
-		ctx->cursor_offset++;
-	}
-}
-
-static void krc_inputw_text_move_line_begin(krc_inputw_t* ctx)
-{
-	while (ctx->cursor_offset > 0u)
-	{
-		if (ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\r' ||ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\n')
-		{
-			break;
-		}
-		ctx->cursor_offset--;
-	}
-}
-
-/* 버퍼의 임의 위치 pos 에 있는 문자를 읽는다 (cursor 이동 없음) */
-static krc_wchar_t krc_inputw_text_peek_char(krc_inputw_t* ctx, krc_size_t pos)
-{
-	return ctx->buffer_pointer[pos];
-}
-
 /* 현재 cursor 위치에 char_code 를 항상 삽입한다 (insert_mode 무관)
    ctx->length 캐시가 구식일 수 있으므로 버퍼를 직접 스캔하여 실제 길이를 구한다.
    → krc_inputw_key_enter 처럼 \r 삽입 직후 length 미갱신 상태에서 \n 삽입 시에도 안전하다. */
@@ -659,12 +710,15 @@ static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t cha
 	return KRC_TRUE;
 }
 
-static void krc_inputw_cursor_set_end(krc_inputw_t* ctx)
+static void krc_inputw_text_new_line(krc_inputw_t* ctx)
 {
-	krc_size_t i = 0u;
-	while (i < ctx->buffer_size && ctx->buffer_pointer[i] != KRC_WCHAR_NULL)
-		i++;
-	ctx->cursor_offset = i;
+	krc_inputw_text_insert_char(ctx, '\r');
+	krc_inputw_text_insert_char(ctx, '\n');
+}
+
+static void krc_inputw_text_tab(krc_inputw_t* ctx)
+{
+	krc_inputw_text_insert_char(ctx, '\t');
 }
 
 /* ctx->length 를 버퍼 실제 내용으로 재동기화 */
@@ -687,6 +741,60 @@ static void krc_inputw_text_sync_length(krc_inputw_t* ctx)
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 //---------------------------------------------------------------------------
+// 커서 위치를 버퍼 처음으로 이동
+//---------------------------------------------------------------------------
+static void krc_inputw_cursor_begin(krc_inputw_t* ctx)
+{
+	ctx->cursor_offset = 0u;
+}
+
+//---------------------------------------------------------------------------
+// 커서 위치를 버퍼 끝으로 이동 (buffer_size 또는 NULL terminator 기준)
+//---------------------------------------------------------------------------
+static void krc_inputw_cursor_end(krc_inputw_t* ctx)
+{
+	krc_size_t i = 0u;
+	while (i < ctx->buffer_size && ctx->buffer_pointer[i] != KRC_WCHAR_NULL)
+		i++;
+	ctx->cursor_offset = i;
+}
+
+static void krc_inputw_cursor_line_begin(krc_inputw_t* ctx)
+{
+	while (ctx->cursor_offset > 0u)
+	{
+		if (ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\r' || ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\n')
+		{
+			break;
+		}
+		ctx->cursor_offset--;
+	}
+}
+
+static void krc_inputw_cursor_line_end(krc_inputw_t* ctx)
+{
+	/* \r 또는 \n 바로 앞까지 이동 — key_end 와 동일 기준 */
+	while (ctx->cursor_offset < ctx->length)
+	{
+		if (ctx->buffer_pointer[ctx->cursor_offset] == '\r' || ctx->buffer_pointer[ctx->cursor_offset] == '\n')
+		{
+			break;
+		}
+		ctx->cursor_offset++;
+	}
+}
+
+static void krc_inputw_cursor_left(krc_inputw_t* ctx)
+{
+	krc_inputw_cursor_back(ctx);
+}
+
+static void krc_inputw_cursor_right(krc_inputw_t* ctx)
+{
+	krc_inputw_cursor_advance(ctx);
+}
+
+//---------------------------------------------------------------------------
 // 다중라인 커서 이동 — 윗 줄 목표 행/열 위치로 이동
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_up(krc_inputw_t* ctx)
@@ -698,7 +806,7 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 	krc_size_t   column = 0u;
 	krc_wchar_t  ch;
 
-	krc_inputw_cursor_reset(ctx);
+	krc_inputw_cursor_begin(ctx);
 	while ((ch = krc_inputw_text_peek_char(ctx, pos)) != KRC_WCHAR_NULL)
 	{
 		if (line == target_line && column == target_col)
@@ -823,51 +931,6 @@ static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
 
 
 
-/////////////////////////////////////////////////////////////////////////////
-// 
-// 한글 조합 중
-// 
-/////////////////////////////////////////////////////////////////////////////
-//===========================================================================
-//---------------------------------------------------------------------------
-// 조합 중 여부 확인
-//---------------------------------------------------------------------------
-static krc_bool_t krc_inputw_is_composing(const krc_inputw_t* ctx)
-{
-	return ctx->hangul_composing;
-}
-
-//---------------------------------------------------------------------------
-// 조합 시작
-//---------------------------------------------------------------------------
-static void krc_inputw_start_composing(krc_inputw_t* ctx)
-{
-	ctx->hangul_composing = KRC_TRUE;
-}
-
-//---------------------------------------------------------------------------
-// 조합 중단
-//---------------------------------------------------------------------------
-static void krc_inputw_stop_composing(krc_inputw_t* ctx)
-{
-	ctx->hangul_composing = KRC_FALSE;
-}
-
-//---------------------------------------------------------------------------
-// 한글 조합 종료 — 커서 전진 후 composing 해제
-//---------------------------------------------------------------------------
-static void krc_inputw_commit_composing(krc_inputw_t* ctx)
-{
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-		krc_inputw_cursor_advance(ctx);
-	}
-}
-
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -891,23 +954,20 @@ static void krc_inputw_put_char_hangul_fail_moeum(krc_inputw_t* ctx, krc_wchar_t
 	{
 		/* 갓 + ㅏ = 가 + 사 */
 		krc_inputw_text_set_char(ctx, remaining_code);
-		krc_inputw_cursor_advance(ctx);
-		krc_hangulw_compose(last_code, char_code, &compound_code);
-		krc_inputw_stop_composing(ctx);
-		if (krc_inputw_text_put_char(ctx, compound_code))
+		krc_inputw_commit_composing(ctx);
+
+		if (krc_hangulw_compose(last_code, char_code, &compound_code) == KRC_TRUE)
 		{
 			krc_inputw_start_composing(ctx);
+			krc_inputw_text_put_char(ctx, compound_code);
 		}
 	}
 	else
 	{
 		/* 가 + ㅏ = 가 + ㅏ  (조합 불가) */
-		krc_inputw_cursor_advance(ctx);
-		krc_inputw_stop_composing(ctx);
-		if (krc_inputw_text_put_char(ctx, char_code))
-		{
-			krc_inputw_cursor_advance(ctx); /* 모음은 조합 안됨 — 커서 전진 */
-		}
+		krc_inputw_commit_composing(ctx);
+
+		krc_inputw_text_put_char(ctx, char_code);
 	}
 }
 
@@ -917,12 +977,10 @@ static void krc_inputw_put_char_hangul_fail_moeum(krc_inputw_t* ctx, krc_wchar_t
 static void krc_inputw_put_char_hangul_fail_jaeum(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	/* 각 + ㄱ = 각 + ㄱ */
-	krc_inputw_cursor_advance(ctx); /* 조합 완료된 글자를 지나쳐 커서 이동 */
-	krc_inputw_stop_composing(ctx);
-	if (krc_inputw_text_put_char(ctx, char_code))
-	{
-		krc_inputw_start_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
+	krc_inputw_start_composing(ctx);
+	krc_inputw_text_put_char(ctx, char_code);
 }
 
 //---------------------------------------------------------------------------
@@ -935,13 +993,11 @@ static void krc_inputw_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t 
 
 	if (krc_hangulw_compose(base_code, char_code, &compound_code) == KRC_TRUE)
 	{
-		krc_inputw_start_composing(ctx);
 		/* 조합 성공: 가 + ㄱ = 각 */
 		krc_inputw_text_set_char(ctx, compound_code);
 	}
 	else
 	{
-		krc_inputw_stop_composing(ctx);
 		/* 조합 실패 */
 		if (krc_hangulw_is_moeum(char_code))
 		{
@@ -962,18 +1018,12 @@ static void krc_inputw_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t 
 //---------------------------------------------------------------------------
 static void krc_inputw_put_char_hangul_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
-	if (krc_inputw_text_put_char(ctx, char_code))
+	if (krc_hangulw_is_jaeum(char_code))
 	{
-		if (krc_hangulw_is_jaeum(char_code))
-		{
-			krc_inputw_start_composing(ctx);
-		}
-		else
-		{
-			krc_inputw_stop_composing(ctx);
-			krc_inputw_cursor_advance(ctx);
-		}
+		krc_inputw_start_composing(ctx);
 	}
+
+	krc_inputw_text_put_char(ctx, char_code);
 
 	krc_inputw_text_sync_length(ctx);
 	krc_inputw_cursor_update_pos(ctx);
@@ -986,11 +1036,7 @@ static void krc_inputw_put_char_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_inputw_commit_composing(ctx);
 
-	if (krc_inputw_text_put_char(ctx, char_code))
-	{
-		krc_inputw_cursor_advance(ctx);
-	}
-	krc_inputw_stop_composing(ctx);
+	krc_inputw_text_put_char(ctx, char_code);
 
 	krc_inputw_text_sync_length(ctx);
 	krc_inputw_cursor_update_pos(ctx);
@@ -1007,11 +1053,28 @@ static void krc_inputw_put_char_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 //---------------------------------------------------------------------------
+// 키 핸들러 — Enter
+//---------------------------------------------------------------------------
+static void krc_inputw_key_enter(krc_inputw_t* ctx)
+{
+	krc_inputw_commit_composing(ctx);
+
+	if (ctx->multiline == KRC_TRUE)
+	{
+		krc_inputw_text_new_line(ctx);
+	}
+	krc_inputw_text_sync_length(ctx);
+	krc_inputw_cursor_update_pos(ctx);
+}
+
+//---------------------------------------------------------------------------
 // 키 핸들러 — Tab
 //---------------------------------------------------------------------------
 static void krc_inputw_key_tab(krc_inputw_t* ctx)
 {
-	krc_inputw_put_char(ctx, '\t');
+	krc_inputw_commit_composing(ctx);
+
+	krc_inputw_text_tab(ctx);
 }
 
 //---------------------------------------------------------------------------
@@ -1035,7 +1098,6 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 		if (remaining_code != KRC_WCHAR_NULL)
 		{
 			krc_inputw_text_set_char(ctx, remaining_code);
-			krc_inputw_start_composing(ctx);
 		}
 		else
 		{
@@ -1046,31 +1108,8 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 	else
 	{
 		krc_inputw_text_backspace_char(ctx);
-		krc_inputw_stop_composing(ctx);
 	}
 	krc_inputw_text_sync_length(ctx);
-	krc_inputw_cursor_update_pos(ctx);
-}
-
-//---------------------------------------------------------------------------
-// 키 핸들러 — Enter
-//---------------------------------------------------------------------------
-static void krc_inputw_key_enter(krc_inputw_t* ctx)
-{
-	krc_inputw_commit_composing(ctx);
-
-	if (ctx->multiline == KRC_TRUE)
-	{
-		if (krc_inputw_text_insert_char(ctx, '\r'))
-		{
-			krc_inputw_cursor_advance(ctx);
-		}
-		if (krc_inputw_text_insert_char(ctx, '\n'))
-		{
-			krc_inputw_cursor_advance(ctx);
-		}
-		krc_inputw_text_sync_length(ctx);
-	}
 	krc_inputw_cursor_update_pos(ctx);
 }
 
@@ -1080,6 +1119,7 @@ static void krc_inputw_key_enter(krc_inputw_t* ctx)
 static void krc_inputw_key_delete(krc_inputw_t* ctx)
 {
 	krc_inputw_commit_composing(ctx);
+
 	krc_inputw_text_remove_char(ctx);
 	krc_inputw_text_sync_length(ctx);
 	krc_inputw_cursor_update_pos(ctx);
@@ -1090,14 +1130,9 @@ static void krc_inputw_key_delete(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_left(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
-	else
-	{
-		krc_inputw_cursor_back(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
+	krc_inputw_cursor_left(ctx);
 	krc_inputw_cursor_update_pos(ctx);
 }
 
@@ -1106,18 +1141,9 @@ static void krc_inputw_key_left(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_right(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-		krc_inputw_cursor_advance(ctx);
-	}
-	else
-	{
-		if (krc_inputw_cursor_get(ctx) < krc_inputw_text_get_length(ctx))
-		{
-			krc_inputw_cursor_advance(ctx);
-		}
-	}
+	krc_inputw_commit_composing(ctx);
+
+	krc_inputw_cursor_right(ctx);
 	krc_inputw_cursor_update_pos(ctx);
 }
 
@@ -1126,11 +1152,9 @@ static void krc_inputw_key_right(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_up(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
-	if (ctx->multiline == KRC_TRUE && ctx->cursor_line > 0u)
+	krc_inputw_commit_composing(ctx);
+
+	if (ctx->multiline == KRC_TRUE)
 	{
 		krc_inputw_cursor_up(ctx);
 	}
@@ -1142,10 +1166,8 @@ static void krc_inputw_key_up(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_down(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	if (ctx->multiline == KRC_TRUE)
 	{
 		krc_inputw_cursor_down(ctx);
@@ -1158,17 +1180,15 @@ static void krc_inputw_key_down(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_home(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	if (ctx->multiline == KRC_TRUE)
 	{
-		krc_inputw_text_move_line_begin(ctx);
+		krc_inputw_cursor_line_begin(ctx);
 	}
 	else
 	{
-		krc_inputw_cursor_reset(ctx);
+		krc_inputw_cursor_begin(ctx);
 	}
 	krc_inputw_cursor_update_pos(ctx);
 }
@@ -1178,17 +1198,15 @@ static void krc_inputw_key_home(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_end(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	if (ctx->multiline == KRC_TRUE)
 	{
-		krc_inputw_text_move_line_end(ctx);
+		krc_inputw_cursor_line_end(ctx);
 	}
 	else
 	{
-		krc_inputw_cursor_set_end(ctx);
+		krc_inputw_cursor_end(ctx);
 	}
 	krc_inputw_cursor_update_pos(ctx);
 }
@@ -1198,10 +1216,8 @@ static void krc_inputw_key_end(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_insert(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	ctx->insert_mode = (ctx->insert_mode == KRC_TRUE) ? KRC_FALSE : KRC_TRUE;
 }
 
@@ -1210,6 +1226,8 @@ static void krc_inputw_key_insert(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_capslock(krc_inputw_t* ctx)
 {
+	krc_inputw_commit_composing(ctx);
+
 	ctx->capslock_mode = (ctx->capslock_mode == KRC_TRUE) ? KRC_FALSE : KRC_TRUE;
 }
 
@@ -1218,10 +1236,8 @@ static void krc_inputw_key_capslock(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_hangul(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	if (ctx->key_mode == KRC_INPUT_KEY_MODE_LATIN)
 	{
 		ctx->key_mode = KRC_INPUT_KEY_MODE_HANGUL;
@@ -1237,10 +1253,7 @@ static void krc_inputw_key_hangul(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_esc(krc_inputw_t* ctx)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
 }
 
 //---------------------------------------------------------------------------
@@ -1248,8 +1261,8 @@ static void krc_inputw_key_esc(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_default(krc_inputw_t* ctx)
 {
-	/* 조합 중이면 확정 후 진행 */
 	krc_inputw_commit_composing(ctx);
+
 	krc_inputw_cursor_update_pos(ctx);
 }
 
@@ -1345,7 +1358,7 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 
 
 	//=======================================================================
-	// 문자 키 처리 — put_char() 에 위임
+	// 문자 키 처리
 	//=======================================================================
 	krc_uint32_t key_code = KRC_INPUT_KEY_CODE(key);
 	krc_uint32_t key_modifier = KRC_INPUT_KEY_MODIFIER(key);
@@ -1416,24 +1429,22 @@ KRC_API void krc_inputw_set_shift_mode(krc_inputw_t* ctx, krc_bool_t mode)
 
 KRC_API void krc_inputw_set_capslock_mode(krc_inputw_t* ctx, krc_bool_t mode)
 {
+	krc_inputw_commit_composing(ctx);
+
 	ctx->capslock_mode = mode;
 }
 
 KRC_API void krc_inputw_set_insert_mode(krc_inputw_t* ctx, krc_bool_t mode)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	ctx->insert_mode = mode;
 }
 
 KRC_API void krc_inputw_set_key_mode(krc_inputw_t* ctx, krc_uint32_t mode)
 {
-	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
-	{
-		krc_inputw_stop_composing(ctx);
-	}
+	krc_inputw_commit_composing(ctx);
+
 	if (mode == KRC_INPUT_KEY_MODE_LATIN || mode == KRC_INPUT_KEY_MODE_HANGUL)
 	{
 		ctx->key_mode = mode;

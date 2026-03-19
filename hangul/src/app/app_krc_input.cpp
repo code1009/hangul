@@ -110,7 +110,7 @@ static void test_latin_basic()
 
 /////////////////////////////////////////////////////////////////////////////
 // 테스트 2: 영문 SHIFT 입력
-// krc_inputw_set_shift_mode() API 를 사용하여 shift_mode 를 직접 제어
+// KRC_INPUT_KEY_LSHIFT 수식자를 OR해서 shift 입력 처리
 /////////////////////////////////////////////////////////////////////////////
 static void test_latin_shift()
 {
@@ -119,19 +119,15 @@ static void test_latin_shift()
     krc_inputw_t ctx;
     init_ctx(ctx, buf, 64);
 
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_H);   // H
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_I);   // I
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_H);   // H
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_I);   // I
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_SPACE);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_1);       // !
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_2);       // @
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_3);       // #
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_GRAVE);   // ~
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_MINUS);   // _
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_EQUAL);   // +
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_1);       // !
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_2);       // @
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_3);       // #
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_GRAVE);   // ~
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_MINUS);   // _
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_EQUAL);   // +
     print_buf("HI !@#~_+", ctx);
     check("buffer == \"HI !@#~_+\"", buf_equals(buf, L"HI !@#~_+"));
     check("length == 9", ctx.length == 9);
@@ -314,7 +310,7 @@ static void test_hangul_compound_jungseong()
 
 /////////////////////////////////////////////////////////////////////////////
 // 테스트 8: 한글 SHIFT (쌍자음, 겹모음)
-// krc_inputw_set_shift_mode() API 를 사용하여 shift_mode 를 직접 제어
+// KRC_INPUT_KEY_LSHIFT 수식자를 OR해서 shift 입력 처리
 /////////////////////////////////////////////////////////////////////////////
 static void test_hangul_shift()
 {
@@ -325,9 +321,7 @@ static void test_hangul_shift()
     // shift+R(ㄲ) + K(ㅏ) → 까 U+AE4C
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);  // ㄲ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_R);  // ㄲ
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);  // ㅏ
     print_buf("까", ctx);
     check("shift+R, K -> 까(0xAE4C)",   buf_equals(buf, L"\xAE4C"));
@@ -335,9 +329,7 @@ static void test_hangul_shift()
     // shift+E(ㄸ) + J(ㅓ) → 떠 U+B5A0
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E);  // ㄸ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_E);  // ㄸ
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_J);  // ㅓ
     print_buf("떠", ctx);
     check("shift+E, J -> 떠(0xB5A0)",   buf_equals(buf, L"\xB5A0"));
@@ -345,9 +337,7 @@ static void test_hangul_shift()
     // shift+T(ㅆ) + L(ㅣ) → 씨 U+C528
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_T);  // ㅆ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_T);  // ㅆ
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_L);  // ㅣ
     print_buf("씨", ctx);
     check("shift+T, L -> 씨(0xC528)",   buf_equals(buf, L"\xC528"));
@@ -355,18 +345,14 @@ static void test_hangul_shift()
     // shift+Q(ㅃ) 단독 → 자음이므로 composing
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_Q);  // ㅃ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_Q);  // ㅃ
     check("shift+Q -> ㅃ composing",    ctx.hangul_composing == KRC_TRUE);
     check("shift+Q: buf[0]==0x3143",     buf[0] == 0x3143);
 
     // shift+O(ㅒ) → 단독 모음이므로 cursor 전진
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_O);  // ㅒ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_O);  // ㅒ
     print_buf("ㅒ", ctx);
     check("shift+O -> ㅒ(0x3152)",      buf[0] == 0x3152);
     check("shift+O: cursor==1",         ctx.cursor_offset == 1);
@@ -375,9 +361,7 @@ static void test_hangul_shift()
     // shift+P(ㅖ) → 단독 모음
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
-    krc_inputw_set_shift_mode(&ctx, KRC_TRUE);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_P);  // ㅖ
-    krc_inputw_set_shift_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_LSHIFT | KRC_INPUT_KEY_P);  // ㅖ
     check("shift+P -> ㅖ(0x3156)",      buf[0] == 0x3156);
     check("shift+P: cursor==1",         ctx.cursor_offset == 1);
 }
@@ -480,14 +464,15 @@ static void test_delete_key()
     check("DEL: empty length==0",       ctx.length == 0);
 
     // 한글 조합 중 DELETE → commit(cursor 전진) 후 다음 글자 삭제
-    // "간"(composing, cursor=0) 뒤에 영문 'b'(cursor=0에서 삽입) → "b간"
-    // DELETE at cursor=0 → 'b' 삭제 → "간"
+    // "간"(composing, cursor=0) → HANGUL 전환(commit: cursor=1) → HOME(cursor=0) 후
+    // 영문 'b' 삽입 → "b간" → HOME(cursor=0) → DELETE → 'b' 삭제 → "간"
     init_ctx(ctx, buf, 64);
     set_hangul(ctx);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_S); // 간(composing, cursor=0)
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL); // 영문 전환, composing stop, cursor=0
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL); // 영문 전환, commit: cursor=1
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);   // cursor=0
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B); // 'b' at cursor=0 → "b간"(cursor=1)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME); // cursor=0
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // 'b' 삭제 → "간"
@@ -574,17 +559,17 @@ static void test_hangul_latin_toggle()
     check("hangul: buf[0]==가(0xAC00)",         buf[0] == 0xAC00);
     check("hangul: cursor==0",                  ctx.cursor_offset == 0);
 
-    // 영문 전환 → composing 해제만, cursor 전진 없음(=0 유지)
+    // 영문 전환 → composing 확정(커서 전진), cursor=1
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL);
     check("toggle->LATIN",                      ctx.key_mode == KRC_INPUT_KEY_MODE_LATIN);
     check("composing stopped",                  ctx.hangul_composing == KRC_FALSE);
-    check("cursor unchanged after toggle==0",   ctx.cursor_offset == 0);
+    check("cursor advanced after toggle==1",    ctx.cursor_offset == 1);
 
-    // cursor=0에서 영문 'r' → 삽입모드이므로 가 앞에 삽입 → "r가"
+    // cursor=1에서 영문 'r' → 삽입모드이므로 가 뒤에 삽입 → "가r"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R);
-    print_buf("r가", ctx);
-    check("latin: buf[0]=='r'",          buf[0] == 'r');
-    check("latin: buf[1]==가(0xAC00)",   buf[1] == 0xAC00);
+    print_buf("가r", ctx);
+    check("latin: buf[0]==가(0xAC00)",   buf[0] == 0xAC00);
+    check("latin: buf[1]=='r'",          buf[1] == 'r');
     check("latin: length==2",            ctx.length == 2);
 }
 
@@ -892,15 +877,15 @@ static void test_esc_key()
     print_buf("가(ESC후)", ctx);
     check("ESC: buf==\"가\"",        buf_equals(buf, L"\xAC00"));
     check("ESC: composing=false",    ctx.hangul_composing == KRC_FALSE);
-    check("ESC: cursor==0",          ctx.cursor_offset == 0);
+    check("ESC: cursor==1",          ctx.cursor_offset == 1);
     check("ESC: length==1",          ctx.length == 1);
 
-    // ESC 후 영문 입력 → cursor=0에서 insert → '가' 앞에 삽입
+    // ESC 후 영문 입력 → cursor=1에서 insert → '가' 뒤에 삽입
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HANGUL); // 영문 전환
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);      // 'a' at cursor=0 → "a가"
-    print_buf("a가", ctx);
-    check("ESC후 latin: buf==\"a가\"", buf_equals(buf, L"a\xAC00"));
-    check("ESC후 latin: cursor==1",    ctx.cursor_offset == 1);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);      // 'a' at cursor=1 → "가a"
+    print_buf("가a", ctx);
+    check("ESC후 latin: buf==\"가a\"", buf_equals(buf, L"\xAC00" L"a"));
+    check("ESC후 latin: cursor==2",    ctx.cursor_offset == 2);
     check("ESC후 latin: length==2",    ctx.length == 2);
 
     // 조합 없는 상태에서 ESC → no-op (글자, 커서, 길이 변화 없음)
@@ -920,7 +905,7 @@ static void test_esc_key()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ESC);
     check("ESC 간: buf==\"간\"",          buf_equals(buf, L"\xAC04"));
     check("ESC 간: composing=false",      ctx.hangul_composing == KRC_FALSE);
-    check("ESC 간: cursor==0",            ctx.cursor_offset == 0);
+    check("ESC 간: cursor==1",            ctx.cursor_offset == 1);
 }
 
 
@@ -964,13 +949,13 @@ static void test_capslock()
     check("CAPSLOCK in hangul: buf==\"가\"",      buf_equals(buf, L"\xAC00")); // ㄲ(0x3132) 아닌 ㄱ(0x3131)
     check("CAPSLOCK in hangul: composing=true",   ctx.hangul_composing == KRC_TRUE);
 
-    // set_capslock_mode API 직접 호출 검증
+    // CAPSLOCK 키 토글로 캡스락 제어 검증
     init_ctx(ctx, buf, 64);
-    krc_inputw_set_capslock_mode(&ctx, KRC_TRUE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_CAPSLOCK); // capslock ON
     check("set_capslock TRUE: capslock=true", ctx.capslock_mode == KRC_TRUE);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A); // 'A'
     check("set_capslock: buf[0]=='A'",        buf[0] == L'A');
-    krc_inputw_set_capslock_mode(&ctx, KRC_FALSE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_CAPSLOCK); // capslock OFF
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A); // 'a'
     check("set_capslock off: buf[1]=='a'",    buf[1] == L'a');
 }
