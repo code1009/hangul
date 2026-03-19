@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 #include <assert.h>
 #include <Windows.h>
@@ -53,7 +53,7 @@ static void print_buf(const char* label, const krc_inputw_t& ctx)
     std::string utf8 = wcs_to_utf8(buf_to_wstr(ctx.buffer_pointer));
     std::cout << "    \"" << utf8 << "\""
               << "  len=" << ctx.length
-              << "  cur=" << ctx.cursor
+              << "  cur=" << ctx.cursor_offset
               << "  composing=" << ctx.hangul_composing
               << "  [" << label << "]\n";
 }
