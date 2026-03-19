@@ -504,74 +504,10 @@ static krc_bool_t krc_hangulw_pop_back_code(krc_wchar_t composing_code, krc_wcha
 
 /////////////////////////////////////////////////////////////////////////////
 // 
-// 한글 조합 중
-// 
-/////////////////////////////////////////////////////////////////////////////
-//===========================================================================
-//---------------------------------------------------------------------------
-// 조합 중 여부 확인
-//---------------------------------------------------------------------------
-static krc_bool_t krc_inputw_is_composing(const krc_inputw_t* ctx)
-{
-	return ctx->hangul_composing;
-}
-
-//---------------------------------------------------------------------------
-// 조합 시작
-//---------------------------------------------------------------------------
-static void krc_inputw_composing_start(krc_inputw_t* ctx)
-{
-	ctx->hangul_composing = KRC_TRUE;
-}
-
-//---------------------------------------------------------------------------
-// 조합 중단
-//---------------------------------------------------------------------------
-static void krc_inputw_composing_stop(krc_inputw_t* ctx)
-{
-	ctx->hangul_composing = KRC_FALSE;
-}
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// 
 // 커서
 // 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-//---------------------------------------------------------------------------
-// 커서 위치(cursor_line, cursor_column) 갱신
-//---------------------------------------------------------------------------
-static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
-{
-	const krc_wchar_t* text = ctx->buffer_pointer;
-	krc_size_t pos    = 0u;
-	krc_size_t line   = 0u;
-	krc_size_t column = 0u;
-
-	while (pos < ctx->cursor_offset && text[pos] != 0x0000)
-	{
-		if (text[pos] == '\n')
-		{
-			line++;
-			column = 0u;
-		}
-		else if (text[pos] != '\r')
-		{
-			column++;
-		}
-		pos++;
-	}
-	ctx->cursor_line   = line;
-	ctx->cursor_column = column;
-}
-
-//---------------------------------------------------------------------------
-// 커서 함수
-//---------------------------------------------------------------------------
 static void krc_inputw_cursor_advance(krc_inputw_t* ctx)
 {
 	if (ctx->cursor_offset < ctx->buffer_size - 1u)
@@ -606,16 +542,90 @@ static void krc_inputw_cursor_set_end(krc_inputw_t* ctx)
 	ctx->cursor_offset = krc_textw_length(ctx->buffer_pointer, ctx->buffer_size);
 }
 
+//---------------------------------------------------------------------------
+// 커서 위치(cursor_line, cursor_column, current_line_offset) 갱신
+//
+//   current_line_offset 캐시를 활용하여 스캔 범위를 최소화한다.
+//   - cursor_offset >= current_line_offset : 현재 줄 시작부터 순방향 스캔
+//   - cursor_offset <  current_line_offset : 처음부터 전체 스캔 (역방향 이동)
+//---------------------------------------------------------------------------
+static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
+{
+	const krc_wchar_t* text = ctx->buffer_pointer;
+	krc_size_t pos;
+	krc_size_t line;
+	krc_size_t line_start;
+	krc_size_t column = 0u;
+
+	if (ctx->current_line_offset <= ctx->cursor_offset)
+	{
+		/* 순방향: 현재 줄 시작부터 스캔 */
+		pos        = ctx->current_line_offset;
+		line       = ctx->cursor_line;
+		line_start = ctx->current_line_offset;
+	}
+	else
+	{
+		/* 역방향: 버퍼 처음부터 전체 스캔 */
+		pos        = 0u;
+		line       = 0u;
+		line_start = 0u;
+	}
+
+	while (pos < ctx->cursor_offset && text[pos] != 0x0000)
+	{
+		if (text[pos] == '\n')
+		{
+			line++;
+			column     = 0u;
+			line_start = pos + 1u;
+		}
+		else if (text[pos] != '\r')
+		{
+			column++;
+		}
+		pos++;
+	}
+
+	ctx->cursor_line         = line;
+	ctx->cursor_column       = column;
+	ctx->current_line_offset = line_start;
+}
+
 
 
 
 
 /////////////////////////////////////////////////////////////////////////////
 // 
-// 입력
+// 한글 조합 중
 // 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+//---------------------------------------------------------------------------
+// 조합 중 여부 확인
+//---------------------------------------------------------------------------
+static krc_bool_t krc_inputw_is_composing(const krc_inputw_t* ctx)
+{
+	return ctx->hangul_composing;
+}
+
+//---------------------------------------------------------------------------
+// 조합 시작
+//---------------------------------------------------------------------------
+static void krc_inputw_composing_start(krc_inputw_t* ctx)
+{
+	ctx->hangul_composing = KRC_TRUE;
+}
+
+//---------------------------------------------------------------------------
+// 조합 중단
+//---------------------------------------------------------------------------
+static void krc_inputw_composing_stop(krc_inputw_t* ctx)
+{
+	ctx->hangul_composing = KRC_FALSE;
+}
+
 //---------------------------------------------------------------------------
 // 한글 조합 종료 — 커서 전진 후 composing 해제
 //---------------------------------------------------------------------------
@@ -1167,7 +1177,7 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	ctx->capslock_mode       = KRC_FALSE;
 	ctx->insert_mode         = KRC_TRUE;
 	ctx->key_mode            = KRC_INPUT_KEY_MODE_LATIN;
-	krc_inputw_composing_stop(ctx);
+	ctx->hangul_composing    = KRC_FALSE;
 
 	if (buffer != (krc_wchar_t*)0 && buffer_size > 0u)
 	{
@@ -1175,6 +1185,12 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	}
 }
 
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 //---------------------------------------------------------------------------
 // krc_inputw_put_char()
 //
@@ -1296,6 +1312,13 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	}
 }
 
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
 KRC_API void krc_inputw_set_shift_mode(krc_inputw_t* ctx, krc_bool_t mode)
 {
 	ctx->shift_mode = mode;
