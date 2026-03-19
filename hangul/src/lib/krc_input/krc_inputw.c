@@ -1096,7 +1096,7 @@ static void krc_inputw_key_left(krc_inputw_t* ctx)
 	}
 	else
 	{
-		krc_inputw_cursor_back(ctx); /* 이미 cursor==0 경계 검사 포함 */
+		krc_inputw_cursor_back(ctx);
 	}
 	krc_inputw_cursor_update_pos(ctx);
 }
@@ -1336,7 +1336,7 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 //---------------------------------------------------------------------------
 KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 {
-	krc_wchar_t  char_code;
+	krc_wchar_t char_code;
 
 	if (krc_inputw_text_is_null(ctx))
 	{
@@ -1346,16 +1346,12 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 
 	//=======================================================================
 	// 문자 키 처리 — put_char() 에 위임
-	// key_mode × shift 조합으로 4개 테이블 중 하나를 선택
-	// KRC_INPUT_KEY_1(1) ~ KRC_INPUT_KEY_SPACE(48) 범위
 	//=======================================================================
 	krc_uint32_t key_code = KRC_INPUT_KEY_CODE(key);
 	krc_uint32_t key_modifier = KRC_INPUT_KEY_MODIFIER(key);
 	krc_bool_t shift = KRC_FALSE;
 
-	/* shift 단독 수정자일 때만 문자 입력에 반영 (Ctrl+Shift 등 다른 modifier와 조합은 제외) */
-	if (key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) ||
-		key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT))
+	if (key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) || key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT))
 	{
 		shift = KRC_TRUE;
 	}
