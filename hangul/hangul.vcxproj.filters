@@ -87,7 +87,7 @@
     <ClCompile Include="src\lib\krc_input\krc_inputw.c">
       <Filter>src\lib\krc_input</Filter>
     </ClCompile>
-    <ClCompile Include="src\lib\krc_input\krc_inputw_key_char_table.c">
+    <ClCompile Include="src\lib\krc_input\krc_inputw_key_char.c">
       <Filter>src\lib\krc_input</Filter>
     </ClCompile>
   </ItemGroup>
@@ -200,25 +200,13 @@
     <ClInclude Include="src\lib\krc_input\krc_input.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_input_config.h">
-      <Filter>src\lib\krc_input</Filter>
-    </ClInclude>
     <ClInclude Include="src\lib\krc_input\krc_input_key.h">
-      <Filter>src\lib\krc_input</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_input_key_mode.h">
-      <Filter>src\lib\krc_input</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_input_type.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
     <ClInclude Include="src\lib\krc_input\krc_inputw.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_inputw_key_char_table.h">
-      <Filter>src\lib\krc_input</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_hangulw_table.h">
+    <ClInclude Include="src\lib\krc_input\krc_inputw_key_char.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
   </ItemGroup>

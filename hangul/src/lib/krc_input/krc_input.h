@@ -20,11 +20,7 @@
 #include "../krc/krc_type.h"
 #include "../krc/krc_api.h"
 
-#include "krc_input_config.h"
-#include "krc_input_type.h"
-
 #include "krc_input_key.h"
-#include "krc_input_key_mode.h"
 #include "krc_inputw.h"
 
 

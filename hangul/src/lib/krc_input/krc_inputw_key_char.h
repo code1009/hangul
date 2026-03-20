@@ -1,9 +1,9 @@
-﻿#ifndef __krc_input_key_mode__h__
-#define __krc_input_key_mode__h__
+﻿#ifndef __krc_inputw_key_char__h__
+#define __krc_inputw_key_char__h__
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_input_key_mode.h
+// File: krc_inputw_key_char.h
 //
 // Created by MOON, Eui-kwon.
 // Created on Mar-20th, 2026.
@@ -17,8 +17,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define KRC_INPUT_KEY_MODE_LATIN   1
-#define KRC_INPUT_KEY_MODE_HANGUL  2
+KRC_API krc_wchar_t krc_inputw_key_char(krc_size_t index, krc_uint32_t key_mode, krc_bool_t shift);
 
 
 

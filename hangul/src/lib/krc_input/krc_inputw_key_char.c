@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //
-// File: krc_inputw_key_char_table.c
+// File: krc_inputw_key_char.c
 //
 // Created by MOON, Eui-kwon.
 // Created on Mar-20th, 2026.
@@ -22,13 +22,11 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#include "../krc/krc.h"
+#include "../krc/krc_type.h"
+#include "../krc/krc_api.h"
 
-#include "krc_input_config.h"
-#include "krc_input_type.h"
 #include "krc_input_key.h"
-#include "krc_input_key_mode.h"
-#include "krc_inputw_key_char_table.h"
+#include "krc_inputw_key_char.h"
 
 
 

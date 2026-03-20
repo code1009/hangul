@@ -38,7 +38,7 @@
     <ClCompile Include="src\lib\krc\krc_stream.c" />
     <ClCompile Include="src\lib\krc\krc_unicode_conversion.c" />
     <ClCompile Include="src\lib\krc_input\krc_inputw.c" />
-    <ClCompile Include="src\lib\krc_input\krc_inputw_key_char_table.c" />
+    <ClCompile Include="src\lib\krc_input\krc_inputw_key_char.c" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -79,12 +79,8 @@
     <ClInclude Include="src\lib\krc\krc_unicode_conversion.h" />
     <ClInclude Include="src\lib\krc_input\krc_input.h" />
     <ClInclude Include="src\lib\krc_input\krc_inputw.h" />
-    <ClInclude Include="src\lib\krc_input\krc_inputw_key_char_table.h" />
-    <ClInclude Include="src\lib\krc_input\krc_hangulw_table.h" />
-    <ClInclude Include="src\lib\krc_input\krc_input_config.h" />
+    <ClInclude Include="src\lib\krc_input\krc_inputw_key_char.h" />
     <ClInclude Include="src\lib\krc_input\krc_input_key.h" />
-    <ClInclude Include="src\lib\krc_input\krc_input_key_mode.h" />
-    <ClInclude Include="src\lib\krc_input\krc_input_type.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
