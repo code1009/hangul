@@ -42,13 +42,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#define KRC_WCHAR_NULL         0x0000 /* 와이드 문자 NULL terminator */
-#define KRC_HANGULW_CHAR_BASE  0xAC00 /* 한글 음절 시작: 가          */
-#define KRC_HANGULW_CHAR_END   0xD7A3 /* 한글 음절 끝:   힣          */
-#define KRC_HANGULW_JAEUM_BASE 0x3131 /* 자음/자모 시작: ㄱ          */
-#define KRC_HANGULW_JAEUM_END  0x314E /* 자음 끝:        ㅎ          */
-#define KRC_HANGULW_MOEUM_BASE 0x314F /* 모음 시작:      ㅏ          */
-#define KRC_HANGULW_MOEUM_END  0x3163 /* 모음/자모 끝:   ㅣ          */
+#define KRC_WCHAR_NULL         0x0000 // 와이드 문자 NULL terminator 
+#define KRC_HANGULW_CHAR_BASE  0xAC00 // 한글 음절 시작: 가          
+#define KRC_HANGULW_CHAR_END   0xD7A3 // 한글 음절 끝:   힣          
+#define KRC_HANGULW_JAEUM_BASE 0x3131 // 자음/자모 시작: ㄱ          
+#define KRC_HANGULW_JAEUM_END  0x314E // 자음 끝:        ㅎ          
+#define KRC_HANGULW_MOEUM_BASE 0x314F // 모음 시작:      ㅏ          
+#define KRC_HANGULW_MOEUM_END  0x3163 // 모음/자모 끝:   ㅣ          
 
 
 
@@ -434,11 +434,63 @@ static krc_bool_t krc_hangulw_decompose_last(krc_wchar_t base_code, krc_wchar_t*
 // 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
+//---------------------------------------------------------------------------
+// 커서 위치(cursor_line, cursor_column, current_line_offset) 갱신
+//
+//   current_line_offset 캐시를 활용하여 스캔 범위를 최소화한다.
+//   - cursor_offset >= current_line_offset : 현재 줄 시작부터 순방향 스캔
+//   - cursor_offset <  current_line_offset : 처음부터 전체 스캔 (역방향 이동)
+//---------------------------------------------------------------------------
+static void krc_inputw_cursor_update(krc_inputw_t* ctx)
+{
+	const krc_wchar_t* text = ctx->buffer_pointer;
+	krc_size_t offset;
+	krc_size_t line;
+	krc_size_t line_start;
+	krc_size_t column = 0u;
+
+	if (ctx->current_line_offset <= ctx->cursor_offset && (ctx->current_line_offset == 0u || text[ctx->current_line_offset - 1u] == '\n'))
+	{
+		/* 순방향: 현재 줄 시작부터 스캔 */
+		offset = ctx->current_line_offset;
+		line = ctx->cursor_line;
+		line_start = ctx->current_line_offset;
+	}
+	else
+	{
+		/* 역방향: 버퍼 처음부터 전체 스캔 (역방향 커서 이동 또는 개행 삭제 후 캐시 무효) */
+		offset = 0u;
+		line = 0u;
+		line_start = 0u;
+	}
+
+	while (offset < ctx->cursor_offset && text[offset] != KRC_WCHAR_NULL)
+	{
+		if (text[offset] == '\n')
+		{
+			line++;
+			column = 0u;
+			line_start = offset + 1u;
+		}
+		else if (text[offset] != '\r')
+		{
+			column++;
+		}
+		offset++;
+	}
+
+	ctx->cursor_line = line;
+	ctx->cursor_column = column;
+	ctx->current_line_offset = line_start;
+}
+
 static krc_bool_t krc_inputw_cursor_advance(krc_inputw_t* ctx)
 {
 	if (ctx->cursor_offset < ctx->length)
 	{
 		ctx->cursor_offset++;
+
+		krc_inputw_cursor_update(ctx);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -449,6 +501,8 @@ static krc_bool_t krc_inputw_cursor_back(krc_inputw_t* ctx)
 	if (ctx->cursor_offset > 0u)
 	{
 		ctx->cursor_offset--;
+
+		krc_inputw_cursor_update(ctx);
 		return KRC_TRUE;
 	}
 	return KRC_FALSE;
@@ -459,6 +513,8 @@ static void krc_inputw_cursor_set(krc_inputw_t* ctx, krc_size_t offset)
 	if (offset <= ctx->length)
 	{
 		ctx->cursor_offset = offset;
+
+		krc_inputw_cursor_update(ctx);
 	}
 }
 
@@ -586,6 +642,7 @@ static krc_bool_t krc_inputw_text_put_char(krc_inputw_t* ctx, krc_wchar_t char_c
 			text[i] = text[i - 1u];
 		}
 		text[ctx->cursor_offset] = char_code;
+
 		ctx->length++;
 
 		if (KRC_FALSE==krc_inputw_is_composing(ctx))
@@ -655,8 +712,9 @@ static void krc_inputw_text_backspace_char(krc_inputw_t* ctx)
 		ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 1u];
 	}
 
+	krc_inputw_cursor_back(ctx);
+
 	ctx->length--;
-	ctx->cursor_offset--;
 }
 
 static void krc_inputw_text_clear(krc_inputw_t* ctx)
@@ -698,6 +756,7 @@ static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t cha
 	}
 
 	text[ctx->cursor_offset] = char_code;
+
 	ctx->length++;
 
 	krc_inputw_cursor_advance(ctx);
@@ -727,98 +786,51 @@ static void krc_inputw_text_tab(krc_inputw_t* ctx)
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 //---------------------------------------------------------------------------
-// 커서 위치(cursor_line, cursor_column, current_line_offset) 갱신
-//
-//   current_line_offset 캐시를 활용하여 스캔 범위를 최소화한다.
-//   - cursor_offset >= current_line_offset : 현재 줄 시작부터 순방향 스캔
-//   - cursor_offset <  current_line_offset : 처음부터 전체 스캔 (역방향 이동)
-//---------------------------------------------------------------------------
-static void krc_inputw_cursor_update_pos(krc_inputw_t* ctx)
-{
-	const krc_wchar_t* text = ctx->buffer_pointer;
-	krc_size_t pos;
-	krc_size_t line;
-	krc_size_t line_start;
-	krc_size_t column = 0u;
-
-	if (ctx->current_line_offset <= ctx->cursor_offset
-		&& (ctx->current_line_offset == 0u || text[ctx->current_line_offset - 1u] == '\n'))
-	{
-		/* 순방향: 현재 줄 시작부터 스캔 */
-		pos = ctx->current_line_offset;
-		line = ctx->cursor_line;
-		line_start = ctx->current_line_offset;
-	}
-	else
-	{
-		/* 역방향: 버퍼 처음부터 전체 스캔 (역방향 커서 이동 또는 개행 삭제 후 캐시 무효) */
-		pos = 0u;
-		line = 0u;
-		line_start = 0u;
-	}
-
-	while (pos < ctx->cursor_offset && text[pos] != KRC_WCHAR_NULL)
-	{
-		if (text[pos] == '\n')
-		{
-			line++;
-			column = 0u;
-			line_start = pos + 1u;
-		}
-		else if (text[pos] != '\r')
-		{
-			column++;
-		}
-		pos++;
-	}
-
-	ctx->cursor_line = line;
-	ctx->cursor_column = column;
-	ctx->current_line_offset = line_start;
-}
-
-//---------------------------------------------------------------------------
-// 커서 위치를 버퍼 처음으로 이동
+// 커서 위치를 처음으로 이동
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_begin(krc_inputw_t* ctx)
 {
-	ctx->cursor_offset = 0u;
+	krc_inputw_cursor_set(ctx, 0u);
 }
 
 //---------------------------------------------------------------------------
-// 커서 위치를 버퍼 끝으로 이동 (buffer_size 또는 NULL terminator 기준)
+// 커서 위치를 끝으로 이동
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_end(krc_inputw_t* ctx)
 {
-	krc_size_t i = 0u;
-	while (i < ctx->buffer_size && ctx->buffer_pointer[i] != KRC_WCHAR_NULL)
-		i++;
-	ctx->cursor_offset = i;
+	krc_inputw_cursor_set(ctx, krc_inputw_text_get_length(ctx));
 }
 
 static void krc_inputw_cursor_line_begin(krc_inputw_t* ctx)
 {
-	while (ctx->cursor_offset > 0u)
+	krc_size_t offset = ctx->cursor_offset;
+	krc_wchar_t ch;
+	while (offset > 0u)
 	{
-		if (ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\r' || ctx->buffer_pointer[ctx->cursor_offset - 1u] == '\n')
+		ch = krc_inputw_text_peek_char(ctx, offset - 1u);
+		if (ch == '\r' || ch == '\n')
 		{
 			break;
 		}
-		ctx->cursor_offset--;
+		offset--;
 	}
+	krc_inputw_cursor_set(ctx, offset);
 }
 
 static void krc_inputw_cursor_line_end(krc_inputw_t* ctx)
 {
-	/* \r 또는 \n 바로 앞까지 이동 — key_end 와 동일 기준 */
-	while (ctx->cursor_offset < ctx->length)
+	krc_size_t offset = ctx->cursor_offset;
+	krc_wchar_t ch;
+	while (offset < ctx->length)
 	{
-		if (ctx->buffer_pointer[ctx->cursor_offset] == '\r' || ctx->buffer_pointer[ctx->cursor_offset] == '\n')
+		ch = krc_inputw_text_peek_char(ctx, offset);
+		if (ch == '\r' || ch == '\n')
 		{
 			break;
 		}
-		ctx->cursor_offset++;
+		offset++;
 	}
+	krc_inputw_cursor_set(ctx, offset);
 }
 
 static void krc_inputw_cursor_left(krc_inputw_t* ctx)
@@ -836,19 +848,19 @@ static void krc_inputw_cursor_right(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 {
-	krc_size_t   target_line = ctx->cursor_line - 1u;
-	krc_size_t   target_col = ctx->cursor_column;
-	krc_size_t   pos = 0u;
-	krc_size_t   line = 0u;
-	krc_size_t   column = 0u;
-	krc_wchar_t  ch;
+	krc_size_t  target_line = ctx->cursor_line - 1u;
+	krc_size_t  target_column = ctx->cursor_column;
+	krc_size_t  line = 0u;
+	krc_size_t  column = 0u;
+	krc_size_t  offset = 0u;
+	krc_wchar_t ch;
 
-	krc_inputw_cursor_begin(ctx);
-	while ((ch = krc_inputw_text_peek_char(ctx, pos)) != KRC_WCHAR_NULL)
+
+	while ((ch = krc_inputw_text_peek_char(ctx, offset)) != KRC_WCHAR_NULL)
 	{
-		if (line == target_line && column == target_col)
+		if (line == target_line && column == target_column)
 		{
-			krc_inputw_cursor_set(ctx, pos);
+			krc_inputw_cursor_set(ctx, offset);
 			break;
 		}
 		if (ch == '\n')
@@ -863,7 +875,7 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 				column++;
 			}
 		}
-		pos++;
+		offset++;
 	}
 }
 
@@ -872,28 +884,28 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 {
-	krc_size_t   target_line = ctx->cursor_line + 1u;
-	krc_size_t   target_col = ctx->cursor_column;
-	krc_size_t   pos = 0u;
-	krc_size_t   line = 0u;
-	krc_size_t   column = 0u;
-	krc_size_t   found = 0u;
-	krc_wchar_t  ch;
+	krc_size_t  target_line = ctx->cursor_line + 1u;
+	krc_size_t  target_column = ctx->cursor_column;
+	krc_size_t  line = 0u;
+	krc_size_t  column = 0u;
+	krc_size_t  offset = 0u;
+	krc_wchar_t ch;
+	krc_bool_t  found = KRC_FALSE;
 
-	while ((ch = krc_inputw_text_peek_char(ctx, pos)) != KRC_WCHAR_NULL)
+	while ((ch = krc_inputw_text_peek_char(ctx, offset)) != KRC_WCHAR_NULL)
 	{
-		if (line == target_line && column == target_col)
+		if (line == target_line && column == target_column)
 		{
-			krc_inputw_cursor_set(ctx, pos);
-			found = 1u;
+			krc_inputw_cursor_set(ctx, offset);
+			found = KRC_TRUE;
 			break;
 		}
 		if (ch == '\n')
 		{
 			if (line == target_line) /* 줄 끝 도달 */
 			{
-				krc_inputw_cursor_set(ctx, pos);
-				found = 1u;
+				krc_inputw_cursor_set(ctx, offset);
+				found = KRC_TRUE;
 				break;
 			}
 			line++;
@@ -906,11 +918,11 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 				column++;
 			}
 		}
-		pos++;
+		offset++;
 	}
-	if (found == 0u && line == target_line)
+	if (found == KRC_FALSE && line == target_line)
 	{
-		krc_inputw_cursor_set(ctx, pos); /* 마지막 줄 끝 */
+		krc_inputw_cursor_set(ctx, offset); /* 마지막 줄 끝 */
 	}
 }
 
