@@ -852,6 +852,12 @@ static void krc_inputw_cursor_right(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 {
+	if (ctx->cursor_line == 0u)
+	{
+		return;
+	}
+
+
 	krc_size_t  target_line = ctx->cursor_line - 1u;
 	krc_size_t  target_column = ctx->cursor_column;
 	krc_size_t  line = 0u;
@@ -870,6 +876,12 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 		}
 		if (ch == '\n')
 		{
+			if (line == target_line)
+			{
+				krc_inputw_cursor_set(ctx, offset);
+				found = KRC_TRUE;
+				break;
+			}
 			line++;
 			column = 0u;
 		}
@@ -883,9 +895,10 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 		offset++;
 	}
 
+
 	if (found == KRC_FALSE && line == target_line)
 	{
-		krc_inputw_cursor_begin(ctx);
+		krc_inputw_cursor_set(ctx, offset); /* 버퍼 끝이 target_line인 경우 */
 	}
 }
 
