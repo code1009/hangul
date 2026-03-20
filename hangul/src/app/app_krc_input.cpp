@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <Windows.h>
 
-#include "../lib/krc/krc.h"
 #include "../lib/krc_input/krc_input.h"
 
 #include <iostream>

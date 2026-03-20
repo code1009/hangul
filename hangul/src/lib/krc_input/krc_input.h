@@ -17,7 +17,8 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-#include "../krc/krc.h"
+#include "../krc/krc_type.h"
+#include "../krc/krc_api.h"
 
 #include "krc_input_config.h"
 #include "krc_input_type.h"
