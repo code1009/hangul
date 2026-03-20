@@ -1029,7 +1029,7 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 	found = KRC_FALSE;
 
 #if 1
-	offset = ctx->cursor_offset;
+	offset = ctx->cursor_line_offset;
 	line = ctx->cursor_line;
 #endif
 
