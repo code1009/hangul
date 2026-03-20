@@ -1087,6 +1087,117 @@ static void test_multiline_line_merge()
 
 
 /////////////////////////////////////////////////////////////////////////////
+// 테스트 23: cursor_line, cursor_column, line_count
+//
+//   커서의 줄/열 위치와 전체 줄 수가 올바르게 갱신되는지 검증.
+/////////////////////////////////////////////////////////////////////////////
+static void test_line_and_line_count()
+{
+    krc_wchar_t buf[128] = {};
+    krc_inputw_t ctx;
+
+    // ----- 1) 초기 상태 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    check(L"init: cursor_line==0",   ctx.cursor_line  == 0);
+    check(L"init: cursor_column==0", ctx.cursor_column == 0);
+    check(L"init: line_count==1",    ctx.line_count   == 1);
+
+    // ----- 2) 첫 번째 줄 입력 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A); // 'a'
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B); // 'b'
+    check(L"\"ab\": cursor_line==0",   ctx.cursor_line  == 0);
+    check(L"\"ab\": cursor_column==2", ctx.cursor_column == 2);
+    check(L"\"ab\": line_count==1",    ctx.line_count   == 1);
+
+    // ----- 3) Enter → 새 줄 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    check(L"after Enter: cursor_line==1",   ctx.cursor_line  == 1);
+    check(L"after Enter: cursor_column==0", ctx.cursor_column == 0);
+    check(L"after Enter: line_count==2",    ctx.line_count   == 2);
+
+    // ----- 4) 두 번째 줄 입력 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_C); // 'c'
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_D); // 'd'
+    check(L"\"ab\\r\\ncd\": cursor_line==1",   ctx.cursor_line  == 1);
+    check(L"\"ab\\r\\ncd\": cursor_column==2", ctx.cursor_column == 2);
+    check(L"\"ab\\r\\ncd\": line_count==2",    ctx.line_count   == 2);
+
+    // ----- 5) Enter 두 번 더 → 3줄, 4줄 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    check(L"2nd Enter: line_count==3",  ctx.line_count == 3);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER);
+    check(L"3rd Enter: line_count==4",  ctx.line_count == 4);
+    check(L"3rd Enter: cursor_line==3", ctx.cursor_line == 3);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_E); // 'e'
+    check(L"line3 e: cursor_line==3",   ctx.cursor_line  == 3);
+    check(L"line3 e: cursor_column==1", ctx.cursor_column == 1);
+
+    // ----- 6) UP 커서 이동 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    check(L"UP: cursor_line==2",   ctx.cursor_line  == 2);
+    check(L"UP: cursor_column==0", ctx.cursor_column == 0); // 빈 줄
+    check(L"UP: line_count==4",    ctx.line_count   == 4);  // line_count 불변
+
+    // ----- 7) UP → 첫 줄 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    check(L"UP x3: cursor_line==0", ctx.cursor_line == 0);
+    check(L"UP x3: line_count==4",  ctx.line_count  == 4);
+
+    // ----- 8) DOWN 커서 이동 -----
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DOWN);
+    check(L"DOWN: cursor_line==1",  ctx.cursor_line  == 1);
+    check(L"DOWN: line_count==4",   ctx.line_count   == 4);
+
+    // ----- 9) Backspace로 \n 삭제 → line_count 감소 -----
+    // 현재 커서는 line1 column2("cd" 끝)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
+    check(L"END line1: cursor_column==2", ctx.cursor_column == 2);
+    // cursor는 \r\n 앞(offset=4), Backspace → \n 삭제
+    // \n 앞에 \r이 있으므로 \r을 먼저 지움. "ab\r\ncd..." 에서 cursor=6(\n 다음 위치)
+    // Home → line_begin(offset=4, 'd' 다음인 \r 앞)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
+    // 아래로 한 줄 내려가야 빈 줄의 시작
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DOWN);
+    check(L"빈 줄: cursor_line==2", ctx.cursor_line == 2);
+    // Backspace × 2 (\n, \r 삭제) → line2 제거
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE); // \n 삭제
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE); // \r 삭제
+    check(L"BS \\r\\n: line_count==3",   ctx.line_count   == 3);
+    check(L"BS \\r\\n: cursor_line==1",  ctx.cursor_line  == 1);
+
+    // ----- 10) Delete로 \n 삭제 → line_count 감소 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_A);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER); // "a\r\n"
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_B);     // "a\r\nb"  line_count=2
+    check(L"DEL setup: line_count==2", ctx.line_count == 2);
+
+    // 맨 처음으로 이동, END → 'a' 뒤 (\r 앞)
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \r 삭제
+    check(L"DEL \\r: line_count==2",  ctx.line_count  == 2); // \n 아직 있음
+    check(L"DEL \\r: cursor_line==0", ctx.cursor_line == 0);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \n 삭제
+    check(L"DEL \\n: line_count==1",  ctx.line_count  == 1);
+    check(L"DEL \\n: cursor_line==0", ctx.cursor_line == 0);
+
+    // ----- 11) 한글 입력 시 줄 위치 -----
+    init_ctx(ctx, buf, 128, KRC_TRUE);
+    set_hangul(ctx);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_R); // ㄱ
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_K); // 가 (composing)
+    check(L"한글 가: cursor_line==0",  ctx.cursor_line  == 0);
+    check(L"한글 가: cursor_column==0", ctx.cursor_column == 0); // composing 중 커서 고정
+    check(L"한글 가: line_count==1",   ctx.line_count   == 1);
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_ENTER); // commit + 새 줄
+    check(L"한글+Enter: cursor_line==1", ctx.cursor_line == 1);
+    check(L"한글+Enter: line_count==2",  ctx.line_count  == 2);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 void krc_input_main()
 {
@@ -1121,7 +1232,8 @@ void krc_input_main()
     TEST(test_esc_key                  );                   
     TEST(test_capslock                 );                  
     TEST(test_tab_key                  );                   
-    TEST(test_multiline_line_merge     );      
+    TEST(test_multiline_line_merge     );
+    TEST(test_line_and_line_count      );
 
     std::wcout << L"[결과]";
     std::wcout << L" PASS = " << s_pass;

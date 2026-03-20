@@ -652,7 +652,7 @@ static krc_bool_t krc_inputw_text_put_char(krc_inputw_t* ctx, krc_wchar_t char_c
 
 		ctx->length++;
 
-		if (KRC_FALSE==krc_inputw_is_composing(ctx))
+		if (KRC_FALSE == krc_inputw_is_composing(ctx))
 		{
 			krc_inputw_cursor_advance(ctx);
 		}
@@ -723,10 +723,10 @@ static void krc_inputw_text_backspace_char(krc_inputw_t* ctx)
 
 	ctx->length--;
 }
-
 static void krc_inputw_text_clear(krc_inputw_t* ctx)
 {
 	ctx->length              = 0u;
+	ctx->line_count          = 1u;
 	ctx->cursor_offset       = 0u;
 	ctx->cursor_line_offset  = 0u;
 	ctx->cursor_line         = 0u;
@@ -738,9 +738,8 @@ static void krc_inputw_text_clear(krc_inputw_t* ctx)
 	}
 }
 
-/* 현재 cursor 위치에 char_code 를 항상 삽입한다 (insert_mode 무관)
-   → krc_inputw_key_enter 처럼 \r 삽입 직후 length 미갱신 상태에서 \n 삽입 시에도 안전하다. */
-static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t char_code)
+/* 현재 cursor 위치에 char_code 를 항상 삽입한다 (insert_mode 무관) */
+static krc_bool_t krc_inputw_text_insert_control_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
 	krc_inputw_commit_composing(ctx);
 
@@ -761,6 +760,11 @@ static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t cha
 
 	text[ctx->cursor_offset] = char_code;
 
+	if(char_code == '\n') 
+	{
+		ctx->line_count++;
+	}
+
 	ctx->length++;
 
 	krc_inputw_cursor_advance(ctx);
@@ -770,13 +774,13 @@ static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t cha
 
 static void krc_inputw_text_new_line(krc_inputw_t* ctx)
 {
-	krc_inputw_text_insert_char(ctx, '\r');
-	krc_inputw_text_insert_char(ctx, '\n');
+	krc_inputw_text_insert_control_char(ctx, '\r');
+	krc_inputw_text_insert_control_char(ctx, '\n');
 }
 
 static void krc_inputw_text_tab(krc_inputw_t* ctx)
 {
-	krc_inputw_text_insert_char(ctx, '\t');
+	krc_inputw_text_insert_control_char(ctx, '\t');
 }
 
 
@@ -852,7 +856,7 @@ static void krc_inputw_cursor_right(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 {
-	if (ctx->cursor_line == 0u)
+	if (0u == ctx->cursor_line)
 	{
 		return;
 	}
@@ -907,6 +911,12 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 {
+	if (ctx->line_count <= (ctx->cursor_line + 1u))
+	{
+		return;
+	}
+
+
 	krc_size_t  target_line = ctx->cursor_line + 1u;
 	krc_size_t  target_column = ctx->cursor_column;
 	krc_size_t  line = 0u;
@@ -1092,16 +1102,15 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 	krc_wchar_t remaining_code;
 	krc_wchar_t last_code;
 
-	if (krc_inputw_cursor_get(ctx) == 0u && krc_inputw_is_composing(ctx) == KRC_FALSE)
+	base_code = krc_inputw_text_get_char(ctx);
+	if (base_code == 0u)
 	{
 		return;
 	}
 
 	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
-		base_code = krc_inputw_text_get_char(ctx);
-		krc_hangulw_decompose_last(base_code, &remaining_code, &last_code);
-		if (remaining_code != KRC_WCHAR_NULL)
+		if (krc_hangulw_decompose_last(base_code, &remaining_code, &last_code) == KRC_TRUE)
 		{
 			krc_inputw_text_set_char(ctx, remaining_code);
 		}
@@ -1275,6 +1284,7 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	ctx->buffer_pointer      = buffer;
 	ctx->buffer_size         = buffer_size;
 	ctx->multiline           = multiline;
+	ctx->line_count          = 1u;
 	ctx->length              = 0u;
 	ctx->cursor_offset       = 0u;
 	ctx->cursor_line_offset  = 0u;

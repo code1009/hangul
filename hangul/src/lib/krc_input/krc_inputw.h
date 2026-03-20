@@ -23,6 +23,7 @@ typedef struct _krc_inputw_t
 	krc_size_t   buffer_size;
 	krc_bool_t   multiline;
 	krc_size_t   length;
+	krc_size_t   line_count;       // 전체 줄 수 (최솟값 1)
 	krc_size_t   cursor_offset;
 	krc_size_t   cursor_line_offset;
 	krc_size_t   cursor_line;
