@@ -735,6 +735,8 @@ static void krc_inputw_text_clear(krc_inputw_t* ctx)
    → krc_inputw_key_enter 처럼 \r 삽입 직후 length 미갱신 상태에서 \n 삽입 시에도 안전하다. */
 static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
+	krc_inputw_commit_composing(ctx);
+
 	krc_wchar_t* text       = ctx->buffer_pointer;
 	krc_size_t   max_length = ctx->buffer_size - 1u;
 
@@ -1047,8 +1049,6 @@ static void krc_inputw_put_char_new(krc_inputw_t* ctx, krc_wchar_t char_code)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_enter(krc_inputw_t* ctx)
 {
-	krc_inputw_commit_composing(ctx);
-
 	if (ctx->multiline == KRC_TRUE)
 	{
 		krc_inputw_text_new_line(ctx);
@@ -1060,8 +1060,6 @@ static void krc_inputw_key_enter(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_key_tab(krc_inputw_t* ctx)
 {
-	krc_inputw_commit_composing(ctx);
-
 	krc_inputw_text_tab(ctx);
 }
 
@@ -1308,6 +1306,8 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	case '\t':
 		return;
 	}
+	*/
+	/*
 	// UTF-16 서로게이트 코드 처리
 	if ((char_code >= 0xD800 && char_code <= 0xDBFF) || // High Surrogate
 		(char_code >= 0xDC00 && char_code <= 0xDFFF))   // Low Surrogate
@@ -1414,6 +1414,28 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	default:                      krc_inputw_key_default(ctx);   break;
 	}
 }
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//===========================================================================
+KRC_API void krc_inputw_put_new_line(krc_inputw_t* ctx)
+{
+	if (ctx->multiline == KRC_TRUE)
+	{
+		krc_inputw_text_new_line(ctx);
+	}
+}
+
+KRC_API void krc_inputw_put_tab(krc_inputw_t* ctx)
+{
+	krc_inputw_text_tab(ctx);
+}
+
 
 
 

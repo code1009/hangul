@@ -593,10 +593,11 @@ static void test_4()
 //===========================================================================
 void krc_main()
 {
-    std::cout << "krc_main()!\n";
+    std::cout << "# krc" << std::endl;
     test_1();
     test_2();
     test_3();
     test_4();
+    std::cout << std::endl;
 }
 

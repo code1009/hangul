@@ -21,7 +21,7 @@
 
 #define TEST(x) \
     std::wcout << L"=============================================================" << std::endl; \
-    std::wcout << L"# TEST: " << WSTRINGIFY(x) << std::endl; \
+    std::wcout << WSTRINGIFY(x) << std::endl; \
     std::wcout << L"=============================================================" << std::endl;  \
     (x)(); \
     std::wcout << std::endl;
@@ -1098,8 +1098,7 @@ void krc_input_main()
     std::locale::global(std::locale("ko_KR.UTF-8"));
     std::wcout.imbue(std::locale());
 
-    std::wcout << L"===== krc_inputw 테스트 =====";
-    std::wcout << std::endl;
+    std::wcout << L"# krc_input" << std::endl;
 
     TEST(test_latin_basic              );               
     TEST(test_latin_shift              );               
@@ -1124,6 +1123,10 @@ void krc_input_main()
     TEST(test_tab_key                  );                   
     TEST(test_multiline_line_merge     );      
 
-    std::wcout << L"===== 결과: PASS=" << s_pass << "  FAIL=" << s_fail << " =====";
+    std::wcout << L"[결과]";
+    std::wcout << L" PASS = " << s_pass;
+    std::wcout << L" FAIL = " << s_fail;
+    std::wcout << std::endl;
+
     std::wcout << std::endl;
 }

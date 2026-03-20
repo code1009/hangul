@@ -41,8 +41,13 @@ typedef struct _krc_inputw_t
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline);
+
 KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code);
 KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key);
+
+KRC_API void krc_inputw_put_new_line(krc_inputw_t* ctx);
+KRC_API void krc_inputw_put_tab(krc_inputw_t* ctx);
+
 KRC_API void krc_inputw_set_shift_mode(krc_inputw_t* ctx, krc_bool_t mode);
 KRC_API void krc_inputw_set_capslock_mode(krc_inputw_t* ctx, krc_bool_t mode);
 KRC_API void krc_inputw_set_insert_mode(krc_inputw_t* ctx, krc_bool_t mode);

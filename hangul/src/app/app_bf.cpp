@@ -464,9 +464,11 @@ static void test1()
 
 void bf_main()
 {
-    std::cout << "bf_main()!\n";
+	std::cout << "# bf" << std::endl;
 
     bf_context_default_setup();
 
 	test1();
+
+	std::cout << std::endl;
 }
