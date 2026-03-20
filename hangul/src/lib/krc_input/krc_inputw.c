@@ -930,8 +930,8 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 		return;
 	}
 
-	krc_size_t offset;
 	krc_wchar_t ch;
+	krc_size_t offset;
 	krc_size_t line;
 	krc_size_t column;
 	krc_size_t target_line;
@@ -940,9 +940,9 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 
 	offset = 0u;
 	line = 0u;
+	column = 0u;
 	target_line = ctx->cursor_line - 1u;
 	target_column = ctx->cursor_column;
-	column = 0u;
 	found = KRC_FALSE;
 
 #if 1
@@ -1013,8 +1013,8 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 		return;
 	}
 
-	krc_size_t offset;
 	krc_wchar_t ch;
+	krc_size_t offset;
 	krc_size_t line;
 	krc_size_t column;
 	krc_size_t target_line;
@@ -1023,9 +1023,9 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 
 	offset = 0u;
 	line = 0u;
+	column = 0u;
 	target_line = ctx->cursor_line + 1u;
 	target_column = ctx->cursor_column;
-	column = 0u;
 	found = KRC_FALSE;
 
 #if 1
@@ -1082,10 +1082,10 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 //---------------------------------------------------------------------------
 static void krc_inputw_put_char_hangul_fail_moeum(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
-	krc_wchar_t  base_code = krc_inputw_text_get_char(ctx);
-	krc_wchar_t  remaining_code;
-	krc_wchar_t  last_code;
-	krc_wchar_t  compound_code;
+	krc_wchar_t base_code = krc_inputw_text_get_char(ctx);
+	krc_wchar_t remaining_code;
+	krc_wchar_t last_code;
+	krc_wchar_t compound_code;
 
 	krc_hangulw_decompose_last(base_code, &remaining_code, &last_code);
 
@@ -1127,8 +1127,8 @@ static void krc_inputw_put_char_hangul_fail_jaeum(krc_inputw_t* ctx, krc_wchar_t
 //---------------------------------------------------------------------------
 static void krc_inputw_put_char_hangul_composing(krc_inputw_t* ctx, krc_wchar_t char_code)
 {
-	krc_wchar_t  base_code = krc_inputw_text_get_char(ctx);
-	krc_wchar_t  compound_code;
+	krc_wchar_t base_code = krc_inputw_text_get_char(ctx);
+	krc_wchar_t compound_code;
 
 	if (krc_hangulw_compose(base_code, char_code, &compound_code) == KRC_TRUE)
 	{
@@ -1386,20 +1386,20 @@ static void krc_inputw_key_default(krc_inputw_t* ctx)
 //===========================================================================
 KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t buffer_size, krc_bool_t multiline)
 {
-	ctx->buffer_pointer      = buffer;
-	ctx->buffer_size         = buffer_size;
-	ctx->multiline           = multiline;
-	ctx->line_count          = 1u;
-	ctx->length              = 0u;
-	ctx->cursor_offset       = 0u;
-	ctx->cursor_line_offset  = 0u;
-	ctx->cursor_line         = 0u;
-	ctx->cursor_column       = 0u;
-	ctx->shift_mode          = KRC_FALSE;
-	ctx->capslock_mode       = KRC_FALSE;
-	ctx->insert_mode         = KRC_TRUE;
-	ctx->key_mode            = KRC_INPUT_KEY_MODE_LATIN;
-	ctx->hangul_composing    = KRC_FALSE;
+	ctx->buffer_pointer     = buffer;
+	ctx->buffer_size        = buffer_size;
+	ctx->multiline          = multiline;
+	ctx->line_count         = 1u;
+	ctx->length             = 0u;
+	ctx->cursor_offset      = 0u;
+	ctx->cursor_line_offset = 0u;
+	ctx->cursor_line        = 0u;
+	ctx->cursor_column      = 0u;
+	ctx->shift_mode         = KRC_FALSE;
+	ctx->capslock_mode      = KRC_FALSE;
+	ctx->insert_mode        = KRC_TRUE;
+	ctx->key_mode           = KRC_INPUT_KEY_MODE_LATIN;
+	ctx->hangul_composing   = KRC_FALSE;
 
 	if (buffer != (krc_wchar_t*)0 && buffer_size > 0u)
 	{
