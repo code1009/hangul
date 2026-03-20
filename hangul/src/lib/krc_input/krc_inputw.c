@@ -1426,29 +1426,6 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 
 
 
-
-
-/////////////////////////////////////////////////////////////////////////////
-//===========================================================================
-KRC_API void krc_inputw_put_new_line(krc_inputw_t* ctx)
-{
-	if (ctx->multiline == KRC_TRUE)
-	{
-		krc_inputw_text_new_line(ctx);
-	}
-}
-
-KRC_API void krc_inputw_put_tab(krc_inputw_t* ctx)
-{
-	krc_inputw_text_tab(ctx);
-}
-
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 KRC_API void krc_inputw_set_shift_mode(krc_inputw_t* ctx, krc_bool_t mode)
