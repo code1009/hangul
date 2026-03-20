@@ -456,16 +456,16 @@ static void krc_inputw_cursor_update(krc_inputw_t* ctx)
 	krc_size_t line_start;
 	krc_size_t column = 0u;
 
+#if 1
 	if (ctx->cursor_line_offset <= ctx->cursor_offset && (ctx->cursor_line_offset == 0u || text[ctx->cursor_line_offset - 1u] == '\n'))
 	{
-		/* 순방향: 현재 줄 시작부터 스캔 */
 		offset = ctx->cursor_line_offset;
 		line = ctx->cursor_line;
 		line_start = ctx->cursor_line_offset;
 	}
 	else
+#endif
 	{
-		/* 역방향: 버퍼 처음부터 전체 스캔 (역방향 커서 이동 또는 개행 삭제 후 캐시 무효) */
 		offset = 0u;
 		line = 0u;
 		line_start = 0u;
@@ -930,14 +930,42 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 		return;
 	}
 
-
-	krc_size_t  target_line = ctx->cursor_line - 1u;
-	krc_size_t  target_column = ctx->cursor_column;
-	krc_size_t  line = 0u;
-	krc_size_t  column = 0u;
-	krc_size_t  offset = 0u;
+	krc_size_t offset;
 	krc_wchar_t ch;
-	krc_bool_t  found = KRC_FALSE;
+	krc_size_t line;
+	krc_size_t column;
+	krc_size_t target_line;
+	krc_size_t target_column;
+	krc_bool_t found;
+
+	offset = 0u;
+	line = 0u;
+	target_line = ctx->cursor_line - 1u;
+	target_column = ctx->cursor_column;
+	column = 0u;
+	found = KRC_FALSE;
+
+#if 1
+	offset = ctx->cursor_line_offset;
+	line = ctx->cursor_line;
+
+	krc_size_t line_up;
+	line_up = 0u;
+	while (offset > 0u)
+	{
+		ch = krc_inputw_text_peek_char(ctx, offset);
+		if (ch == '\n')
+		{
+			line--;
+			line_up++;
+			if (line_up == 2u)
+			{
+				break;
+			}
+		}
+		offset--;
+	}
+#endif
 
 	while ((ch = krc_inputw_text_peek_char(ctx, offset)) != KRC_WCHAR_NULL)
 	{
@@ -985,14 +1013,25 @@ static void krc_inputw_cursor_down(krc_inputw_t* ctx)
 		return;
 	}
 
-
-	krc_size_t  target_line = ctx->cursor_line + 1u;
-	krc_size_t  target_column = ctx->cursor_column;
-	krc_size_t  line = 0u;
-	krc_size_t  column = 0u;
-	krc_size_t  offset = 0u;
+	krc_size_t offset;
 	krc_wchar_t ch;
-	krc_bool_t  found = KRC_FALSE;
+	krc_size_t line;
+	krc_size_t column;
+	krc_size_t target_line;
+	krc_size_t target_column;
+	krc_bool_t found;
+
+	offset = 0u;
+	line = 0u;
+	target_line = ctx->cursor_line + 1u;
+	target_column = ctx->cursor_column;
+	column = 0u;
+	found = KRC_FALSE;
+
+#if 1
+	offset = ctx->cursor_offset;
+	line = ctx->cursor_line;
+#endif
 
 	while ((ch = krc_inputw_text_peek_char(ctx, offset)) != KRC_WCHAR_NULL)
 	{
