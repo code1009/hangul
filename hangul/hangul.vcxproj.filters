@@ -218,13 +218,8 @@
     <ClInclude Include="src\lib\krc_input\krc_inputw_key_char_table.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
-    <ClInclude Include="src\lib\krc_input\krc_inputw_table.h">
+    <ClInclude Include="src\lib\krc_input\krc_hangulw_table.h">
       <Filter>src\lib\krc_input</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="src\lib\krc_input\todo.txt">
-      <Filter>src\lib\krc_input</Filter>
-    </Text>
   </ItemGroup>
 </Project>

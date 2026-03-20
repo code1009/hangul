@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-static const int _krc_inputw_hangul_choseong_index_table[30] = 
+static const int _krc_hangulw_choseong_index_table[30] = 
 {
 	 0, // 0x3131 ㄱ
 	 1, // 0x3132 ㄲ
@@ -34,7 +34,7 @@ static const int _krc_inputw_hangul_choseong_index_table[30] =
 	18  // 0x314e ㅎ
 };
 
-static const int _krc_inputw_hangul_jongseong_index_table[30] = 
+static const int _krc_hangulw_jongseong_index_table[30] = 
 {
 	 1, // 0x3131 ㄱ
 	 2, // 0x3132 ㄲ
@@ -69,7 +69,7 @@ static const int _krc_inputw_hangul_jongseong_index_table[30] =
 };
 
 //===========================================================================
-static const krc_wchar_t _krc_inputw_hangul_choseong_code_table[19] = 
+static const krc_wchar_t _krc_hangulw_choseong_code_table[19] = 
 {
 	0x3131, // ㄱ
 	0x3132, // ㄲ
@@ -92,7 +92,7 @@ static const krc_wchar_t _krc_inputw_hangul_choseong_code_table[19] =
 	0x314e  // ㅎ
 };
 
-static const krc_wchar_t _krc_inputw_hangul_jongseong_code_table[28] = 
+static const krc_wchar_t _krc_hangulw_jongseong_code_table[28] = 
 {
 	0x0000, // blank
 	0x3131, // ㄱ

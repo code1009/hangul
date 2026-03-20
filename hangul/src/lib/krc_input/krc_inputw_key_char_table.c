@@ -48,7 +48,7 @@
 //===========================================================================
 // [1] 영문
 //===========================================================================
-static const krc_wchar_t _krc_inputw_key_char_table_latin[48] = 
+static const krc_wchar_t _krc_inputw_key_char_table_latin[KRC_INPUT_KEY_CHAR_COUNT] =
 {
 	/*  1 1          */ '1',
 	/*  2 2          */ '2',
@@ -103,7 +103,7 @@ static const krc_wchar_t _krc_inputw_key_char_table_latin[48] =
 //===========================================================================
 // [2] 영문 + 시프트
 //===========================================================================
-static const krc_wchar_t _krc_inputw_key_char_table_latin_shift[48] = 
+static const krc_wchar_t _krc_inputw_key_char_table_latin_shift[KRC_INPUT_KEY_CHAR_COUNT] =
 {
 	/*  1 1          */ '!',
 	/*  2 2          */ '@',
@@ -159,7 +159,7 @@ static const krc_wchar_t _krc_inputw_key_char_table_latin_shift[48] =
 // [3] 한국어(두벌식)
 // A-Z 는 한글 자모, 나머지는 영문과 동일
 //===========================================================================
-static const krc_wchar_t _krc_inputw_key_char_table_hangul[48] =
+static const krc_wchar_t _krc_inputw_key_char_table_hangul[KRC_INPUT_KEY_CHAR_COUNT] =
 {
 	/*  1 1          */ '1',
 	/*  2 2          */ '2',
@@ -218,7 +218,7 @@ static const krc_wchar_t _krc_inputw_key_char_table_hangul[48] =
 // 나머지 A-Z 는 비시프트 한글 자모와 동일, 
 // 비 A-Z 위치는 영문 SHIFT 와 동일 
 //===========================================================================
-static const krc_wchar_t _krc_inputw_key_char_table_hangul_shift[48] = 
+static const krc_wchar_t _krc_inputw_key_char_table_hangul_shift[KRC_INPUT_KEY_CHAR_COUNT] =
 {
 	/*  1 1          */ '!',
 	/*  2 2          */ '@',
@@ -269,13 +269,6 @@ static const krc_wchar_t _krc_inputw_key_char_table_hangul_shift[48] =
 	/* 47 SLASH      */ '?',
 	/* 48 SPACE      */ ' ',
 };
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-//===========================================================================
-#define KRC_INPUT_KEY_CHAR_COUNT (KRC_INPUT_KEY_SPACE - KRC_INPUT_KEY_1 + 1u)
 
 
 

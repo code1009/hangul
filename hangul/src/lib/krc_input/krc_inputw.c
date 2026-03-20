@@ -29,7 +29,7 @@
 #include "krc_input_key.h"
 #include "krc_input_key_mode.h"
 #include "krc_inputw_key_char_table.h"
-#include "krc_inputw_table.h"
+#include "krc_hangulw_table.h"
 #include "krc_inputw.h"
 
 
@@ -43,6 +43,13 @@
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
 #define KRC_WCHAR_NULL         0x0000 // 와이드 문자 NULL terminator 
+#define KRC_WCHAR_CHAR_BASE    0x0020
+
+#define KRC_WCHAR_UTF16_SURROGATE_HIGH_BASE 0xD800 // High Surrogate 시작
+#define KRC_WCHAR_UTF16_SURROGATE_HIGH_END  0xDBFF
+#define KRC_WCHAR_UTF16_SURROGATE_LOW_BASE  0xDC00 // Low Surrogate 시작
+#define KRC_WCHAR_UTF16_SURROGATE_LOW_END   0xDFFF
+
 #define KRC_HANGULW_CHAR_BASE  0xAC00 // 한글 음절 시작: 가          
 #define KRC_HANGULW_CHAR_END   0xD7A3 // 한글 음절 끝:   힣          
 #define KRC_HANGULW_JAEUM_BASE 0x3131 // 자음/자모 시작: ㄱ          
@@ -230,7 +237,7 @@ static krc_bool_t krc_hangulw_add_jongseong(krc_wchar_t base_code, krc_wchar_t a
 	int choseong, jungseong, jongseong;
 	krc_hangulw_code_to_index(base_code, &choseong, &jungseong, &jongseong);
 
-	int jongseong_additional = _krc_inputw_hangul_jongseong_index_table[additional_code - KRC_HANGULW_JAEUM_BASE];
+	int jongseong_additional = _krc_hangulw_jongseong_index_table[additional_code - KRC_HANGULW_JAEUM_BASE];
 	int jongseong_compound;
 
 	if (jongseong == 0)
@@ -279,7 +286,7 @@ static krc_bool_t krc_hangulw_add_jungseong(krc_wchar_t base_code, krc_wchar_t a
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_compose_jamo(krc_wchar_t jaeum_code, krc_wchar_t moeum_code, krc_wchar_t* compound_code)
 {
-	int choseong = _krc_inputw_hangul_choseong_index_table[jaeum_code - KRC_HANGULW_JAEUM_BASE];
+	int choseong = _krc_hangulw_choseong_index_table[jaeum_code - KRC_HANGULW_JAEUM_BASE];
 	int jungseong = (int)(moeum_code - KRC_HANGULW_MOEUM_BASE);
 
 	if (choseong != -1)
@@ -392,7 +399,7 @@ static krc_bool_t krc_hangulw_decompose_last(krc_wchar_t base_code, krc_wchar_t*
 			else
 			{
 				/* 단순 중성 분리: [초성] + [중성모음] */
-				*remaining_code = _krc_inputw_hangul_choseong_code_table[choseong];
+				*remaining_code = _krc_hangulw_choseong_code_table[choseong];
 				*last_code = KRC_HANGULW_MOEUM_BASE + (krc_wchar_t)jungseong;
 			}
 		}
@@ -406,13 +413,13 @@ static krc_bool_t krc_hangulw_decompose_last(krc_wchar_t base_code, krc_wchar_t*
 			{
 				/* 겹받침 분리: [초성+중성+단자음종성] + [겹받침의 두번째 자음] */
 				*remaining_code = krc_hangulw_index_to_code(choseong, jungseong, jongseong_base);
-				*last_code = _krc_inputw_hangul_jongseong_code_table[jongseong_additional];
+				*last_code = _krc_hangulw_jongseong_code_table[jongseong_additional];
 			}
 			else
 			{
 				/* 단받침 분리: [초성+중성] + [종성자음] */
 				*remaining_code = krc_hangulw_index_to_code(choseong, jungseong, 0);
-				*last_code = _krc_inputw_hangul_jongseong_code_table[jongseong];
+				*last_code = _krc_hangulw_jongseong_code_table[jongseong];
 			}
 		}
 
@@ -720,8 +727,8 @@ static void krc_inputw_text_backspace_char(krc_inputw_t* ctx)
 static void krc_inputw_text_clear(krc_inputw_t* ctx)
 {
 	ctx->length              = 0u;
-	ctx->cursor_line_offset = 0u;
 	ctx->cursor_offset       = 0u;
+	ctx->cursor_line_offset  = 0u;
 	ctx->cursor_line         = 0u;
 	ctx->cursor_column       = 0u;
 	ctx->hangul_composing    = KRC_FALSE;
@@ -1256,8 +1263,8 @@ KRC_API void krc_inputw_init(krc_inputw_t* ctx, krc_wchar_t* buffer, krc_size_t 
 	ctx->buffer_size         = buffer_size;
 	ctx->multiline           = multiline;
 	ctx->length              = 0u;
-	ctx->cursor_line_offset = 0u;
 	ctx->cursor_offset       = 0u;
+	ctx->cursor_line_offset  = 0u;
 	ctx->cursor_line         = 0u;
 	ctx->cursor_column       = 0u;
 	ctx->shift_mode          = KRC_FALSE;
@@ -1294,7 +1301,7 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 
 
 	//=======================================================================
-	if (char_code < 0x20u)
+	if (char_code < KRC_WCHAR_CHAR_BASE)
 	{
 		return;
 	}
@@ -1309,8 +1316,8 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	*/
 	/*
 	// UTF-16 서로게이트 코드 처리
-	if ((char_code >= 0xD800 && char_code <= 0xDBFF) || // High Surrogate
-		(char_code >= 0xDC00 && char_code <= 0xDFFF))   // Low Surrogate
+	if ( ((KRC_WCHAR_UTF16_SURROGATE_HIGH_BASE <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_HIGH_END)) ||
+		 ((KRC_WCHAR_UTF16_SURROGATE_LOW_BASE  <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_LOW_END )) )
 	{
 		return;
 	}
