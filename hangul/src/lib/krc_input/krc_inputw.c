@@ -1404,7 +1404,6 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 	}
 	*/
 	/*
-	// UTF-16 서로게이트 코드 처리
 	if ( ((KRC_WCHAR_UTF16_SURROGATE_HIGH_BASE <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_HIGH_END)) ||
 		 ((KRC_WCHAR_UTF16_SURROGATE_LOW_BASE  <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_LOW_END )) )
 	{
