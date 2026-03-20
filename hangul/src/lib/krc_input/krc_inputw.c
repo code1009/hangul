@@ -745,11 +745,6 @@ static krc_bool_t krc_inputw_text_insert_char(krc_inputw_t* ctx, krc_wchar_t cha
 		return KRC_FALSE;
 	}
 
-	if (ctx->length == ctx->cursor_offset)
-	{
-		return KRC_FALSE;
-	}
-
 	for (i = ctx->length + 1u; i > ctx->cursor_offset; i--) /* NULL terminator 포함 */
 	{
 		text[i] = text[i - 1u];
@@ -854,13 +849,14 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 	krc_size_t  column = 0u;
 	krc_size_t  offset = 0u;
 	krc_wchar_t ch;
-
+	krc_bool_t  found = KRC_FALSE;
 
 	while ((ch = krc_inputw_text_peek_char(ctx, offset)) != KRC_WCHAR_NULL)
 	{
 		if (line == target_line && column == target_column)
 		{
 			krc_inputw_cursor_set(ctx, offset);
+			found = KRC_TRUE;
 			break;
 		}
 		if (ch == '\n')
@@ -876,6 +872,11 @@ static void krc_inputw_cursor_up(krc_inputw_t* ctx)
 			}
 		}
 		offset++;
+	}
+
+	if (found == KRC_FALSE && line == target_line)
+	{
+		krc_inputw_cursor_begin(ctx);
 	}
 }
 
