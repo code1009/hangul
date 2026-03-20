@@ -1557,10 +1557,6 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 
 
 	//=======================================================================
-	if (char_code < KRC_WCHAR_CHAR_BASE)
-	{
-		return;
-	}
 	/*
 	switch (char_code)
 	{
@@ -1570,6 +1566,9 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 		return;
 	}
 	*/
+
+
+	//=======================================================================
 	/*
 	if ( ((KRC_WCHAR_UTF16_SURROGATE_HIGH_BASE <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_HIGH_END)) ||
 		 ((KRC_WCHAR_UTF16_SURROGATE_LOW_BASE  <= char_code) && (char_code <= KRC_WCHAR_UTF16_SURROGATE_LOW_END )) )
@@ -1577,6 +1576,13 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 		return;
 	}
 	*/
+
+
+	//=======================================================================
+	if (char_code < KRC_WCHAR_CHAR_BASE)
+	{
+		return;
+	}
 
 
 	//=======================================================================
@@ -1612,6 +1618,7 @@ KRC_API void krc_inputw_put_char(krc_inputw_t* ctx, krc_wchar_t char_code)
 KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 {
 	krc_wchar_t char_code;
+
 
 	if (krc_inputw_text_is_null(ctx))
 	{
