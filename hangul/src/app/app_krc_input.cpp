@@ -33,13 +33,13 @@ static void check(const wchar_t* name, bool cond)
 {
     if (cond)
     {
-        std::wcout << L"  [PASS] " << name << std::endl;
         s_pass++;
+        std::wcout << L"  [PASS] " << name << std::endl;
     }
     else
     {
-        std::wcout << L"  [FAIL] " << name << std::endl;
         s_fail++;
+        std::wcout << L"! [FAIL] " << s_fail << L": " << name << std::endl;
     }
 }
 
@@ -1010,24 +1010,24 @@ static void test_multiline_line_merge()
     check(L"setup: col==2",    ctx.cursor_column == 2);
     check(L"setup: length==6", ctx.length == 6); // a,b,\r,\n,c,d
 
-    // HOME(line1) → cursor=4, BS → \n 삭제 → "ab\rcd"
+    // HOME(line1) → cursor=4, BS → \r\n 삭제 → "abcd"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_HOME);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
     print_buf(L"BS removes \\n", ctx);
     check(L"BS \\n: line==0",    ctx.cursor_line == 0);
-    check(L"BS \\n: length==5",  ctx.length == 5);
+    check(L"BS \\n: length==4",  ctx.length == 4);
 
-    // BS → \r 삭제 → "abcd" (단일 라인)
+    // BS → b 삭제 → "acd" (단일 라인)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE);
     print_buf(L"BS removes \\r", ctx);
     check(L"BS \\r: line==0",    ctx.cursor_line == 0);
-    check(L"BS \\r: col==2",     ctx.cursor_column == 2);
-    check(L"BS \\r: length==4",  ctx.length == 4);
+    check(L"BS \\r: col==1",     ctx.cursor_column == 1);
+    check(L"BS \\r: length==3",  ctx.length == 3);
 
     // END → 줄 끝 (line=0, col=4)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
     check(L"end after merge: line==0", ctx.cursor_line == 0);
-    check(L"end after merge: col==4",  ctx.cursor_column == 4);
+    check(L"end after merge: col==4",  ctx.cursor_column == 3);
 
     // ----- 2) Delete로 줄 합침 -----
     init_ctx(ctx, buf, 128, KRC_TRUE);
@@ -1043,11 +1043,10 @@ static void test_multiline_line_merge()
     check(L"del setup: line==0",  ctx.cursor_line == 0);
     check(L"del setup: col==1",   ctx.cursor_column == 1);
 
-    // DELETE × 2 → \r 삭제 후 \n 삭제 → "ab"
+    // DELETE → \r \n 삭제 → "ab"
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \r 삭제
     check(L"DEL \\r: line==0",    ctx.cursor_line == 0);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \n 삭제
-    print_buf(L"после DEL merges lines", ctx);
+    print_buf(L"DEL merges lines", ctx);
     check(L"DEL \\n: line==0",    ctx.cursor_line == 0);
     check(L"DEL \\n: length==2",  ctx.length == 2);
     check(L"DEL \\n: col==1",     ctx.cursor_column == 1);
@@ -1074,8 +1073,7 @@ static void test_multiline_line_merge()
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
     check(L"3line up: line==0",   ctx.cursor_line == 0);
 
-    // DELETE×2 → \r,\n 삭제 → "ab\r\nc" (line0="ab", line1="c")
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
+    // DELETE → \r\n 삭제 → "ab\r\nc" (line0="ab", line1="c")
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE);
     check(L"3line DEL: line==0",    ctx.cursor_line == 0);
     check(L"3line DEL: length==5",  ctx.length == 5); // a,\r,\n,b,\r,\n,c(7) → \r,\n 삭제 → ab\r\nc(5)
@@ -1160,9 +1158,8 @@ static void test_line_and_line_count()
     // 아래로 한 줄 내려가야 빈 줄의 시작
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DOWN);
     check(L"빈 줄: cursor_line==2", ctx.cursor_line == 2);
-    // Backspace × 2 (\n, \r 삭제) → line2 제거
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE); // \n 삭제
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE); // \r 삭제
+    // Backspace (\r, \n 삭제) → line2 제거
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_BACKSPACE); // \n\r 삭제
     check(L"BS \\r\\n: line_count==3",   ctx.line_count   == 3);
     check(L"BS \\r\\n: cursor_line==1",  ctx.cursor_line  == 1);
 
@@ -1176,8 +1173,8 @@ static void test_line_and_line_count()
     // 맨 처음으로 이동, END → 'a' 뒤 (\r 앞)
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_UP);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_END);
-    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \r 삭제
-    check(L"DEL \\r: line_count==2",  ctx.line_count  == 2); // \n 아직 있음
+    krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \r\n 삭제
+    check(L"DEL \\r: line_count==1",  ctx.line_count  == 1);
     check(L"DEL \\r: cursor_line==0", ctx.cursor_line == 0);
     krc_inputw_put_key(&ctx, KRC_INPUT_KEY_DELETE); // \n 삭제
     check(L"DEL \\n: line_count==1",  ctx.line_count  == 1);

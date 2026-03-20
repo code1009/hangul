@@ -515,6 +515,24 @@ static krc_bool_t krc_inputw_cursor_back(krc_inputw_t* ctx)
 	return KRC_FALSE;
 }
 
+static krc_bool_t krc_inputw_cursor_back2(krc_inputw_t* ctx)
+{
+	if (ctx->cursor_offset > 1u)
+	{
+		ctx->cursor_offset-=2u;
+
+		krc_inputw_cursor_update(ctx);
+		return KRC_TRUE;
+	}
+	else if (ctx->cursor_offset == 1u)
+	{
+		ctx->cursor_offset = 0u;
+		krc_inputw_cursor_update(ctx);
+		return KRC_TRUE;
+	}
+	return KRC_FALSE;
+}
+
 static void krc_inputw_cursor_set(krc_inputw_t* ctx, krc_size_t offset)
 {
 	if (offset <= ctx->length)
@@ -691,38 +709,89 @@ static krc_bool_t krc_inputw_text_put_char(krc_inputw_t* ctx, krc_wchar_t char_c
 static void krc_inputw_text_remove_char(krc_inputw_t* ctx)
 {
 	krc_size_t i;
-
+	krc_wchar_t ch;
+	krc_wchar_t ch_next;
+	
 	if (ctx->length == 0u || ctx->cursor_offset == ctx->length)
 	{
 		return;
 	}
 
-	for (i = ctx->cursor_offset; i <= ctx->length; i++) /* NULL terminator 포함 */
-	{
-		ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 1u];
-	}
+	ch = krc_inputw_text_get_char(ctx);
+	ch_next = krc_inputw_text_peek_char(ctx, ctx->cursor_offset + 1u);
 
-	ctx->length--;
+	if (ch=='\r' && ch_next == '\n')
+	{
+		for (i = ctx->cursor_offset; i < ctx->length; i++) /* NULL terminator 포함 */
+		{
+			ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 2u];
+		}
+
+		ctx->length -= 2u;
+
+		ctx->line_count--;
+	}
+	else
+	{
+		for (i = ctx->cursor_offset; i <= ctx->length; i++) /* NULL terminator 포함 */
+		{
+			ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 1u];
+		}
+
+		ctx->length--;
+
+		if (ch == '\n')
+		{
+			ctx->line_count--;
+		}
+	}
 }
 
 static void krc_inputw_text_backspace_char(krc_inputw_t* ctx)
 {
 	krc_size_t i;
+	krc_wchar_t ch;
+	krc_wchar_t ch_next;
 
 	if (ctx->length == 0u || ctx->cursor_offset == 0u)
 	{
 		return;
 	}
 
-	for (i = ctx->cursor_offset - 1u; i <= ctx->length; i++) /* NULL terminator 포함 */
+	ch = krc_inputw_text_peek_char(ctx, ctx->cursor_offset - 2u);
+	ch_next = krc_inputw_text_peek_char(ctx, ctx->cursor_offset - 1u);
+
+	if (ch == '\r' && ch_next == '\n')
 	{
-		ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 1u];
+		for (i = ctx->cursor_offset - 2u; i <= ctx->length; i++) /* NULL terminator 포함 */
+		{
+			ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 2u];
+		}
+
+		krc_inputw_cursor_back2(ctx);
+
+		ctx->length-=2;
+
+		ctx->line_count--;
 	}
+	else
+	{
+		for (i = ctx->cursor_offset - 1u; i <= ctx->length; i++) /* NULL terminator 포함 */
+		{
+			ctx->buffer_pointer[i] = ctx->buffer_pointer[i + 1u];
+		}
 
-	krc_inputw_cursor_back(ctx);
+		krc_inputw_cursor_back(ctx);
 
-	ctx->length--;
+		ctx->length--;
+
+		if (ch_next == '\n')
+		{
+			ctx->line_count--;
+		}
+	}
 }
+
 static void krc_inputw_text_clear(krc_inputw_t* ctx)
 {
 	ctx->length              = 0u;
@@ -1102,14 +1171,11 @@ static void krc_inputw_key_backspace(krc_inputw_t* ctx)
 	krc_wchar_t remaining_code;
 	krc_wchar_t last_code;
 
-	base_code = krc_inputw_text_get_char(ctx);
-	if (base_code == 0u)
-	{
-		return;
-	}
 
 	if (krc_inputw_is_composing(ctx) == KRC_TRUE)
 	{
+		base_code = krc_inputw_text_get_char(ctx);
+
 		if (krc_hangulw_decompose_last(base_code, &remaining_code, &last_code) == KRC_TRUE)
 		{
 			krc_inputw_text_set_char(ctx, remaining_code);
