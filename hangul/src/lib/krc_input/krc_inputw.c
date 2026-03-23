@@ -1633,7 +1633,7 @@ KRC_API void krc_inputw_put_key(krc_inputw_t* ctx, krc_uint32_t key)
 	krc_uint32_t key_modifier = KRC_INPUT_KEY_MODIFIER(key);
 	krc_bool_t shift = KRC_FALSE;
 
-	if (key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_LSHIFT) || key_modifier == KRC_INPUT_KEY_MODIFIER(KRC_INPUT_KEY_RSHIFT))
+	if (key_modifier == KRC_INPUT_KEY_LSHIFT || key_modifier == KRC_INPUT_KEY_RSHIFT)
 	{
 		shift = KRC_TRUE;
 	}
