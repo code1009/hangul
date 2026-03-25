@@ -97,12 +97,12 @@ BF_API void bf_get_cp949_bitmap(
 		}
 		break;
 
-	case KRC_CODE_RANGE_HANGUL_JAMO_JAEUM:
-		bf_get_font_bitmap_hangul_johab844_jamo_jaeum(ctx->font_hangul_johab844, char_code - 0xA4A1u, font_bitmap);
+	case KRC_CODE_RANGE_HANGUL_JAEUM:
+		bf_get_font_bitmap_hangul_johab844_jaeum(ctx->font_hangul_johab844, char_code - 0xA4A1u, font_bitmap);
 		return;
 
-	case KRC_CODE_RANGE_HANGUL_JAMO_MOEUM:
-		bf_get_font_bitmap_hangul_johab844_jamo_moeum(ctx->font_hangul_johab844, char_code - 0xA4BFu, font_bitmap);
+	case KRC_CODE_RANGE_HANGUL_MOEUM:
+		bf_get_font_bitmap_hangul_johab844_moeum(ctx->font_hangul_johab844, char_code - 0xA4BFu, font_bitmap);
 		return;
 
 
@@ -187,12 +187,12 @@ BF_API void bf_get_unicode_bitmap(
 		bf_get_font_bitmap_hangul_johab844(ctx->font_hangul_johab844, choseong, jungseong, jongseong, font_bitmap, ctx->font_hangul_johab_bitmap_buffer);
 		return;
 
-	case KRC_CODE_RANGE_HANGUL_JAMO_JAEUM:
-		bf_get_font_bitmap_hangul_johab844_jamo_jaeum(ctx->font_hangul_johab844, char_unicode - 0x3131u, font_bitmap);
+	case KRC_CODE_RANGE_HANGUL_JAEUM:
+		bf_get_font_bitmap_hangul_johab844_jaeum(ctx->font_hangul_johab844, char_unicode - 0x3131u, font_bitmap);
 		return;
 
-	case KRC_CODE_RANGE_HANGUL_JAMO_MOEUM:
-		bf_get_font_bitmap_hangul_johab844_jamo_moeum(ctx->font_hangul_johab844, char_unicode - 0x314Fu, font_bitmap);
+	case KRC_CODE_RANGE_HANGUL_MOEUM:
+		bf_get_font_bitmap_hangul_johab844_moeum(ctx->font_hangul_johab844, char_unicode - 0x314Fu, font_bitmap);
 		return;
 
 

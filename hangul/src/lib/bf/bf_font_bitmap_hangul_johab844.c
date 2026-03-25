@@ -283,7 +283,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_choseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_choseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
@@ -297,7 +297,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_choseong(
 	font_bitmap->font_bitmap_cy = font->font_cy;
 }
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jungseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_jungseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
@@ -311,7 +311,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jungseong(
 	font_bitmap->font_bitmap_cy = font->font_cy;
 }
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jongseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_jongseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
@@ -331,7 +331,7 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jongseong(
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_moeum(
+BF_API void bf_get_font_bitmap_hangul_johab844_moeum(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
@@ -345,59 +345,59 @@ BF_API void bf_get_font_bitmap_hangul_johab844_jamo_moeum(
 	font_bitmap->font_bitmap_cy = font->font_cy;
 }
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jaeum(
+BF_API void bf_get_font_bitmap_hangul_johab844_jaeum(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
 )
 {
 	//-----------------------------------------------------------------------
-	bf_uint8_t* jamo;
-	bf_uint32_t jamo_index;
+	bf_uint8_t* jaeum;
+	bf_uint32_t jaeum_index;
 
 
-	jamo = BF_NULL_PTR;
-	jamo_index = 0u;
+	jaeum = BF_NULL_PTR;
+	jaeum_index = 0u;
 
 	switch (index)
 	{
-	/*ㄱ*/ case 0x00u: jamo = font->choseong [0]; jamo_index =  0u;      break;
-	/*ㄲ*/ case 0x01u: jamo = font->choseong [0]; jamo_index =  1u;      break;
-	/*ㄳ*/ case 0x02u: jamo = font->jongseong[0]; jamo_index =  3u - 1u; break;
-	/*ㄴ*/ case 0x03u: jamo = font->choseong [0]; jamo_index =  2u;      break;
-	/*ㄵ*/ case 0x04u: jamo = font->jongseong[0]; jamo_index =  5u - 1u; break;
-	/*ㄶ*/ case 0x05u: jamo = font->jongseong[0]; jamo_index =  6u - 1u; break;
-	/*ㄷ*/ case 0x06u: jamo = font->choseong [0]; jamo_index =  3u;      break;
-	/*ㄸ*/ case 0x07u: jamo = font->choseong [0]; jamo_index =  4u;      break;
-	/*ㄹ*/ case 0x08u: jamo = font->choseong [0]; jamo_index =  5u;      break;
-	/*ㄺ*/ case 0x09u: jamo = font->jongseong[0]; jamo_index =  9u - 1u; break;
-	/*ㄻ*/ case 0x0Au: jamo = font->jongseong[0]; jamo_index = 10u - 1u; break;
-	/*ㄼ*/ case 0x0Bu: jamo = font->jongseong[0]; jamo_index = 11u - 1u; break;
-	/*ㄽ*/ case 0x0Cu: jamo = font->jongseong[0]; jamo_index = 12u - 1u; break;
-	/*ㄾ*/ case 0x0Du: jamo = font->jongseong[0]; jamo_index = 13u - 1u; break;
-	/*ㄿ*/ case 0x0Eu: jamo = font->jongseong[0]; jamo_index = 14u - 1u; break;
-	/*ㅀ*/ case 0x0Fu: jamo = font->jongseong[0]; jamo_index = 15u - 1u; break;
-	/*ㅁ*/ case 0x10u: jamo = font->choseong [0]; jamo_index =  6u;      break;
-	/*ㅂ*/ case 0x11u: jamo = font->choseong [0]; jamo_index =  7u;      break;
-	/*ㅃ*/ case 0x12u: jamo = font->choseong [0]; jamo_index =  8u;      break;
-	/*ㅄ*/ case 0x13u: jamo = font->jongseong[0]; jamo_index = 18u - 1u; break;
-	/*ㅅ*/ case 0x14u: jamo = font->choseong [0]; jamo_index =  9u;      break;
-	/*ㅆ*/ case 0x15u: jamo = font->choseong [0]; jamo_index = 10u;      break;
-	/*ㅇ*/ case 0x16u: jamo = font->choseong [0]; jamo_index = 11u;      break;
-	/*ㅈ*/ case 0x17u: jamo = font->choseong [0]; jamo_index = 12u;      break;
-	/*ㅉ*/ case 0x18u: jamo = font->choseong [0]; jamo_index = 13u;      break;
-	/*ㅊ*/ case 0x19u: jamo = font->choseong [0]; jamo_index = 14u;      break;
-	/*ㅋ*/ case 0x1Au: jamo = font->choseong [0]; jamo_index = 15u;      break;
-	/*ㅌ*/ case 0x1Bu: jamo = font->choseong [0]; jamo_index = 16u;      break;
-	/*ㅍ*/ case 0x1Cu: jamo = font->choseong [0]; jamo_index = 17u;      break;
-	/*ㅎ*/ case 0x1Du: jamo = font->choseong [0]; jamo_index = 18u;      break;
+	/*ㄱ*/ case 0x00u: jaeum = font->choseong [0]; jaeum_index =  0u;      break;
+	/*ㄲ*/ case 0x01u: jaeum = font->choseong [0]; jaeum_index =  1u;      break;
+	/*ㄳ*/ case 0x02u: jaeum = font->jongseong[0]; jaeum_index =  3u - 1u; break;
+	/*ㄴ*/ case 0x03u: jaeum = font->choseong [0]; jaeum_index =  2u;      break;
+	/*ㄵ*/ case 0x04u: jaeum = font->jongseong[0]; jaeum_index =  5u - 1u; break;
+	/*ㄶ*/ case 0x05u: jaeum = font->jongseong[0]; jaeum_index =  6u - 1u; break;
+	/*ㄷ*/ case 0x06u: jaeum = font->choseong [0]; jaeum_index =  3u;      break;
+	/*ㄸ*/ case 0x07u: jaeum = font->choseong [0]; jaeum_index =  4u;      break;
+	/*ㄹ*/ case 0x08u: jaeum = font->choseong [0]; jaeum_index =  5u;      break;
+	/*ㄺ*/ case 0x09u: jaeum = font->jongseong[0]; jaeum_index =  9u - 1u; break;
+	/*ㄻ*/ case 0x0Au: jaeum = font->jongseong[0]; jaeum_index = 10u - 1u; break;
+	/*ㄼ*/ case 0x0Bu: jaeum = font->jongseong[0]; jaeum_index = 11u - 1u; break;
+	/*ㄽ*/ case 0x0Cu: jaeum = font->jongseong[0]; jaeum_index = 12u - 1u; break;
+	/*ㄾ*/ case 0x0Du: jaeum = font->jongseong[0]; jaeum_index = 13u - 1u; break;
+	/*ㄿ*/ case 0x0Eu: jaeum = font->jongseong[0]; jaeum_index = 14u - 1u; break;
+	/*ㅀ*/ case 0x0Fu: jaeum = font->jongseong[0]; jaeum_index = 15u - 1u; break;
+	/*ㅁ*/ case 0x10u: jaeum = font->choseong [0]; jaeum_index =  6u;      break;
+	/*ㅂ*/ case 0x11u: jaeum = font->choseong [0]; jaeum_index =  7u;      break;
+	/*ㅃ*/ case 0x12u: jaeum = font->choseong [0]; jaeum_index =  8u;      break;
+	/*ㅄ*/ case 0x13u: jaeum = font->jongseong[0]; jaeum_index = 18u - 1u; break;
+	/*ㅅ*/ case 0x14u: jaeum = font->choseong [0]; jaeum_index =  9u;      break;
+	/*ㅆ*/ case 0x15u: jaeum = font->choseong [0]; jaeum_index = 10u;      break;
+	/*ㅇ*/ case 0x16u: jaeum = font->choseong [0]; jaeum_index = 11u;      break;
+	/*ㅈ*/ case 0x17u: jaeum = font->choseong [0]; jaeum_index = 12u;      break;
+	/*ㅉ*/ case 0x18u: jaeum = font->choseong [0]; jaeum_index = 13u;      break;
+	/*ㅊ*/ case 0x19u: jaeum = font->choseong [0]; jaeum_index = 14u;      break;
+	/*ㅋ*/ case 0x1Au: jaeum = font->choseong [0]; jaeum_index = 15u;      break;
+	/*ㅌ*/ case 0x1Bu: jaeum = font->choseong [0]; jaeum_index = 16u;      break;
+	/*ㅍ*/ case 0x1Cu: jaeum = font->choseong [0]; jaeum_index = 17u;      break;
+	/*ㅎ*/ case 0x1Du: jaeum = font->choseong [0]; jaeum_index = 18u;      break;
 	default:
 		return;
 	}
 
 
 	//-----------------------------------------------------------------------
-	font_bitmap->font_bitmap_pointer = jamo + font->font_glyph_size * jamo_index;
+	font_bitmap->font_bitmap_pointer = jaeum + font->font_glyph_size * jaeum_index;
 	font_bitmap->font_bitmap_size = font->font_glyph_size;
 	font_bitmap->font_bitmap_stride = font->font_glyph_stride;
 

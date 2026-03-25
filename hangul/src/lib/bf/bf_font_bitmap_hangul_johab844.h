@@ -25,32 +25,32 @@ BF_API void bf_get_font_bitmap_hangul_johab844(
 );
 
 //===========================================================================
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_choseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_choseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
 );
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jungseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_jungseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
 );
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jongseong(
+BF_API void bf_get_font_bitmap_hangul_johab844_jongseong(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
 );
 
 //===========================================================================
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_moeum(
+BF_API void bf_get_font_bitmap_hangul_johab844_moeum(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap
 );
 
-BF_API void bf_get_font_bitmap_hangul_johab844_jamo_jaeum(
+BF_API void bf_get_font_bitmap_hangul_johab844_jaeum(
 	bf_font_hangul_johab844_t* font,
 	const bf_uint32_t index,
 	bf_font_bitmap_t* font_bitmap

@@ -60,11 +60,11 @@ static krc_uint16_t krc_code_range_cp949_hangul_51(const krc_char16_t ch)
 	{
 		if ((0xA4A1u <= ch) && (ch <= 0xA4BEu))
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_JAEUM;
+			return KRC_CODE_RANGE_HANGUL_JAEUM;
 		}
 		if ((0xA4BFu <= ch) && (ch <= 0xA4D3u))
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_MOEUM;
+			return KRC_CODE_RANGE_HANGUL_MOEUM;
 		}
 	}
 
@@ -282,15 +282,15 @@ KRC_API krc_uint16_t krc_code_range_unicode(const krc_wchar_t ch)
 	{
 		if ((0x1100u <= ch) && (ch <= 0x1112u)) // 0x1100u+초성19자
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_CHOSEONG;
+			return KRC_CODE_RANGE_HANGUL_CHOSEONG;
 		}
 		if ((0x1161u <= ch) && (ch <= 0x1175u)) // 0x1161u+중성21자
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_JUNGSEONG;
+			return KRC_CODE_RANGE_HANGUL_JUNGSEONG;
 		}
 		if ((0x11A8u <= ch) && (ch <= 0x11C2u)) // 0x11A8u+종성28자
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_JONGSEONG;
+			return KRC_CODE_RANGE_HANGUL_JONGSEONG;
 		}
 	}
 
@@ -298,11 +298,11 @@ KRC_API krc_uint16_t krc_code_range_unicode(const krc_wchar_t ch)
 	{
 		if ((0x3131u <= ch) && (ch <= 0x314Eu)) // 0x3131u+자음30자
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_JAEUM;
+			return KRC_CODE_RANGE_HANGUL_JAEUM;
 		}
 		if ((0x314Fu <= ch) && (ch <= 0x3163u)) // 0x314Fu+모음21자
 		{
-			return KRC_CODE_RANGE_HANGUL_JAMO_MOEUM;
+			return KRC_CODE_RANGE_HANGUL_MOEUM;
 		}
 	}
 

@@ -52,13 +52,13 @@ ctx->jongseong[set] // set: 0~3, 각 set의 종성 배열 시작 포인터
 
 ### 자음 
 
-`bf_get_font_bitmap_hangul_johab844_jamo_jaeum`
+`bf_get_font_bitmap_hangul_johab844_jaeum`
 
 자음은 초성 또는 종성 폰트에서 해당 자소를 찾아 표시한다.
 
 ### 모음
 
-`bf_get_font_bitmap_hangul_johab844_jamo_moeum`
+`bf_get_font_bitmap_hangul_johab844_moeum`
 
 모음은 `jungseong[0]` 배열에서 중성 인덱스로 직접 조회한다.
 
@@ -66,16 +66,16 @@ ctx->jongseong[set] // set: 0~3, 각 set의 종성 배열 시작 포인터
 
 ## 주요 API
 
-| 함수                                                                    | 설명                                                                   |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 함수                                                                  | 설명                                                                   |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `bf_context_default_setup()`                                          | 기본 컨텍스트 및 폰트 초기화                                           |
 | `bf_context_default_get()`                                            | 기본 컨텍스트 포인터 반환                                              |
 | `bf_get_cp949_bitmap(ctx, char_code, out)`                            | CP949 코드로 비트맵 조회                                               |
 | `bf_get_unicode_bitmap(ctx, char_unicode, out)`                       | 유니코드(UCS-16)로 비트맵 조회                                         |
 | `bf_get_font_bitmap(font, index, out)`                                | 폰트 배열에서 index번 비트맵 포인터 반환 (경계 검사 없음, 호출자 책임) |
 | `bf_get_font_bitmap_hangul_johab844(font, cho, jung, jong, out, buf)` | 한글 완성자 비트맵 합성                                                |
-| `bf_get_font_bitmap_hangul_johab844_jamo_jaeum(font, index, out)`     | 자음 낱글자 비트맵 조회                                                |
-| `bf_get_font_bitmap_hangul_johab844_jamo_moeum(font, index, out)`     | 모음 낱글자 비트맵 조회                                                |
+| `bf_get_font_bitmap_hangul_johab844_jaeum(font, index, out)`          | 자음 낱글자 비트맵 조회                                                |
+| `bf_get_font_bitmap_hangul_johab844_moeum(font, index, out)`          | 모음 낱글자 비트맵 조회                                                |
 
 ### `bf_font_bitmap_t` 구조체
 
