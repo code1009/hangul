@@ -61,7 +61,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 //===========================================================================
-static const int _krc_hangulw_choseong_index_table[30] =
+static const int _krc_hangulw_jaeum_choseong_index_table[30] =
 {
 	 0, // 0x3131 ㄱ
 	 1, // 0x3132 ㄲ
@@ -95,7 +95,7 @@ static const int _krc_hangulw_choseong_index_table[30] =
 	18  // 0x314e ㅎ
 };
 
-static const int _krc_hangulw_jongseong_index_table[30] =
+static const int _krc_hangulw_jaeum_jongseong_index_table[30] =
 {
 	 1, // 0x3131 ㄱ
 	 2, // 0x3132 ㄲ
@@ -365,7 +365,7 @@ static krc_bool_t krc_hangulw_add_jongseong(krc_wchar_t base_code, krc_wchar_t a
 	int choseong, jungseong, jongseong;
 	krc_hangulw_code_to_index(base_code, &choseong, &jungseong, &jongseong);
 
-	int jongseong_additional = _krc_hangulw_jongseong_index_table[additional_code - KRC_HANGULW_JAEUM_BASE];
+	int jongseong_additional = _krc_hangulw_jaeum_jongseong_index_table[additional_code - KRC_HANGULW_JAEUM_BASE];
 	int jongseong_compound;
 
 	if (jongseong == 0)
@@ -414,7 +414,7 @@ static krc_bool_t krc_hangulw_add_jungseong(krc_wchar_t base_code, krc_wchar_t a
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_compose_jamo(krc_wchar_t jaeum_code, krc_wchar_t moeum_code, krc_wchar_t* compound_code)
 {
-	int choseong = _krc_hangulw_choseong_index_table[jaeum_code - KRC_HANGULW_JAEUM_BASE];
+	int choseong = _krc_hangulw_jaeum_choseong_index_table[jaeum_code - KRC_HANGULW_JAEUM_BASE];
 	int jungseong = (int)(moeum_code - KRC_HANGULW_MOEUM_BASE);
 
 	if (choseong != -1)
