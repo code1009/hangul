@@ -318,7 +318,7 @@ static krc_bool_t krc_hangulw_decompose_jungseong_index(int jungseong_index, int
 //---------------------------------------------------------------------------
 // 한글11172자 음절 여부
 //---------------------------------------------------------------------------
-static krc_bool_t krc_hangulw_is_char(krc_wchar_t code)
+static krc_bool_t krc_hangulw_is_eumjul(krc_wchar_t code)
 {
 	return (KRC_HANGULW_CHAR_BASE <= code && code <= KRC_HANGULW_CHAR_END) ? KRC_TRUE : KRC_FALSE;
 }
@@ -447,7 +447,7 @@ static krc_bool_t krc_hangulw_compose(krc_wchar_t base_code, krc_wchar_t additio
 		//===================================================================
 		// base_code 가 초성+중성 이상 조합된 상태
 		//===================================================================
-		if (krc_hangulw_is_char(base_code) == KRC_TRUE)
+		if (krc_hangulw_is_eumjul(base_code) == KRC_TRUE)
 		{
 			if (krc_hangulw_is_jaeum(additional_code))
 			{
@@ -509,7 +509,7 @@ static krc_bool_t krc_hangulw_decompose_last(krc_wchar_t base_code, krc_wchar_t*
 	int jungseong_base, jungseong_additional;
 	int jongseong_base, jongseong_additional;
 
-	if (krc_hangulw_is_char(base_code) == KRC_TRUE)
+	if (krc_hangulw_is_eumjul(base_code) == KRC_TRUE)
 	{
 		krc_hangulw_code_to_index(base_code, &choseong, &jungseong, &jongseong);
 
