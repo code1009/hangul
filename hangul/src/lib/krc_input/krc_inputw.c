@@ -48,12 +48,12 @@
 #define KRC_WCHAR_UTF16_SURROGATE_LOW_BASE  0xDC00 // Low Surrogate 시작
 #define KRC_WCHAR_UTF16_SURROGATE_LOW_END   0xDFFF
 
-#define KRC_HANGULW_CHAR_BASE  0xAC00 // 한글 음절 시작: 가          
-#define KRC_HANGULW_CHAR_END   0xD7A3 // 한글 음절 끝:   힣          
-#define KRC_HANGULW_JAEUM_BASE 0x3131 // 자음/자모 시작: ㄱ          
-#define KRC_HANGULW_JAEUM_END  0x314E // 자음 끝:        ㅎ          
-#define KRC_HANGULW_MOEUM_BASE 0x314F // 모음 시작:      ㅏ          
-#define KRC_HANGULW_MOEUM_END  0x3163 // 모음/자모 끝:   ㅣ          
+#define KRC_HANGULW_EUMJUL_BASE  0xAC00 // 한글 음절 시작: 가          
+#define KRC_HANGULW_EUMJUL_END   0xD7A3 // 한글 음절 끝:   힣          
+#define KRC_HANGULW_JAEUM_BASE   0x3131 // 자음/자모 시작: ㄱ          
+#define KRC_HANGULW_JAEUM_END    0x314E // 자음 끝:        ㅎ          
+#define KRC_HANGULW_MOEUM_BASE   0x314F // 모음 시작:      ㅏ          
+#define KRC_HANGULW_MOEUM_END    0x3163 // 모음/자모 끝:   ㅣ          
 
 
 
@@ -200,7 +200,7 @@ static const krc_wchar_t _krc_hangulw_jongseong_code_table[28] =
 //---------------------------------------------------------------------------
 static void krc_hangulw_code_to_index(krc_wchar_t code, int* choseong, int* jungseong, int* jongseong)
 {
-	int offset = (int)(code - KRC_HANGULW_CHAR_BASE);
+	int offset = (int)(code - KRC_HANGULW_EUMJUL_BASE);
 	*jongseong = offset % 28;
 	*jungseong = (offset / 28) % 21;
 	*choseong  = offset / (28 * 21);
@@ -211,7 +211,7 @@ static void krc_hangulw_code_to_index(krc_wchar_t code, int* choseong, int* jung
 //---------------------------------------------------------------------------
 static krc_wchar_t krc_hangulw_index_to_code(int choseong, int jungseong, int jongseong)
 {
-	return KRC_HANGULW_CHAR_BASE + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
+	return KRC_HANGULW_EUMJUL_BASE + (krc_wchar_t)(choseong * 21 * 28 + jungseong * 28 + jongseong);
 }
 
 //===========================================================================
@@ -320,7 +320,7 @@ static krc_bool_t krc_hangulw_decompose_jungseong_index(int jungseong_index, int
 //---------------------------------------------------------------------------
 static krc_bool_t krc_hangulw_is_eumjul(krc_wchar_t code)
 {
-	return (KRC_HANGULW_CHAR_BASE <= code && code <= KRC_HANGULW_CHAR_END) ? KRC_TRUE : KRC_FALSE;
+	return (KRC_HANGULW_EUMJUL_BASE <= code && code <= KRC_HANGULW_EUMJUL_END) ? KRC_TRUE : KRC_FALSE;
 }
 
 //---------------------------------------------------------------------------
