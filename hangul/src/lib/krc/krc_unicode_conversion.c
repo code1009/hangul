@@ -80,7 +80,7 @@ KRC_API krc_size_t krc_utf8_char_size(const krc_char_t* utf8_pointer)
 	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
-	if ((p[0] & 0x80u) == 0x00u)
+	if      ((p[0] & 0x80u) == 0x00u)
 	{
 		return 1u;
 	}
@@ -117,32 +117,44 @@ KRC_API krc_size_t krc_utf8l_char_size(const krc_char_t* utf8_pointer, const krc
 	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
-	if (((p[0] & 0x80u) == 0x00u) && (1u <= utf8_size))
+	if      (1u <= utf8_size)
 	{
-		return 1u;
-	}
-	else if (((p[0] & 0xE0u) == 0xC0u) && (2u <= utf8_size))
-	{
-		if (KRC_TRUE == krc_utf8_continuation(p[1]))
+		if ((p[0] & 0x80u) == 0x00u)
 		{
-			return 2u;
+			return 1u;
 		}
 	}
-	else if (((p[0] & 0xF0u) == 0xE0u) && (3u <= utf8_size))
+	else if (2u <= utf8_size)
 	{
-		if ((KRC_TRUE == krc_utf8_continuation(p[1])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[2])))
+		if ((p[0] & 0xE0u) == 0xC0u)
 		{
-			return 3u;
+			if (KRC_TRUE == krc_utf8_continuation(p[1]))
+			{
+				return 2u;
+			}
 		}
 	}
-	else if (((p[0] & 0xF8u) == 0xF0u) && (4u <= utf8_size))
+	else if (3u <= utf8_size)
 	{
-		if ((KRC_TRUE == krc_utf8_continuation(p[1])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[2])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[3])))
+		if ((p[0] & 0xF0u) == 0xE0u)
 		{
-			return 4u;
+			if ((KRC_TRUE == krc_utf8_continuation(p[1])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[2])))
+			{
+				return 3u;
+			}
+		}
+	}
+	else if (4u <= utf8_size)
+	{
+		if ((p[0] & 0xF8u) == 0xF0u)
+		{
+			if ((KRC_TRUE == krc_utf8_continuation(p[1])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[2])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[3])))
+			{
+				return 4u;
+			}
 		}
 	}
 	return 0u;
@@ -156,7 +168,7 @@ KRC_API krc_size_t krc_utf8l_char_size(const krc_char_t* utf8_pointer, const krc
 //===========================================================================
 KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_uchar32_t unicode, krc_char_t* utf8_pointer)
 {
-	if ((unicode <= 0x7Fu))
+	if      ((unicode <= 0x7Fu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(unicode);
 		return 1;
@@ -187,25 +199,25 @@ KRC_API krc_size_t krc_unicode_to_utf8_char(const krc_uchar32_t unicode, krc_cha
 
 KRC_API krc_size_t krc_unicode_to_utf8l_char(const krc_uchar32_t unicode, krc_char_t* utf8_pointer, const krc_size_t utf8_size)
 {
-	if     ((unicode <= 0x7Fu) && (1u <= utf8_size))
+	if     ((1u <= utf8_size) && (unicode <= 0x7Fu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(unicode);
 		return 1;
 	}
-	else if ((unicode <= 0x7FFu) && (2u <= utf8_size))
+	else if ((2u <= utf8_size) && (unicode <= 0x7FFu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xC0u | (unicode >> 6u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
 		return 2;
 	}
-	else if ((unicode <= 0xFFFFu) && (3u <= utf8_size))
+	else if ((3u <= utf8_size) && (unicode <= 0xFFFFu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xE0u |  (unicode >> 12u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >>  6u) & 0x3Fu));
 		*(utf8_pointer + 2) = (krc_char_t)(0x80u | (unicode & 0x3Fu));
 		return 3;
 	}
-	else if ((unicode <= 0x10FFFFu) && (4u <= utf8_size))
+	else if ((4u <= utf8_size) && (unicode <= 0x10FFFFu))
 	{
 		*(utf8_pointer + 0) = (krc_char_t)(0xF0u |  (unicode >> 18u));
 		*(utf8_pointer + 1) = (krc_char_t)(0x80u | ((unicode >> 12u) & 0x3Fu));
@@ -227,7 +239,7 @@ KRC_API krc_size_t krc_utf8_to_unicode_char(const krc_char_t* utf8_pointer, krc_
 	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
-	if (((p[0] & 0x80u) == 0x00u))
+	if      (((p[0] & 0x80u) == 0x00u))
 	{
 		*unicode = p[0];
 		return 1u;
@@ -274,42 +286,54 @@ KRC_API krc_size_t krc_utf8l_to_unicode_char(const krc_char_t* utf8_pointer, con
 	const krc_uchar8_t* p = (const krc_uchar8_t*)utf8_pointer;
 
 
-	if      (((p[0] & 0x80u) == 0x00u) && (1u <= utf8_size))
+	if      (1u <= utf8_size)
 	{
-		*unicode = p[0];
-		return 1u;
-	}
-	else if (((p[0] & 0xE0u) == 0xC0u) && (2u <= utf8_size))
-	{
-		if (KRC_TRUE == krc_utf8_continuation(p[1]))
+		if ((p[0] & 0x80u) == 0x00u)
 		{
-			*unicode  = (p[0] & 0x1Fu) << 6u;
-			*unicode |= (p[1] & 0x3Fu);
-			return 2u;
+			*unicode = p[0];
+			return 1u;
 		}
 	}
-	else if (((p[0] & 0xF0u) == 0xE0u) && (3u <= utf8_size))
+	else if (2u <= utf8_size)
 	{
-		if ((KRC_TRUE == krc_utf8_continuation(p[1])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[2])))
+		if ((p[0] & 0xE0u) == 0xC0u)
 		{
-			*unicode  = (p[0] & 0xFu) << 12u;
-			*unicode |= (p[1] & 0x3Fu) << 6u;
-			*unicode |= (p[2] & 0x3Fu);
-			return 3u;
+			if (KRC_TRUE == krc_utf8_continuation(p[1]))
+			{
+				*unicode = (p[0] & 0x1Fu) << 6u;
+				*unicode |= (p[1] & 0x3Fu);
+				return 2u;
+			}
 		}
 	}
-	else if (((p[0] & 0xF8u) == 0xF0u) && (4u <= utf8_size))
+	else if (3u <= utf8_size)
 	{
-		if ((KRC_TRUE == krc_utf8_continuation(p[1])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[2])) && 
-			(KRC_TRUE == krc_utf8_continuation(p[3])))
+		if ((p[0] & 0xF0u) == 0xE0u)
 		{
-			*unicode  = (p[0] & 0x7u) << 18u;
-			*unicode |= (p[1] & 0x3Fu) << 12u;
-			*unicode |= (p[2] & 0x3Fu) << 6u;
-			*unicode |= (p[3] & 0x3Fu);
-			return 4u;
+			if ((KRC_TRUE == krc_utf8_continuation(p[1])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[2])))
+			{
+				*unicode = (p[0] & 0xFu) << 12u;
+				*unicode |= (p[1] & 0x3Fu) << 6u;
+				*unicode |= (p[2] & 0x3Fu);
+				return 3u;
+			}
+		}
+	}
+	else if (4u <= utf8_size)
+	{
+		if ((p[0] & 0xF8u) == 0xF0u)
+		{
+			if ((KRC_TRUE == krc_utf8_continuation(p[1])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[2])) &&
+				(KRC_TRUE == krc_utf8_continuation(p[3])))
+			{
+				*unicode = (p[0] & 0x7u) << 18u;
+				*unicode |= (p[1] & 0x3Fu) << 12u;
+				*unicode |= (p[2] & 0x3Fu) << 6u;
+				*unicode |= (p[3] & 0x3Fu);
+				return 4u;
+			}
 		}
 	}
 	*unicode = 0u;
